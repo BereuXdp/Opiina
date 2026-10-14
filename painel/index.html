@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dashboard — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Login de demonstração: sem ele, volta para o login (protótipo) -->
+  <script>try { if (/[?&]demo=1/.test(location.search)) sessionStorage.setItem('opiina-demo', '1'); if (!sessionStorage.getItem('opiina-demo')) location.replace('../login.html'); } catch (e) {}</script>
+  <!-- Modo escuro: escolha guardada (botão no menu) ou, sem escolha, o tema do sistema. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="painel.js" defer></script>
+</head>
+<!--
+  Protótipo do painel do app no padrão do site. DADOS DE EXEMPLO (dados.js), nada é real.
+  Não vai para a "Site online". Diagnóstico: specs/app-usabilidade.md e specs/app-design-system.md.
+-->
+<body data-tela="dashboard">
+  <a class="pular" href="#conteudo" data-fora-do-menu>Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel" data-fora-do-menu>
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do painel" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa">Casa Exemplo</span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <p class="nav__titulo">Visão geral</p>
+          <a class="nav__item" href="index.html" data-nav="dashboard"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Dashboard</a>
+          <a class="nav__item" href="ranking.html" data-nav="ranking"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Ranking</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Atendimento</p>
+          <a class="nav__item" href="feedbacks.html" data-nav="feedbacks"><svg class="icone" aria-hidden="true"><use href="icones.svg#feedbacks"/></svg>Feedbacks<span class="nav__selo" data-selo-vencidas hidden></span></a>
+          <a class="nav__item" href="denuncias.html" data-nav="denuncias"><svg class="icone" aria-hidden="true"><use href="icones.svg#denuncias"/></svg>Denúncias</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Pesquisa e clientes</p>
+          <a class="nav__item" href="pesquisas.html" data-nav="pesquisas"><svg class="icone" aria-hidden="true"><use href="icones.svg#pesquisas"/></svg>Pesquisas</a>
+          <a class="nav__item" href="clientes.html" data-nav="clientes"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Clientes</a>
+          <a class="nav__item" href="breve.html?tela=premios" data-nav="premios"><svg class="icone" aria-hidden="true"><use href="icones.svg#premios"/></svg>Prêmios</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="configuracoes.html" data-nav="configuracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#config"/></svg>Configurações</a>
+        </div>
+      </nav>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true">AS</span>
+        <span class="conta__texto"><span class="conta__nome">Ana Souza</span><span class="conta__perfil">Administradora</span></span>
+        <a class="conta__sair" href="../login.html" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </a>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+
+    <main class="principal" id="conteudo" data-fora-do-menu>
+      <div class="principal__conteudo" data-dashboard>
+        <p class="aviso-prototipo anima-entrada" style="--ordem: 0"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>Protótipo com dados de exemplo. Nada aqui é real.</p>
+
+        <div class="cabeca anima-entrada" style="--ordem: 1">
+          <div>
+            <h1 class="cabeca__titulo" data-saudacao>Olá, Ana</h1>
+            <p class="cabeca__desc" data-contexto>Últimos 30 dias · Todas as unidades</p>
+          </div>
+          <form class="filtros-topo" aria-label="Filtros do dashboard" onsubmit="return false">
+            <div class="campo">
+              <label for="filtro-periodo">Período</label>
+              <select id="filtro-periodo">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+                <option value="90">Últimos 90 dias</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="filtro-unidade">Unidade</label>
+              <select id="filtro-unidade"><option value="todas">Todas as unidades</option></select>
+            </div>
+          </form>
+        </div>
+
+        <!-- Números principais: cada cartão leva para a tela que explica o número -->
+        <section class="kpis" aria-label="Números principais">
+          <article class="kpi anima-entrada" style="--ordem: 2">
+            <a class="kpi__rotulo kpi__link" href="ranking.html" data-kpi-link="nps">NPS</a>
+            <p class="kpi__valor" data-kpi="nps">—</p>
+            <p class="kpi__nota" data-kpi="nps-nota"></p>
+          </article>
+          <article class="kpi anima-entrada" style="--ordem: 3">
+            <a class="kpi__rotulo kpi__link" href="pesquisas.html" data-kpi-link="respostas">Respostas</a>
+            <p class="kpi__valor" data-kpi="respostas">—</p>
+            <p class="kpi__nota" data-kpi="respostas-nota"></p>
+          </article>
+          <article class="kpi anima-entrada" style="--ordem: 4" data-precisa="ocorrencias">
+            <a class="kpi__rotulo kpi__link" href="feedbacks.html?acao=abertas" data-kpi-link="abertas">Ocorrências abertas</a>
+            <p class="kpi__valor" data-kpi="abertas">—</p>
+            <p class="kpi__nota" data-kpi="abertas-nota"></p>
+          </article>
+          <article class="kpi anima-entrada" style="--ordem: 5" data-kpi-cartao="vencidas" data-precisa="ocorrencias">
+            <a class="kpi__rotulo kpi__link" href="feedbacks.html?acao=vencidas" data-kpi-link="vencidas">Vencidas</a>
+            <p class="kpi__valor" data-kpi="vencidas">—</p>
+            <p class="kpi__nota" data-kpi="vencidas-nota"></p>
+          </article>
+        </section>
+
+        <div class="grade-dash">
+          <section class="cartao anima-entrada" style="--ordem: 6" aria-labelledby="t-tendencia">
+            <div class="cartao__topo">
+              <div>
+                <h2 class="cartao__titulo" id="t-tendencia">Evolução do NPS</h2>
+                <p class="cartao__sub">Por semana, nas últimas 12 semanas</p>
+              </div>
+            </div>
+            <svg class="grafico" viewBox="0 0 640 230" role="img" data-grafico-tendencia></svg>
+          </section>
+
+          <section class="cartao anima-entrada" style="--ordem: 7" aria-labelledby="t-distribuicao">
+            <div class="cartao__topo">
+              <div>
+                <h2 class="cartao__titulo" id="t-distribuicao">Como os clientes avaliam</h2>
+                <p class="cartao__sub">Nota de 0 a 10 para "recomendaria?"</p>
+              </div>
+            </div>
+            <div class="distribuicao">
+              <p class="distribuicao__nps"><strong data-dist-nps>—</strong><span>NPS = % promotores − % detratores</span></p>
+              <div class="barra-nps" aria-hidden="true" data-dist-barra></div>
+              <ul class="legenda" data-dist-legenda></ul>
+            </div>
+          </section>
+
+          <section class="cartao anima-entrada" style="--ordem: 8" aria-labelledby="t-atencao" data-precisa="ocorrencias">
+            <div class="cartao__topo">
+              <div>
+                <h2 class="cartao__titulo" id="t-atencao">Precisa de atenção</h2>
+                <p class="cartao__sub">Vencidas, vencendo hoje ou sem responsável</p>
+              </div>
+              <a class="cartao__link" href="feedbacks.html?acao=abertas">Ver todas<svg class="icone" aria-hidden="true"><use href="icones.svg#seta"/></svg></a>
+            </div>
+            <ul class="atencao" data-atencao></ul>
+          </section>
+
+          <section class="cartao anima-entrada" style="--ordem: 9" aria-labelledby="t-temas">
+            <div class="cartao__topo">
+              <div>
+                <h2 class="cartao__titulo" id="t-temas">Temas mais citados <span class="selo-ia"><svg class="icone" aria-hidden="true"><use href="icones.svg#ia"/></svg>IA</span></h2>
+                <p class="cartao__sub">Assuntos dos comentários, agrupados pela IA</p>
+              </div>
+            </div>
+            <ul class="temas" data-temas></ul>
+            <p class="temas__nota">Número de comentários que citam cada tema.</p>
+          </section>
+
+          <section class="cartao grade-dash__largo anima-entrada" style="--ordem: 10" aria-labelledby="t-unidades">
+            <div class="cartao__topo">
+              <div>
+                <h2 class="cartao__titulo" id="t-unidades">NPS por unidade</h2>
+                <p class="cartao__sub">Da maior para a menor nota</p>
+              </div>
+              <a class="cartao__link" href="ranking.html">Ver ranking completo<svg class="icone" aria-hidden="true"><use href="icones.svg#seta"/></svg></a>
+            </div>
+            <div class="tabela-rolagem">
+              <table class="tabela">
+                <thead>
+                  <tr>
+                    <th scope="col">Unidade</th>
+                    <th scope="col" class="num">Respostas</th>
+                    <th scope="col" class="num">NPS</th>
+                    <th scope="col" class="num">Promotores</th>
+                    <th scope="col" class="num">Detratores</th>
+                    <th scope="col" class="num" data-precisa="ocorrencias">Abertas</th>
+                  </tr>
+                </thead>
+                <tbody data-tabela-unidades></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Avaliações externas: um aviso único em vez de 4 cartões zerados -->
+          <section class="cartao grade-dash__largo anima-entrada" style="--ordem: 11" aria-labelledby="t-conectar">
+            <div class="conectar">
+              <span class="conectar__icone" aria-hidden="true"><svg class="icone"><use href="icones.svg#plug"/></svg></span>
+              <p class="conectar__texto">
+                <strong id="t-conectar">Veja aqui as notas do Google, iFood, Tripadvisor e Reclame Aqui</strong>
+                <span>Conecte as plataformas uma vez e acompanhe tudo junto com o NPS.</span>
+              </p>
+              <a class="btn btn--secundario" href="breve.html?tela=integracoes">Conectar plataformas</a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <p class="toast" role="status" aria-live="polite" data-toast data-oculto></p>
+</body>
+</html>

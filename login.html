@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Entrar — Opiina</title>
+  <meta name="description" content="Acesse o painel do Opiina.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1c7bff">
+  <link rel="icon" href="assets/icons/logo-opiina-64.png" type="image/png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/login.css">
+  <script src="assets/js/login.js" defer></script>
+</head>
+<!--
+  Protótipo visual da tela de login do app (ex.: geppos.opiina.com/login), no padrão do site.
+  Mesmos campos e links da tela original. O formulário NÃO envia dados: no app real,
+  o envio continua sendo feito pelo código de autenticação existente.
+-->
+<body class="pagina-login">
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="brilho" viewBox="0 0 24 24">
+        <path d="M12 2.6c.55 0 .88.55 1.08 2.1.62 4.7 1.52 5.6 6.22 6.22 1.55.2 2.1.53 2.1 1.08s-.55.88-2.1 1.08c-4.7.62-5.6 1.52-6.22 6.22-.2 1.55-.53 2.1-1.08 2.1s-.88-.55-1.08-2.1c-.62-4.7-1.52-5.6-6.22-6.22C3.15 12.88 2.6 12.55 2.6 12s.55-.88 2.1-1.08c4.7-.62 5.6-1.52 6.22-6.22.2-1.55.53-2.1 1.08-2.1Z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="login">
+    <!-- Painel da marca (desktop) -->
+    <aside class="login__marca" aria-label="Sobre o Opiina">
+      <a class="marca marca--clara" href="index.html" aria-label="Opiina — início">
+        <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+        <span class="marca__nome">Opiina</span>
+      </a>
+
+      <div class="login__marca-texto">
+        <p class="selo selo--claro">
+          <svg aria-hidden="true"><use href="#brilho"/></svg>Ouça · Entenda · Fidelize
+        </p>
+        <p class="login__frase">O que o cliente sente. <span>O que a casa precisa fazer.</span></p>
+        <ul class="login__lista">
+          <li>Pesquisa NPS rápida, em mais de um canal</li>
+          <li>Dashboard e métricas por unidade</li>
+          <li>Ocorrências organizadas no Kanban</li>
+        </ul>
+      </div>
+
+      <p class="login__credito">Desenvolvido por <a href="https://devmais.com">Dev+</a></p>
+    </aside>
+
+    <!-- Formulário -->
+    <main class="login__principal" id="conteudo">
+      <a class="marca login__marca-mobile" href="index.html" aria-label="Opiina — início">
+        <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+        <span class="marca__nome">Opiina</span>
+      </a>
+
+      <div class="login__cartao">
+        <h1 class="login__titulo">Entrar</h1>
+        <p class="login__sub">Acesse o painel</p>
+        <!-- Aparece só quando o protótipo do painel está junto (ver login.js) -->
+        <p class="login__demo" data-demo hidden>Demonstração: entre com qualquer e-mail e senha.</p>
+
+        <form class="formulario" data-login novalidate>
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" name="email" type="email" inputmode="email" autocomplete="username"
+                   placeholder="email@empresa.com" required aria-describedby="email-erro">
+            <p class="campo__erro" id="email-erro" hidden>Informe um e-mail válido.</p>
+          </div>
+
+          <div class="campo">
+            <div class="campo__topo">
+              <label for="senha">Senha</label>
+              <!-- Sem JS, abre a página /forgot-password do app; com JS, abre o modal abaixo -->
+              <a class="campo__link" href="/forgot-password" aria-haspopup="dialog" data-abrir-recuperacao>Esqueci minha senha</a>
+            </div>
+            <input id="senha" name="senha" type="password" autocomplete="current-password"
+                   placeholder="••••••••" required aria-describedby="senha-erro">
+            <p class="campo__erro" id="senha-erro" hidden>Informe sua senha.</p>
+          </div>
+
+          <button class="btn btn--solido btn--grande btn--largo" type="submit">Entrar</button>
+          <p class="formulario__status" role="status" aria-live="polite" data-status></p>
+        </form>
+
+        <p class="login__novo">Novo por aqui? <a href="onboarding.html">Criar conta</a></p>
+      </div>
+
+      <p class="login__credito login__credito--mobile">Desenvolvido por <a href="https://devmais.com">Dev+</a></p>
+    </main>
+  </div>
+
+  <!-- Modal "Esqueci minha senha" (textos baseados na página /forgot-password do app).
+       Protótipo: não envia e-mail. No app, o envio usa o mesmo serviço da página atual. -->
+  <dialog class="modal" aria-labelledby="recuperar-titulo" data-recuperacao>
+    <button class="modal__fechar" type="button" aria-label="Fechar" data-fechar-recuperacao>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+
+    <!-- Etapa 1: informar o e-mail -->
+    <div class="modal__etapa" data-etapa="pedido">
+      <span class="modal__icone" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="4" y="10.5" width="16" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><path d="M12 14.5v2"/></svg>
+      </span>
+      <h2 class="modal__titulo" id="recuperar-titulo">Esqueci minha senha</h2>
+      <p class="modal__texto">Informe o e-mail da sua conta para receber o link de redefinição.</p>
+
+      <form class="formulario modal__form" novalidate data-form-recuperacao>
+        <div class="campo">
+          <label for="recuperar-email">E-mail</label>
+          <input id="recuperar-email" name="email" type="email" inputmode="email" autocomplete="username"
+                 placeholder="email@empresa.com" required aria-describedby="recuperar-email-erro">
+          <p class="campo__erro" id="recuperar-email-erro" hidden>Informe um e-mail válido.</p>
+        </div>
+        <button class="btn btn--solido btn--grande btn--largo" type="submit">Enviar link de redefinição</button>
+      </form>
+      <button class="modal__voltar" type="button" data-fechar-recuperacao>Lembrou a senha? Voltar para o login</button>
+    </div>
+
+    <!-- Etapa 2: confirmação (texto neutro: não revela se o e-mail tem conta) -->
+    <div class="modal__etapa" data-etapa="enviado" hidden>
+      <span class="modal__icone modal__icone--ok" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>
+      </span>
+      <h2 class="modal__titulo" tabindex="-1" data-titulo-enviado>Verifique seu e-mail</h2>
+      <p class="modal__texto">
+        Se houver uma conta com <strong data-email-enviado></strong>, enviaremos um link para você criar uma nova senha.
+      </p>
+      <p class="modal__dica">Não recebeu? Confira a caixa de spam ou tente de novo com outro e-mail.</p>
+      <div class="modal__acoes">
+        <button class="btn btn--solido btn--grande btn--largo" type="button" data-fechar-recuperacao>Voltar para o login</button>
+        <button class="modal__voltar" type="button" data-tentar-de-novo>Usar outro e-mail</button>
+      </div>
+    </div>
+  </dialog>
+</body>
+</html>

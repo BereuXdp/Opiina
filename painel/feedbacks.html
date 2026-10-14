@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Feedbacks — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Login de demonstração: sem ele, volta para o login (protótipo) -->
+  <script>try { if (/[?&]demo=1/.test(location.search)) sessionStorage.setItem('opiina-demo', '1'); if (!sessionStorage.getItem('opiina-demo')) location.replace('../login.html'); } catch (e) {}</script>
+  <!-- Modo escuro: escolha guardada (botão no menu) ou, sem escolha, o tema do sistema. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="painel.js" defer></script>
+  <script src="feedbacks.js" defer></script>
+</head>
+<!--
+  Protótipo: Feedbacks = TODAS as respostas das pesquisas (elogios, sugestões, reclamações), com e sem comentário.
+  Ocorrências continua só com o que pede ação; a resposta que virou ocorrência mostra o link para ela.
+  DADOS DE EXEMPLO (dados.js: respostas + ocorrências).
+-->
+<body data-tela="feedbacks">
+  <a class="pular" href="#conteudo" data-fora-do-menu>Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel" data-fora-do-menu>
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do painel" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa">Casa Exemplo</span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <p class="nav__titulo">Visão geral</p>
+          <a class="nav__item" href="index.html" data-nav="dashboard"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Dashboard</a>
+          <a class="nav__item" href="ranking.html" data-nav="ranking"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Ranking</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Atendimento</p>
+          <a class="nav__item" href="feedbacks.html" data-nav="feedbacks"><svg class="icone" aria-hidden="true"><use href="icones.svg#feedbacks"/></svg>Feedbacks<span class="nav__selo" data-selo-vencidas hidden></span></a>
+          <a class="nav__item" href="denuncias.html" data-nav="denuncias"><svg class="icone" aria-hidden="true"><use href="icones.svg#denuncias"/></svg>Denúncias</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Pesquisa e clientes</p>
+          <a class="nav__item" href="pesquisas.html" data-nav="pesquisas"><svg class="icone" aria-hidden="true"><use href="icones.svg#pesquisas"/></svg>Pesquisas</a>
+          <a class="nav__item" href="clientes.html" data-nav="clientes"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Clientes</a>
+          <a class="nav__item" href="breve.html?tela=premios" data-nav="premios"><svg class="icone" aria-hidden="true"><use href="icones.svg#premios"/></svg>Prêmios</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="configuracoes.html" data-nav="configuracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#config"/></svg>Configurações</a>
+        </div>
+      </nav>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true">AS</span>
+        <span class="conta__texto"><span class="conta__nome">Ana Souza</span><span class="conta__perfil">Administradora</span></span>
+        <a class="conta__sair" href="../login.html" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </a>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+
+    <main class="principal" id="conteudo" data-fora-do-menu>
+      <div class="principal__conteudo" data-feedbacks>
+        <p class="aviso-prototipo"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>Protótipo com dados de exemplo.</p>
+
+        <div class="cabeca">
+          <div>
+            <h1 class="cabeca__titulo">Feedbacks</h1>
+            <p class="cabeca__desc">Todas as respostas das pesquisas: elogios, sugestões e reclamações. As que pedem ação têm responsável e prazo.</p>
+          </div>
+          <div class="cabeca__acoes">
+            <div class="campo">
+              <label for="fb-periodo">Período</label>
+              <select id="fb-periodo" data-fb-periodo>
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Últimos 30 dias</option>
+              </select>
+            </div>
+            <!-- Kanban: só para quem trata (permissão "ocorrencias") -->
+            <nav class="alternar" aria-label="Forma de ver" data-precisa="ocorrencias">
+              <a href="feedbacks.html" data-fb-visao="lista" aria-current="page"><svg class="icone" aria-hidden="true"><use href="icones.svg#lista"/></svg>Lista</a>
+              <a href="feedbacks.html?visao=kanban" data-fb-visao="kanban"><svg class="icone" aria-hidden="true"><use href="icones.svg#ocorrencias"/></svg>Kanban</a>
+            </nav>
+          </div>
+        </div>
+
+        <section class="kpis" aria-label="Resumo dos feedbacks" data-fb-resumo></section>
+
+        <section class="cartao" aria-label="Filtros">
+          <form class="filtros" data-fb-filtros>
+            <!-- Tratamento: só para quem trata (o que pede ação, prazos e responsáveis) -->
+            <div class="campo" data-precisa="ocorrencias">
+              <label for="fb-acao">Tratamento</label>
+              <select id="fb-acao" name="acao">
+                <option value="todos">Todos os feedbacks</option>
+                <option value="abertas">Precisa de ação</option>
+                <option value="vencidas">Vencidas</option>
+                <option value="hoje">Vencem hoje</option>
+                <option value="sem-responsavel">Sem responsável</option>
+                <option value="minhas">Atribuídas a mim</option>
+                <option value="resolvidas">Resolvidas</option>
+              </select>
+            </div>
+            <div class="campo campo--busca">
+              <label for="fb-busca">Buscar</label>
+              <input id="fb-busca" name="q" type="search" placeholder="Palavra do comentário, cliente ou atendente" autocomplete="off">
+              <svg class="icone" aria-hidden="true"><use href="icones.svg#busca"/></svg>
+            </div>
+            <div class="campo">
+              <label for="fb-unidade">Unidade</label>
+              <select id="fb-unidade" name="unidade"><option value="todas">Todas</option></select>
+            </div>
+            <div class="campo">
+              <label for="fb-nota">Nota</label>
+              <select id="fb-nota" name="nota">
+                <option value="todas">Todas</option>
+                <option value="promotor">Promotores (9–10)</option>
+                <option value="passivo">Passivos (7–8)</option>
+                <option value="detrator">Detratores (0–6)</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="fb-tipo">O que diz <span class="selo-ia"><svg class="icone" aria-hidden="true"><use href="icones.svg#ia"/></svg>IA</span></label>
+              <select id="fb-tipo" name="tipo">
+                <option value="todos">Tudo</option>
+                <option value="elogio">Elogios</option>
+                <option value="reclamacao">Reclamações</option>
+                <option value="neutro">Neutros</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="fb-tema">Tema <span class="selo-ia"><svg class="icone" aria-hidden="true"><use href="icones.svg#ia"/></svg>IA</span></label>
+              <select id="fb-tema" name="tema"><option value="todos">Todos</option></select>
+            </div>
+            <div class="campo">
+              <label for="fb-comentario">Comentário</label>
+              <select id="fb-comentario" name="comentario">
+                <option value="todos">Com e sem comentário</option>
+                <option value="com">Só com comentário</option>
+                <option value="sem">Só a nota</option>
+              </select>
+            </div>
+          </form>
+          <div class="filtros__rodape">
+            <p class="filtros__contagem" role="status" aria-live="polite" data-fb-contagem></p>
+            <button class="btn btn--fantasma" type="button" data-fb-limpar>Limpar filtros</button>
+          </div>
+        </section>
+
+        <div data-fb-visao-lista>
+          <ul class="fb-lista" data-fb-lista aria-label="Respostas"></ul>
+          <div class="cartao vazio" data-fb-vazio hidden><strong>Nenhum feedback com esses filtros</strong>Tente outro período ou clique em "Limpar filtros".</div>
+          <button class="btn btn--secundario fb-mais" type="button" data-fb-mais hidden>Mostrar mais</button>
+        </div>
+        <!-- Kanban: só os feedbacks que pedem ação, uma coluna por etapa -->
+        <div class="quadro" aria-label="Kanban do tratamento" data-fb-kanban hidden></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Tratamento do feedback (responsável, prazo, etapa, anotação e histórico) -->
+  <dialog class="gaveta" aria-labelledby="g-titulo" data-gaveta>
+    <div class="gaveta__corpo">
+      <div class="gaveta__topo">
+        <span class="gaveta__id" data-g="id"></span>
+        <button class="botao-icone" type="button" aria-label="Fechar" data-gaveta-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+
+      <div class="gaveta__titulo">
+        <span class="nota" data-g="nota"></span>
+        <h2 id="g-titulo" tabindex="-1" data-g="comentario"></h2>
+      </div>
+
+      <dl class="dados">
+        <div><dt>Cliente</dt><dd data-g="cliente"></dd></div>
+        <div><dt>Unidade</dt><dd data-g="unidade"></dd></div>
+        <div><dt>Tema</dt><dd data-g="tema"></dd></div>
+        <div><dt>Atendente</dt><dd data-g="atendente"></dd></div>
+        <div><dt>Recebido</dt><dd data-g="recebida"></dd></div>
+        <div><dt>Prazo</dt><dd><span data-g="prazo"></span></dd></div>
+      </dl>
+
+      <form class="gaveta__form" data-gaveta-form>
+        <div class="campos-2">
+          <div class="campo">
+            <label for="g-etapa">Etapa</label>
+            <select id="g-etapa" name="etapa"></select>
+          </div>
+          <div class="campo">
+            <label for="g-responsavel">Responsável</label>
+            <select id="g-responsavel" name="responsavel"></select>
+          </div>
+        </div>
+        <div class="campo">
+          <label for="g-anotacao">Anotação interna <span style="font-weight:500;color:var(--mudo)">(opcional)</span></label>
+          <textarea id="g-anotacao" name="anotacao" placeholder="Ex.: Liguei para o cliente e ofereci uma cortesia."></textarea>
+        </div>
+        <div class="gaveta__acoes">
+          <button class="btn btn--secundario" type="button" data-gaveta-fechar>Cancelar</button>
+          <button class="btn btn--primario" type="submit">Salvar</button>
+        </div>
+      </form>
+
+      <section class="historico" aria-labelledby="g-historico">
+        <h3 class="historico__titulo" id="g-historico">Histórico</h3>
+        <ul data-g="historico"></ul>
+      </section>
+    </div>
+  </dialog>
+
+  <p class="toast" role="status" aria-live="polite" data-toast data-oculto></p>
+</body>
+</html>

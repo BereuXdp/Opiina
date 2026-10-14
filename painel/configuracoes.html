@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Configurações — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Login de demonstração: sem ele, volta para o login (protótipo) -->
+  <script>try { if (/[?&]demo=1/.test(location.search)) sessionStorage.setItem('opiina-demo', '1'); if (!sessionStorage.getItem('opiina-demo')) location.replace('../login.html'); } catch (e) {}</script>
+  <!-- Modo escuro: escolha guardada (botão no menu) ou, sem escolha, o tema do sistema. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="painel.js" defer></script>
+  <script src="configuracoes.js" defer></script>
+</head>
+<!-- Protótipo: Configurações (DADOS DE EXEMPLO). Abas: Empresa · Unidades · Atendentes · Usuários e perfis ·
+     Integrações · Minha conta. Quem não é administrador vê só "Minha conta". Nada é enviado. -->
+<body data-tela="configuracoes">
+  <a class="pular" href="#conteudo" data-fora-do-menu>Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel" data-fora-do-menu>
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do painel" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa">Casa Exemplo</span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <p class="nav__titulo">Visão geral</p>
+          <a class="nav__item" href="index.html" data-nav="dashboard"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Dashboard</a>
+          <a class="nav__item" href="ranking.html" data-nav="ranking"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Ranking</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Atendimento</p>
+          <a class="nav__item" href="feedbacks.html" data-nav="feedbacks"><svg class="icone" aria-hidden="true"><use href="icones.svg#feedbacks"/></svg>Feedbacks<span class="nav__selo" data-selo-vencidas hidden></span></a>
+          <a class="nav__item" href="denuncias.html" data-nav="denuncias"><svg class="icone" aria-hidden="true"><use href="icones.svg#denuncias"/></svg>Denúncias</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Pesquisa e clientes</p>
+          <a class="nav__item" href="pesquisas.html" data-nav="pesquisas"><svg class="icone" aria-hidden="true"><use href="icones.svg#pesquisas"/></svg>Pesquisas</a>
+          <a class="nav__item" href="clientes.html" data-nav="clientes"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Clientes</a>
+          <a class="nav__item" href="breve.html?tela=premios" data-nav="premios"><svg class="icone" aria-hidden="true"><use href="icones.svg#premios"/></svg>Prêmios</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="configuracoes.html" data-nav="configuracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#config"/></svg>Configurações</a>
+        </div>
+      </nav>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true">AS</span>
+        <span class="conta__texto"><span class="conta__nome">Ana Souza</span><span class="conta__perfil">Administradora</span></span>
+        <a class="conta__sair" href="../login.html" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </a>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+
+    <main class="principal" id="conteudo" data-fora-do-menu>
+      <div class="principal__conteudo" data-config>
+        <p class="aviso-prototipo"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>Protótipo com dados de exemplo. As alterações valem só nesta aba.</p>
+
+        <div class="cabeca">
+          <div>
+            <h1 class="cabeca__titulo" data-cfg-titulo>Configurações</h1>
+            <p class="cabeca__desc" data-cfg-desc>Dados da empresa, unidades, equipe e integrações.</p>
+          </div>
+        </div>
+
+        <div class="cfg">
+          <nav class="cfg__nav" aria-label="Seções das configurações" data-cfg-nav>
+            <a href="?aba=empresa" data-aba-link="empresa"><svg class="icone" aria-hidden="true"><use href="icones.svg#loja"/></svg>Empresa</a>
+            <a href="?aba=unidades" data-aba-link="unidades"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Unidades</a>
+            <a href="?aba=atendentes" data-aba-link="atendentes"><svg class="icone" aria-hidden="true"><use href="icones.svg#pessoa"/></svg>Atendentes</a>
+            <a href="?aba=usuarios" data-aba-link="usuarios"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg>Usuários e perfis</a>
+            <a href="?aba=integracoes" data-aba-link="integracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#plug"/></svg>Integrações<span class="visualmente-oculto">, </span><span class="selo-dev cfg__dev">Em desenvolvimento</span></a>
+            <a href="?aba=conta" data-aba-link="conta"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Minha conta</a>
+          </nav>
+
+          <div class="cfg__conteudo">
+
+            <!-- ===== Empresa ===== -->
+            <section data-aba="empresa" aria-labelledby="t-empresa">
+              <form class="cfg__pilha" data-form-empresa novalidate>
+                <div class="cartao cfg__cartao">
+                  <div class="cfg__topo">
+                    <div><h2 class="cartao__titulo" id="t-empresa">Dados da empresa</h2>
+                    <p class="cartao__sub">Aparecem para a equipe no painel. O nome fantasia também aparece na pesquisa.</p></div>
+                  </div>
+                  <!-- Comece pelo CNPJ: a busca (OpenCNPJ, dados públicos da Receita Federal) preenche o resto -->
+                  <div class="campo cnpj-campo">
+                    <label for="e-documento">CNPJ ou CPF <span class="opcional">(opcional)</span></label>
+                    <div class="cnpj-linha">
+                      <input id="e-documento" name="documento" inputmode="text" autocomplete="off" placeholder="00.000.000/0000-00" aria-describedby="e-documento-dica e-documento-erro">
+                      <button class="btn btn--secundario" type="button" data-cnpj-buscar="e-documento"><svg class="icone" aria-hidden="true"><use href="icones.svg#busca"/></svg>Buscar dados</button>
+                    </div>
+                    <p class="campo__dica" id="e-documento-dica">Com o CNPJ, buscamos razão social, nome fantasia, e-mail, telefone e segmento nos dados públicos da Receita Federal.</p>
+                    <p class="campo__erro" id="e-documento-erro" hidden></p>
+                    <div class="cnpj-resultado" data-cnpj-resultado="e-documento" hidden></div>
+                    <p class="visualmente-oculto" role="status" data-cnpj-status="e-documento"></p>
+                  </div>
+                  <div class="cfg__grade">
+                    <div class="campo">
+                      <label for="e-fantasia">Nome fantasia <span class="obrigatorio" aria-hidden="true">*</span></label>
+                      <input id="e-fantasia" name="fantasia" required aria-describedby="e-fantasia-erro">
+                      <p class="campo__erro" id="e-fantasia-erro" hidden>Escreva o nome fantasia.</p>
+                    </div>
+                    <div class="campo">
+                      <label for="e-razao">Razão social <span class="opcional">(opcional)</span></label>
+                      <input id="e-razao" name="razao">
+                    </div>
+                    <div class="campo">
+                      <label for="e-segmento">Segmento</label>
+                      <select id="e-segmento" name="segmento">
+                        <option>Restaurante</option><option>Bar</option><option>Cafeteria</option><option>Padaria</option><option>Outro</option>
+                      </select>
+                    </div>
+                    <div class="campo">
+                      <label for="e-email">E-mail de contato <span class="opcional">(opcional)</span></label>
+                      <input id="e-email" name="email" type="email" autocomplete="email" placeholder="contato@suaempresa.com.br" aria-describedby="e-email-erro">
+                      <p class="campo__erro" id="e-email-erro" hidden>Confira o e-mail (ex.: contato@suaempresa.com.br).</p>
+                    </div>
+                    <div class="campo">
+                      <label for="e-telefone">Telefone <span class="opcional">(opcional)</span></label>
+                      <input id="e-telefone" name="telefone" type="tel" autocomplete="tel" placeholder="(00) 00000-0000">
+                    </div>
+                  </div>
+                  <div class="cfg__fixo">
+                    <span class="cfg__fixo-rotulo">Endereço do painel</span>
+                    <strong data-endereco-painel>casaexemplo.opiina.com</strong>
+                    <span class="campo__dica">Definido no cadastro da conta. Não muda por aqui.</span>
+                  </div>
+                </div>
+
+                <div class="cfg__salvar">
+                  <p class="cfg__salvar-status" role="status" data-empresa-status></p>
+                  <button class="btn btn--fantasma" type="button" data-empresa-descartar hidden>Descartar alterações</button>
+                  <button class="btn btn--primario" type="submit">Salvar alterações</button>
+                </div>
+              </form>
+            </section>
+
+            <!-- ===== Unidades ===== -->
+            <section class="cartao cfg__cartao" data-aba="unidades" aria-labelledby="t-unidades" hidden>
+              <div class="cfg__topo">
+                <div><h2 class="cartao__titulo" id="t-unidades">Unidades</h2>
+                <p class="cartao__sub">Cada unidade tem a própria pesquisa, link e QR Code.</p></div>
+                <button class="btn btn--primario" type="button" data-nova-unidade><svg class="icone" aria-hidden="true"><use href="icones.svg#mais"/></svg>Nova unidade</button>
+              </div>
+              <div class="tabela-rolagem">
+                <table class="tabela cfg-tabela">
+                  <thead><tr><th scope="col">Unidade</th><th scope="col">CNPJ</th><th scope="col">Endereço</th><th scope="col">Google</th><th scope="col"><span class="visualmente-oculto">Ações</span></th></tr></thead>
+                  <tbody data-lista-unidades></tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- ===== Atendentes ===== -->
+            <section class="cartao cfg__cartao" data-aba="atendentes" aria-labelledby="t-atendentes" hidden>
+              <div class="cfg__topo">
+                <div><h2 class="cartao__titulo" id="t-atendentes">Atendentes</h2>
+                <p class="cartao__sub">Aparecem na pergunta "Quem te atendeu?" da pesquisa da unidade.</p>
+                <p class="cfg-escopo" data-a-escopo hidden></p></div>
+                <div class="cfg__botoes">
+                  <button class="btn btn--secundario" type="button" data-importar>Importar planilha</button>
+                  <button class="btn btn--primario" type="button" data-novo-atendente><svg class="icone" aria-hidden="true"><use href="icones.svg#mais"/></svg>Novo atendente</button>
+                </div>
+              </div>
+              <div class="cfg__filtros">
+                <div class="campo campo--busca">
+                  <label for="a-busca">Buscar</label>
+                  <input id="a-busca" type="search" placeholder="Nome ou cargo" data-a-busca>
+                  <svg class="icone" aria-hidden="true"><use href="icones.svg#busca"/></svg>
+                </div>
+                <div class="campo">
+                  <label for="a-unidade">Unidade</label>
+                  <select id="a-unidade" data-a-unidade><option value="todas">Todas as unidades</option></select>
+                </div>
+              </div>
+              <p class="filtros__contagem" role="status" data-a-contagem></p>
+              <div class="tabela-rolagem">
+                <table class="tabela cfg-tabela">
+                  <thead><tr><th scope="col">Nome</th><th scope="col">Unidade</th><th scope="col">Cargo</th><th scope="col">Situação</th><th scope="col"><span class="visualmente-oculto">Ações</span></th></tr></thead>
+                  <tbody data-lista-atendentes></tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- ===== Usuários e perfis ===== -->
+            <section class="cfg__pilha" data-aba="usuarios" aria-labelledby="t-usuarios" hidden>
+              <div class="cartao cfg__cartao">
+                <div class="cfg__topo">
+                  <div><h2 class="cartao__titulo" id="t-usuarios">Usuários</h2>
+                  <p class="cartao__sub">Quem acessa o painel. O perfil define o que cada pessoa vê.</p></div>
+                  <button class="btn btn--primario" type="button" data-convidar><svg class="icone" aria-hidden="true"><use href="icones.svg#mais"/></svg>Convidar usuário</button>
+                </div>
+                <div class="tabela-rolagem">
+                  <table class="tabela cfg-tabela">
+                    <thead><tr><th scope="col">Pessoa</th><th scope="col">Perfil</th><th scope="col">Unidades</th><th scope="col">Situação</th><th scope="col"><span class="visualmente-oculto">Ações</span></th></tr></thead>
+                    <tbody data-lista-usuarios></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="cartao cfg__cartao">
+                <div class="cfg__topo">
+                  <div><h2 class="cartao__titulo">O que cada perfil vê</h2>
+                  <p class="cartao__sub">Itens do menu liberados para cada perfil.</p></div>
+                </div>
+                <div class="tabela-rolagem">
+                  <table class="tabela matriz" data-matriz></table>
+                </div>
+              </div>
+            </section>
+
+            <!-- ===== Integrações ===== -->
+            <section class="cfg__pilha" data-aba="integracoes" aria-labelledby="t-integracoes" hidden>
+              <!-- EM DESENVOLVIMENTO (decisão do cliente, 2026-10-14: "não iremos usar agora").
+                   O conteúdo abaixo fica guardado e escondido; para liberar, tirar o "hidden" dos dois cartões e do aviso. -->
+              <div class="cartao breve" data-integracoes-dev>
+                <span class="breve__icone" aria-hidden="true"><svg class="icone"><use href="icones.svg#plug"/></svg></span>
+                <h2 class="cabeca__titulo" id="t-integracoes">Integrações <span class="selo-dev">Em desenvolvimento</span></h2>
+                <p>As conexões com outros sistemas (como a Muito Mais, para vouchers, e as avaliações do Google) ainda estão sendo definidas. Esta área chega quando estiver pronta.</p>
+              </div>
+              <div class="cartao cfg__cartao" data-muitomais hidden></div>
+              <div class="cartao cfg__cartao" hidden>
+                <div class="cfg__topo">
+                  <div><h3 class="cartao__titulo">Google (avaliações)</h3>
+                  <p class="cartao__sub">O link do Google de cada unidade fica no cadastro dela.</p></div>
+                  <a class="btn btn--secundario" href="?aba=unidades" data-aba-link="unidades">Ver unidades</a>
+                </div>
+                <p data-google-resumo></p>
+              </div>
+            </section>
+
+            <!-- ===== Minha conta ===== -->
+            <section class="cfg__pilha" data-aba="conta" aria-labelledby="t-conta" hidden>
+              <form class="cartao cfg__cartao" data-form-dados novalidate>
+                <div class="cfg__topo">
+                  <div><h2 class="cartao__titulo" id="t-conta">Seus dados</h2></div>
+                </div>
+                <div class="cfg__grade">
+                  <div class="campo">
+                    <label for="m-nome">Nome</label>
+                    <input id="m-nome" name="nome" autocomplete="name" required aria-describedby="m-nome-erro">
+                    <p class="campo__erro" id="m-nome-erro" hidden>Escreva seu nome.</p>
+                  </div>
+                  <div class="campo">
+                    <label for="m-email">E-mail de acesso</label>
+                    <input id="m-email" name="email" type="email" autocomplete="email" required aria-describedby="m-email-dica m-email-erro">
+                    <p class="campo__dica" id="m-email-dica">É com ele que você entra no painel.</p>
+                    <p class="campo__erro" id="m-email-erro" hidden>Confira o e-mail (ex.: nome@empresa.com.br).</p>
+                  </div>
+                  <div class="campo">
+                    <label for="m-telefone">Celular / WhatsApp <span class="opcional">(opcional)</span></label>
+                    <input id="m-telefone" name="telefone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(00) 00000-0000" aria-describedby="m-telefone-erro">
+                    <p class="campo__erro" id="m-telefone-erro" hidden>Confira o número: DDD + número (10 ou 11 dígitos).</p>
+                  </div>
+                </div>
+                <!-- Aparece só quando o e-mail muda: trocar o login pede a senha atual -->
+                <div class="campo cfg__confirma" data-confirma-email hidden>
+                  <label for="m-senha-email">Sua senha atual, para trocar o e-mail</label>
+                  <input id="m-senha-email" name="senhaEmail" type="password" autocomplete="current-password" aria-describedby="m-senha-email-dica m-senha-email-erro">
+                  <p class="campo__dica" id="m-senha-email-dica">Depois de salvar, enviamos um link para o novo e-mail. A troca só vale depois que você abrir o link.</p>
+                  <p class="campo__erro" id="m-senha-email-erro" hidden>Digite sua senha atual para trocar o e-mail.</p>
+                </div>
+                <div class="cfg-pendente" data-email-pendente hidden>
+                  <p data-email-pendente-texto></p>
+                  <button class="btn btn--fantasma" type="button" data-cancelar-email>Cancelar troca</button>
+                </div>
+                <div class="cfg__fixo">
+                  <span class="cfg__fixo-rotulo">Seu perfil</span>
+                  <strong data-meu-perfil></strong>
+                  <span class="campo__dica" data-meu-acesso></span>
+                </div>
+                <div class="cfg__salvar cfg__salvar--dentro">
+                  <button class="btn btn--primario" type="submit">Salvar</button>
+                </div>
+              </form>
+
+              <form class="cartao cfg__cartao" data-form-senha novalidate>
+                <div class="cfg__topo">
+                  <div><h2 class="cartao__titulo">Trocar senha</h2>
+                  <p class="cartao__sub">Use pelo menos 8 caracteres.</p></div>
+                </div>
+                <!-- Campo de usuário oculto: ajuda o gerenciador de senhas a saber de qual conta é a senha -->
+                <input type="email" name="usuario" autocomplete="username" hidden data-senha-usuario>
+                <div class="cfg__grade cfg__grade--1">
+                  <div class="campo">
+                    <label for="s-atual">Senha atual</label>
+                    <input id="s-atual" name="atual" type="password" autocomplete="current-password" aria-describedby="s-atual-erro">
+                    <p class="campo__erro" id="s-atual-erro" hidden>Digite sua senha atual.</p>
+                  </div>
+                  <div class="campo">
+                    <label for="s-nova">Nova senha</label>
+                    <input id="s-nova" name="nova" type="password" autocomplete="new-password" minlength="8" aria-describedby="s-nova-erro">
+                    <p class="campo__erro" id="s-nova-erro" hidden>A nova senha precisa ter pelo menos 8 caracteres.</p>
+                  </div>
+                  <div class="campo">
+                    <label for="s-confirma">Confirme a nova senha</label>
+                    <input id="s-confirma" name="confirma" type="password" autocomplete="new-password" aria-describedby="s-confirma-erro">
+                    <p class="campo__erro" id="s-confirma-erro" hidden>As senhas não são iguais.</p>
+                  </div>
+                </div>
+                <div class="cfg__salvar cfg__salvar--dentro">
+                  <button class="btn btn--primario" type="submit">Trocar senha</button>
+                </div>
+              </form>
+            </section>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Gaveta de edição (unidade, atendente, usuário): o conteúdo é montado pelo configuracoes.js -->
+  <dialog class="gaveta" aria-labelledby="cg-titulo" data-cfg-gaveta>
+    <form class="gaveta__corpo" data-cfg-gaveta-form novalidate>
+      <div class="gaveta__topo">
+        <h2 class="cfg-gaveta__titulo" id="cg-titulo" tabindex="-1" data-cg-titulo></h2>
+        <button class="botao-icone" type="button" aria-label="Fechar" data-cg-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <div class="gaveta__form" data-cg-campos></div>
+      <div class="gaveta__acoes">
+        <button class="btn btn--secundario" type="button" data-cg-fechar>Cancelar</button>
+        <button class="btn btn--primario" type="submit" data-cg-ok>Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmação (desativar usuário, desconectar integração) -->
+  <dialog class="confirmar" aria-labelledby="c-titulo" aria-describedby="c-texto" data-confirmar>
+    <form method="dialog">
+      <span class="confirmar__icone" aria-hidden="true" data-c="icone"></span>
+      <h2 id="c-titulo" data-c="titulo"></h2>
+      <p id="c-texto" data-c="texto"></p>
+      <div class="confirmar__acoes">
+        <button class="btn btn--secundario" value="cancelar" data-c="cancelar">Cancelar</button>
+        <button class="btn btn--primario" value="ok" data-c="ok">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p class="toast" role="status" aria-live="polite" data-toast data-oculto></p>
+</body>
+</html>

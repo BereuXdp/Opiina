@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Prêmios — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Login de demonstração: sem ele, volta para o login (protótipo) -->
+  <script>try { if (/[?&]demo=1/.test(location.search)) sessionStorage.setItem('opiina-demo', '1'); if (!sessionStorage.getItem('opiina-demo')) location.replace('../login.html'); } catch (e) {}</script>
+  <!-- Modo escuro: escolha guardada (botão no menu) ou, sem escolha, o tema do sistema. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="painel.js" defer></script>
+  <script src="premios.js" defer></script>
+</head>
+<!-- Protótipo: Prêmios (DADOS DE EXEMPLO). Campanhas de voucher (modelo do app real, "Prêmios Muito Mais")
+     + sorteio para clientes cadastrados (em desenvolvimento). Nada é enviado. -->
+<body data-tela="premios">
+  <a class="pular" href="#conteudo" data-fora-do-menu>Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel" data-fora-do-menu>
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do painel" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa">Casa Exemplo</span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <p class="nav__titulo">Visão geral</p>
+          <a class="nav__item" href="index.html" data-nav="dashboard"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Dashboard</a>
+          <a class="nav__item" href="ranking.html" data-nav="ranking"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Ranking</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Atendimento</p>
+          <a class="nav__item" href="feedbacks.html" data-nav="feedbacks"><svg class="icone" aria-hidden="true"><use href="icones.svg#feedbacks"/></svg>Feedbacks<span class="nav__selo" data-selo-vencidas hidden></span></a>
+          <a class="nav__item" href="denuncias.html" data-nav="denuncias"><svg class="icone" aria-hidden="true"><use href="icones.svg#denuncias"/></svg>Denúncias</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Pesquisa e clientes</p>
+          <a class="nav__item" href="pesquisas.html" data-nav="pesquisas"><svg class="icone" aria-hidden="true"><use href="icones.svg#pesquisas"/></svg>Pesquisas</a>
+          <a class="nav__item" href="clientes.html" data-nav="clientes"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Clientes</a>
+          <a class="nav__item" href="premios.html" data-nav="premios"><svg class="icone" aria-hidden="true"><use href="icones.svg#premios"/></svg>Prêmios</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="configuracoes.html" data-nav="configuracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#config"/></svg>Configurações</a>
+        </div>
+      </nav>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true">AS</span>
+        <span class="conta__texto"><span class="conta__nome">Ana Souza</span><span class="conta__perfil">Administradora</span></span>
+        <a class="conta__sair" href="../login.html" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </a>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+
+    <main class="principal" id="conteudo" data-fora-do-menu>
+      <div class="principal__conteudo" data-premios>
+        <p class="aviso-prototipo"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>Protótipo com dados de exemplo. Nenhum voucher ou mensagem é enviado.</p>
+
+        <div class="cabeca">
+          <div>
+            <h1 class="cabeca__titulo">Prêmios</h1>
+            <p class="cabeca__desc">Vouchers em R$ para quem responde às pesquisas, enviados por WhatsApp.</p>
+          </div>
+          <button class="btn btn--primario" type="button" data-nova-campanha><svg class="icone" aria-hidden="true"><use href="icones.svg#mais"/></svg>Nova campanha</button>
+        </div>
+
+        <!-- Aparece quando a Muito Mais (quem gera os vouchers) não está conectada -->
+        <div class="cartao pr-aviso" data-sem-integracao hidden></div>
+
+        <section class="kpis" aria-label="Resumo das campanhas" data-resumo></section>
+
+        <div class="alternar" role="group" aria-label="Mostrar campanhas">
+          <button type="button" data-filtro="todas" aria-pressed="true">Todas <span class="alternar__total"></span></button>
+          <button type="button" data-filtro="ativa" aria-pressed="false">Ativas <span class="alternar__total"></span></button>
+          <button type="button" data-filtro="agendada" aria-pressed="false">Agendadas <span class="alternar__total"></span></button>
+          <button type="button" data-filtro="encerrada" aria-pressed="false">Encerradas <span class="alternar__total"></span></button>
+        </div>
+
+        <ul class="pq-lista" data-campanhas></ul>
+        <div class="cartao vazio" data-campanhas-vazio hidden>
+          <strong>Nenhuma campanha aqui</strong>
+          Crie uma em "Nova campanha" ou escolha outro filtro.
+        </div>
+
+        <!-- Sorteio para clientes cadastrados: ideia ainda em desenvolvimento (decisão do cliente) -->
+        <section class="cartao pr-sorteio" aria-labelledby="t-sorteio">
+          <span class="pr-sorteio__icone" aria-hidden="true"><svg class="icone"><use href="icones.svg#premios"/></svg></span>
+          <div>
+            <h2 class="cartao__titulo" id="t-sorteio">Sorteio para clientes cadastrados <span class="selo-dev">Em desenvolvimento</span></h2>
+            <p class="cartao__sub">Quem deixar o contato na pesquisa vai concorrer a prêmios da casa. Ainda estamos definindo como vai funcionar; por enquanto, o cadastro na pesquisa só explica isso ao cliente.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Gaveta: nova campanha / editar campanha (o conteúdo é montado pelo premios.js) -->
+  <dialog class="gaveta gaveta--larga" aria-labelledby="pr-titulo" data-pr-gaveta>
+    <form class="gaveta__corpo" data-pr-form novalidate>
+      <div class="gaveta__topo">
+        <h2 class="cfg-gaveta__titulo" id="pr-titulo" tabindex="-1" data-pr-titulo>Nova campanha</h2>
+        <button class="botao-icone" type="button" aria-label="Fechar" data-pr-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <div class="gaveta__form" data-pr-campos></div>
+      <div class="gaveta__acoes">
+        <button class="btn btn--secundario" type="button" data-pr-fechar>Cancelar</button>
+        <button class="btn btn--primario" type="submit" data-pr-ok>Criar e ativar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Confirmação (encerrar campanha) -->
+  <dialog class="confirmar" aria-labelledby="c-titulo" aria-describedby="c-texto" data-confirmar>
+    <form method="dialog">
+      <span class="confirmar__icone" aria-hidden="true" data-c="icone"></span>
+      <h2 id="c-titulo" data-c="titulo"></h2>
+      <p id="c-texto" data-c="texto"></p>
+      <div class="confirmar__acoes">
+        <button class="btn btn--secundario" value="cancelar" data-c="cancelar">Cancelar</button>
+        <button class="btn btn--primario" value="ok" data-c="ok">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p class="toast" role="status" aria-live="polite" data-toast data-oculto></p>
+</body>
+</html>

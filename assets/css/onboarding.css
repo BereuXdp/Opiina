@@ -1,0 +1,161 @@
+/* ==========================================================================
+   Opiina — onboarding (protótipo no padrão do site)
+   Reaproveita o layout e os campos de login.css; aqui só o que é próprio do cadastro.
+   ========================================================================== */
+
+/* Formulário longo: o painel da marca fica preso enquanto o formulário rola */
+@media (min-width: 1024px) {
+  .onb__marca { position: sticky; top: 0; height: 100vh; height: 100svh; }
+  .onb__principal { justify-content: flex-start; padding: 40px 48px 56px; }
+}
+
+.onb__principal { gap: 20px; }
+
+.onb__topo {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  width: 100%; max-width: 640px;
+}
+@media (min-width: 1024px) { .onb__topo { justify-content: flex-end; } }
+.onb__entrar { color: var(--mudo); font-size: 15px; }
+.onb__entrar a { display: inline-flex; align-items: center; min-height: 44px; color: var(--link); font-weight: 600; }
+.onb__entrar a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.onb__cartao { max-width: 640px; }
+@media (min-width: 640px) { .onb__cartao { padding: 40px 40px 32px; } }
+
+.onb__form { gap: 28px; }
+
+/* ---------- Grupos (Empresa / Administrador / Primeira unidade) ---------- */
+.grupo {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 0 0 28px;
+  border: 0;
+  border-bottom: 1px solid var(--linha);
+}
+.grupo__titulo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0;
+  color: var(--texto);
+  font-size: 18px; font-weight: 600; letter-spacing: -.02em;
+}
+.grupo__num {
+  display: grid; place-items: center;
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--grad);
+  color: #fff; font-size: 14px; font-weight: 600;
+}
+/* O <legend> fica fora do grid do fieldset (o gap não vale para ele): o respiro vem daqui */
+.grupo__sub { margin-top: 6px; color: var(--mudo); font-size: 14px; }
+
+.campos-2 { display: grid; gap: 16px; }
+@media (min-width: 560px) { .campos-2 { grid-template-columns: 1fr 1fr; } }
+
+.campo__dica { color: var(--mudo); font-size: 14px; }
+.campo__dica strong { color: var(--texto); font-weight: 600; overflow-wrap: anywhere; }
+
+/* Endereço do painel: campo + sufixo fixo ".opiina.com" */
+.campo__composto { display: flex; align-items: stretch; }
+.campo__composto input { border-top-right-radius: 0; border-bottom-right-radius: 0; min-width: 0; }
+.campo__sufixo {
+  display: inline-flex; align-items: center;
+  padding: 0 14px;
+  border: 1px solid rgba(20, 60, 140, .22);
+  border-left: 0;
+  border-radius: 0 12px 12px 0;
+  background: var(--bg-suave);
+  color: var(--mudo);
+  font-size: 15px; font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Select com a mesma aparência dos campos */
+.campo select {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 40px 0 16px;
+  border: 1px solid rgba(20, 60, 140, .22);
+  border-radius: 12px;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%2351627F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 16px center;
+  color: var(--texto);
+  font: 500 16px/1.2 var(--fonte);
+  appearance: none;
+  cursor: pointer;
+  transition: border-color var(--rapido), box-shadow var(--rapido);
+}
+.campo select:hover { border-color: rgba(28, 123, 255, .5); }
+.campo select:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 4px rgba(28, 123, 255, .18); }
+
+/* Ações */
+.onb__acoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.onb__acoes .btn { min-width: 160px; }
+@media (max-width: 559px) {
+  .onb__acoes { flex-direction: column-reverse; }
+  .onb__acoes .btn { width: 100%; }
+}
+
+/* ---------- Resumo do plano ---------- */
+.plano-resumo__rotulo { font-size: 14px; font-weight: 500; opacity: .85; }
+.plano-resumo__nome { margin-top: 4px; font-size: clamp(34px, 3.4vw, 48px); font-weight: 600; letter-spacing: -.04em; line-height: 1.1; }
+.plano-resumo__preco { margin-top: 6px; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+.plano-resumo__preco small { margin-left: 4px; font-size: 15px; font-weight: 500; opacity: .85; }
+.plano-resumo__desc { margin-top: 8px; max-width: 34ch; opacity: .9; }
+.plano-resumo__trocar { display: inline-flex; align-items: center; min-height: 44px; margin-top: 18px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+.plano-resumo--claro { color: #fff; }
+.plano-resumo--claro .login__lista { margin-top: 28px; }
+
+
+/* ---------- Escolha do plano (radios nativos em forma de cartão) ---------- */
+.planos-escolha { display: grid; gap: 14px 10px; padding-top: 10px; }   /* espaço para o selo sobre a borda */
+@media (min-width: 560px) { .planos-escolha { grid-template-columns: repeat(3, 1fr); } }
+
+.plano-opcao {
+  position: relative;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 16px 16px 14px;
+  border: 1px solid rgba(20, 60, 140, .22);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color var(--rapido), background-color var(--rapido), box-shadow var(--rapido);
+}
+.plano-opcao:hover { border-color: rgba(28, 123, 255, .55); }
+
+/* O radio continua acessível (teclado e leitor de tela), mas o visual é o círculo abaixo */
+.plano-opcao input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.plano-opcao::after {
+  content: "";
+  position: absolute; top: 14px; right: 14px;
+  width: 18px; height: 18px;
+  border: 1.5px solid rgba(20, 60, 140, .35);
+  border-radius: 50%;
+  background: #fff;
+  transition: border-color var(--rapido), box-shadow var(--rapido);
+}
+.plano-opcao:has(input:checked) {
+  border-color: var(--primario);
+  background: #F4F8FF;
+  box-shadow: 0 0 0 1px var(--primario);
+}
+.plano-opcao:has(input:checked)::after { border: 5px solid var(--primario); }
+.plano-opcao:has(input:focus-visible) { outline: 3px solid var(--acento); outline-offset: 3px; }
+
+/* Selo sobre a borda do cartão: não empurra o conteúdo, os 3 cartões ficam alinhados */
+.plano-opcao__selo {
+  position: absolute; top: -10px; left: 14px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primario);
+  color: #fff;
+  font-size: 12px; font-weight: 600;
+}
+.plano-opcao__nome { padding-right: 26px; color: var(--texto); font-size: 17px; font-weight: 600; letter-spacing: -.02em; }
+.plano-opcao__preco { color: var(--texto); font-size: 15px; font-weight: 600; }
+.plano-opcao__preco small { margin-left: 2px; color: var(--mudo); font-size: 13px; font-weight: 500; }
+.plano-opcao__desc { margin-top: 6px; color: var(--mudo); font-size: 13px; line-height: 1.45; }
+
+/* Erro do grupo: destaca os cartões */
+.planos-escolha[data-invalido="true"] .plano-opcao { border-color: #DC2626; }

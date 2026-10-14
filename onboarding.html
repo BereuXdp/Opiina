@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Criar conta — Opiina</title>
+  <meta name="description" content="Crie sua conta no Opiina.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1c7bff">
+  <link rel="icon" href="assets/icons/logo-opiina-64.png" type="image/png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/login.css">
+  <link rel="stylesheet" href="assets/css/onboarding.css">
+  <script src="assets/js/onboarding.js" defer></script>
+</head>
+<!--
+  Protótipo visual do onboarding do app (opiina.com/onboarding?plan=start|pro|redes), no padrão do site.
+  Mantém os 13 campos da tela original. O formulário NÃO envia dados: no app real,
+  o envio continua sendo feito pelo código existente.
+-->
+<body class="pagina-login pagina-onboarding">
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="brilho" viewBox="0 0 24 24">
+        <path d="M12 2.6c.55 0 .88.55 1.08 2.1.62 4.7 1.52 5.6 6.22 6.22 1.55.2 2.1.53 2.1 1.08s-.55.88-2.1 1.08c-4.7.62-5.6 1.52-6.22 6.22-.2 1.55-.53 2.1-1.08 2.1s-.88-.55-1.08-2.1c-.62-4.7-1.52-5.6-6.22-6.22C3.15 12.88 2.6 12.55 2.6 12s.55-.88 2.1-1.08c4.7-.62 5.6-1.52 6.22-6.22.2-1.55.53-2.1 1.08-2.1Z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="login">
+    <!-- Painel da marca + plano escolhido (desktop) -->
+    <aside class="login__marca onb__marca" aria-label="Plano escolhido">
+      <a class="marca marca--clara" href="index.html" aria-label="Opiina — início">
+        <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+        <span class="marca__nome">Opiina</span>
+      </a>
+
+      <div class="login__marca-texto">
+        <p class="selo selo--claro">
+          <svg aria-hidden="true"><use href="#brilho"/></svg>Ouça · Entenda · Fidelize
+        </p>
+        <!-- Preenchido pelo onboarding.js a partir de ?plan= (start | pro | redes) -->
+        <div class="plano-resumo plano-resumo--claro" data-plano-resumo></div>
+      </div>
+
+      <p class="login__credito">Desenvolvido por <a href="https://devmais.com">Dev+</a></p>
+    </aside>
+
+    <!-- Formulário -->
+    <main class="login__principal onb__principal" id="conteudo">
+      <div class="onb__topo">
+        <a class="marca login__marca-mobile" href="index.html" aria-label="Opiina — início">
+          <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+          <span class="marca__nome">Opiina</span>
+        </a>
+        <p class="onb__entrar">Já tem conta? <a href="login.html">Entrar</a></p>
+      </div>
+
+      <div class="login__cartao onb__cartao">
+        <h1 class="login__titulo">Crie sua conta</h1>
+        <p class="login__sub">Escolha o plano e cadastre a empresa, quem vai administrar o painel e a primeira unidade.</p>
+
+        <form class="formulario onb__form" data-onboarding novalidate>
+          <!-- 1. Plano (pré-marcado por ?plan=start|pro|redes; obrigatório) -->
+          <fieldset class="grupo" id="escolha-plano" aria-describedby="plano-erro">
+            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">1</span>Plano</legend>
+            <p class="grupo__sub">Escolha como você quer usar o Opiina.</p>
+
+            <div class="planos-escolha">
+              <label class="plano-opcao">
+                <input type="radio" name="plan" value="start" data-plano-opcao>
+                <span class="plano-opcao__nome">Start</span>
+                <span class="plano-opcao__preco">R$ 147,00<small>/mês</small></span>
+                <span class="plano-opcao__desc">NPS e ocorrências para a sua unidade.</span>
+              </label>
+              <label class="plano-opcao">
+                <input type="radio" name="plan" value="pro" data-plano-opcao>
+                <span class="plano-opcao__selo">Mais popular</span>
+                <span class="plano-opcao__nome">Pro</span>
+                <span class="plano-opcao__preco">R$ 297,00<small>/mês</small></span>
+                <span class="plano-opcao__desc">NPS, dashboard e Kanban para a sua unidade.</span>
+              </label>
+              <label class="plano-opcao">
+                <input type="radio" name="plan" value="redes" data-plano-opcao>
+                <span class="plano-opcao__nome">Redes</span>
+                <span class="plano-opcao__preco">R$ 697,00<small>/mês</small></span>
+                <span class="plano-opcao__desc">NPS e atendimento em todas as suas unidades.</span>
+              </label>
+            </div>
+            <p class="campo__erro" id="plano-erro" hidden>Escolha um plano para continuar.</p>          </fieldset>
+
+          <!-- 2. Empresa -->
+          <fieldset class="grupo">
+            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">2</span>Empresa</legend>
+            <p class="grupo__sub">Dados principais da empresa.</p>
+
+            <div class="campo">
+              <label for="razao">Razão social</label>
+              <input id="razao" name="razao_social" type="text" autocomplete="organization" placeholder="Minha Empresa LTDA">
+            </div>
+
+            <div class="campo">
+              <label for="fantasia">Nome fantasia</label>
+              <input id="fantasia" name="nome_fantasia" type="text" placeholder="Minha Marca" data-fantasia>
+            </div>
+
+            <div class="campo">
+              <label for="subdominio">Endereço do painel</label>
+              <div class="campo__composto">
+                <input id="subdominio" name="subdominio" type="text" inputmode="url" autocapitalize="none" spellcheck="false"
+                       placeholder="minha-marca" aria-describedby="subdominio-dica" data-subdominio>
+                <span class="campo__sufixo" aria-hidden="true">.opiina.com</span>
+              </div>
+              <p class="campo__dica" id="subdominio-dica">Seu painel ficará em <strong data-endereco>minha-marca.opiina.com</strong></p>
+            </div>
+
+            <div class="campos-2">
+              <div class="campo">
+                <label for="email-empresa">E-mail</label>
+                <input id="email-empresa" name="email_empresa" type="email" inputmode="email" autocomplete="email"
+                       placeholder="contato@empresa.com" aria-describedby="email-empresa-erro">
+                <p class="campo__erro" id="email-empresa-erro" hidden>Informe um e-mail válido.</p>
+              </div>
+              <div class="campo">
+                <label for="telefone">Telefone</label>
+                <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 90000-0000">
+              </div>
+            </div>
+
+            <div class="campo">
+              <label for="segmento">Segmento</label>
+              <input id="segmento" name="segmento" type="text" value="restaurante">
+            </div>
+
+          </fieldset>
+
+          <!-- 3. Administrador -->
+          <fieldset class="grupo">
+            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">3</span>Administrador</legend>
+            <p class="grupo__sub">Quem vai acessar o painel primeiro.</p>
+
+            <div class="campos-2">
+              <div class="campo">
+                <label for="admin-nome">Nome</label>
+                <input id="admin-nome" name="admin_nome" type="text" autocomplete="name" placeholder="Seu nome">
+              </div>
+              <div class="campo">
+                <label for="admin-email">E-mail</label>
+                <input id="admin-email" name="admin_email" type="email" inputmode="email" autocomplete="username"
+                       placeholder="voce@empresa.com" required aria-describedby="admin-email-erro">
+                <p class="campo__erro" id="admin-email-erro" hidden>Informe um e-mail válido.</p>
+              </div>
+            </div>
+
+            <div class="campo">
+              <label for="admin-senha">Senha</label>
+              <input id="admin-senha" name="admin_senha" type="password" autocomplete="new-password"
+                     placeholder="Crie uma senha" required aria-describedby="admin-senha-erro">
+              <p class="campo__erro" id="admin-senha-erro" hidden>Crie uma senha.</p>
+            </div>
+          </fieldset>
+
+          <!-- 4. Primeira unidade -->
+          <fieldset class="grupo">
+            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">4</span>Primeira unidade</legend>
+            <p class="grupo__sub">Base para permissões e relatórios.</p>
+
+            <div class="campos-2">
+              <div class="campo">
+                <label for="unidade-nome">Nome</label>
+                <input id="unidade-nome" name="unidade_nome" type="text" value="Unidade 1">
+              </div>
+              <div class="campo">
+                <label for="fuso">Fuso horário</label>
+                <select id="fuso" name="fuso_horario">
+                  <option value="America/Sao_Paulo" selected>Brasília (GMT−3)</option>
+                  <option value="America/Manaus">Amazonas (GMT−4)</option>
+                  <option value="America/Rio_Branco">Acre (GMT−5)</option>
+                  <option value="America/Noronha">Fernando de Noronha (GMT−2)</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="onb__acoes">
+            <a class="btn btn--contorno btn--grande" href="index.html">Cancelar</a>
+            <button class="btn btn--solido btn--grande" type="submit">Criar conta</button>
+          </div>
+          <p class="formulario__status" role="status" aria-live="polite" data-status></p>
+        </form>
+      </div>
+
+      <p class="login__credito login__credito--mobile">Desenvolvido por <a href="https://devmais.com">Dev+</a></p>
+    </main>
+  </div>
+</body>
+</html>

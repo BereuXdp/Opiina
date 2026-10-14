@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Canal de denúncias — Casa Exemplo</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F6F9FF">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Página pública do canal de ética: aberta pela equipe (link ou QR Code). Sem login e sempre clara. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="canal.js" defer></script>
+</head>
+<!--
+  Protótipo do canal de denúncias (no app: /canal-etico/[empresa]). Nada sai deste navegador:
+  a denúncia enviada entra na lista de Denúncias do painel só nesta aba (sessionStorage).
+-->
+<body class="pub">
+  <p class="pub__prototipo">Protótipo: a denúncia não sai deste navegador.</p>
+  <main class="pub__pagina">
+    <div class="pub__cartao pub__cartao--largo">
+      <div class="canal" data-canal>
+        <div class="cli__marca"><img src="../assets/icons/logo-opiina-64.png" alt="">Casa Exemplo</div>
+
+        <div class="canal__topo">
+          <h1 class="cli__titulo">Canal de denúncias</h1>
+          <p class="cli__desc">Para a equipe relatar assédio, discriminação, fraude, risco à segurança ou outra conduta errada no trabalho. O relato vai para o time responsável pelo canal de ética.</p>
+        </div>
+
+        <ul class="canal__garantias">
+          <li><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg><span><strong>Você pode ficar anônimo.</strong> Sem nome e sem contato, ninguém sabe quem enviou.</span></li>
+          <li><svg class="icone" aria-hidden="true"><use href="icones.svg#ok"/></svg><span><strong>Sem login.</strong> Não precisa de cadastro nem de senha.</span></li>
+          <li><svg class="icone" aria-hidden="true"><use href="icones.svg#lista"/></svg><span><strong>Você recebe um protocolo</strong> ao enviar.</span></li>
+        </ul>
+
+        <p class="canal__urgente" role="note"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg><span>Se alguém está em perigo agora, ligue <strong>190</strong> (Polícia) ou <strong>192</strong> (SAMU). Este canal não é atendido em tempo real.</span></p>
+
+        <form class="canal__form" data-canal-form novalidate>
+          <div class="campo">
+            <label for="d-categoria">Sobre o que é a denúncia? <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <select id="d-categoria" name="categoria" required aria-describedby="d-categoria-erro"><option value="">Escolha uma categoria</option></select>
+            <p class="campo__erro" id="d-categoria-erro" hidden>Escolha a categoria. Se nenhuma servir, escolha "Outro".</p>
+          </div>
+
+          <div class="campos-2">
+            <div class="campo">
+              <label for="d-unidade">Onde aconteceu?</label>
+              <select id="d-unidade" name="unidade"><option value="">Prefiro não dizer</option></select>
+            </div>
+            <div class="campo">
+              <label for="d-quando">Quando aconteceu? <span class="opcional">(opcional)</span></label>
+              <input id="d-quando" name="quando" type="date">
+            </div>
+          </div>
+
+          <div class="campo">
+            <label for="d-resumo">Resumo em uma frase <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input id="d-resumo" name="resumo" maxlength="120" required autocomplete="off" placeholder="Ex.: Gerente grita com a equipe na frente dos clientes" aria-describedby="d-resumo-erro">
+            <p class="campo__erro" id="d-resumo-erro" hidden>Escreva um resumo curto.</p>
+          </div>
+
+          <div class="campo">
+            <label for="d-relato">O que aconteceu? <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <textarea id="d-relato" name="relato" rows="6" required aria-describedby="d-relato-dica d-relato-erro" placeholder="Conte o que aconteceu, quem estava envolvido e se alguém viu. Quanto mais detalhes, mais fácil apurar."></textarea>
+            <p class="campo__dica" id="d-relato-dica">Se quiser ficar anônimo, não escreva seu nome nem detalhes que identifiquem você.</p>
+            <p class="campo__erro" id="d-relato-erro" hidden>Conte o que aconteceu (pelo menos 20 caracteres).</p>
+          </div>
+
+          <fieldset class="canal__ident">
+            <legend class="campo__rotulo">Como você quer enviar?</legend>
+            <label class="cl-opcao"><input type="radio" name="ident" value="anonima" checked><span><strong>Anônimo</strong>Sem nome e sem contato. Não dá para falarem com você.</span></label>
+            <label class="cl-opcao"><input type="radio" name="ident" value="identificada"><span><strong>Com meu nome</strong>O time responsável pode falar com você para entender melhor.</span></label>
+          </fieldset>
+
+          <div class="campos-2" data-canal-dados hidden>
+            <div class="campo">
+              <label for="d-nome">Seu nome <span class="obrigatorio" aria-hidden="true">*</span></label>
+              <input id="d-nome" name="nome" autocomplete="name" aria-describedby="d-nome-erro">
+              <p class="campo__erro" id="d-nome-erro" hidden>Escreva seu nome ou escolha "Anônimo".</p>
+            </div>
+            <div class="campo">
+              <label for="d-contato">WhatsApp ou e-mail <span class="obrigatorio" aria-hidden="true">*</span></label>
+              <input id="d-contato" name="contato" autocomplete="email" aria-describedby="d-contato-erro">
+              <p class="campo__erro" id="d-contato-erro" hidden>Informe um e-mail ou WhatsApp com DDD.</p>
+            </div>
+          </div>
+
+          <p class="cli__erro cli__erro--geral" role="alert" data-canal-erro hidden></p>
+          <button class="cli__enviar" type="submit">Enviar denúncia</button>
+        </form>
+      </div>
+    </div>
+    <p class="pub__rodape"><img src="../assets/icons/logo-opiina-64.png" alt="" width="16" height="16">Canal de ética com Opiina</p>
+  </main>
+  <noscript><p class="pub__noscript">Para enviar a denúncia, ative o JavaScript do navegador.</p></noscript>
+</body>
+</html>

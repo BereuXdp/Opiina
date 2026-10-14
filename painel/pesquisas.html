@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pesquisas — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Login de demonstração: sem ele, volta para o login (protótipo) -->
+  <script>try { if (/[?&]demo=1/.test(location.search)) sessionStorage.setItem('opiina-demo', '1'); if (!sessionStorage.getItem('opiina-demo')) location.replace('../login.html'); } catch (e) {}</script>
+  <!-- Modo escuro: escolha guardada (botão no menu) ou, sem escolha, o tema do sistema. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="painel.js" defer></script>
+  <script src="qrcode.js" defer></script>
+  <script src="pesquisas.js" defer></script>
+</head>
+<!-- Protótipo: lista de pesquisas (DADOS DE EXEMPLO). Criação em pesquisa-nova.html. -->
+<body data-tela="pesquisas">
+  <a class="pular" href="#conteudo" data-fora-do-menu>Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel" data-fora-do-menu>
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do painel" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa">Casa Exemplo</span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <p class="nav__titulo">Visão geral</p>
+          <a class="nav__item" href="index.html" data-nav="dashboard"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Dashboard</a>
+          <a class="nav__item" href="ranking.html" data-nav="ranking"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Ranking</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Atendimento</p>
+          <a class="nav__item" href="feedbacks.html" data-nav="feedbacks"><svg class="icone" aria-hidden="true"><use href="icones.svg#feedbacks"/></svg>Feedbacks<span class="nav__selo" data-selo-vencidas hidden></span></a>
+          <a class="nav__item" href="denuncias.html" data-nav="denuncias"><svg class="icone" aria-hidden="true"><use href="icones.svg#denuncias"/></svg>Denúncias</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Pesquisa e clientes</p>
+          <a class="nav__item" href="pesquisas.html" data-nav="pesquisas"><svg class="icone" aria-hidden="true"><use href="icones.svg#pesquisas"/></svg>Pesquisas</a>
+          <a class="nav__item" href="clientes.html" data-nav="clientes"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Clientes</a>
+          <a class="nav__item" href="breve.html?tela=premios" data-nav="premios"><svg class="icone" aria-hidden="true"><use href="icones.svg#premios"/></svg>Prêmios</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="configuracoes.html" data-nav="configuracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#config"/></svg>Configurações</a>
+        </div>
+      </nav>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true">AS</span>
+        <span class="conta__texto"><span class="conta__nome">Ana Souza</span><span class="conta__perfil">Administradora</span></span>
+        <a class="conta__sair" href="../login.html" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </a>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+
+    <main class="principal" id="conteudo" data-fora-do-menu>
+      <div class="principal__conteudo" data-pesquisas>
+        <p class="aviso-prototipo"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>Protótipo com dados de exemplo. As alterações valem só nesta aba.</p>
+
+        <div class="cabeca">
+          <div>
+            <h1 class="cabeca__titulo">Pesquisas</h1>
+            <p class="cabeca__desc">Crie a pesquisa, publique e compartilhe o link com os clientes.</p>
+          </div>
+          <a class="btn btn--primario" href="pesquisa-nova.html" data-nova><svg class="icone" aria-hidden="true"><use href="icones.svg#mais"/></svg>Nova pesquisa</a>
+        </div>
+
+        <div class="alternar" role="group" aria-label="Mostrar pesquisas">
+          <button type="button" data-filtro="todas" aria-pressed="true">Todas <span class="alternar__total"></span></button>
+          <button type="button" data-filtro="publicada" aria-pressed="false">Publicadas <span class="alternar__total"></span></button>
+          <button type="button" data-filtro="rascunho" aria-pressed="false">Rascunhos <span class="alternar__total"></span></button>
+          <button type="button" data-filtro="arquivada" aria-pressed="false">Arquivadas <span class="alternar__total"></span></button>
+        </div>
+
+        <ul class="pq-lista" data-pq-lista></ul>
+        <div class="cartao vazio" data-pq-vazio hidden>
+          <strong>Nenhuma pesquisa aqui</strong>
+          Crie uma em "Nova pesquisa" ou escolha outro filtro.
+        </div>
+      </div>
+    </main>
+  </div>
+  <!-- Confirmação (arquivar, apagar, publicar, sair sem salvar) -->
+  <dialog class="confirmar" aria-labelledby="c-titulo" aria-describedby="c-texto" data-confirmar>
+    <form method="dialog">
+      <span class="confirmar__icone" aria-hidden="true" data-c="icone"></span>
+      <h2 id="c-titulo" data-c="titulo"></h2>
+      <p id="c-texto" data-c="texto"></p>
+      <div class="confirmar__acoes">
+        <button class="btn btn--secundario" value="cancelar" data-c="cancelar">Cancelar</button>
+        <button class="btn btn--primario" value="ok" data-c="ok">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p class="toast" role="status" aria-live="polite" data-toast data-oculto></p>
+</body>
+</html>

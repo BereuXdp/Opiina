@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pesquisa — Casa Exemplo</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F6F9FF">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Página pública: o cliente abre pelo link ou QR Code da unidade. Sem login e sempre clara (sem modo escuro). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="responder.js" defer></script>
+</head>
+<!--
+  Protótipo da pesquisa que o cliente responde: responder.html?p=pq-12&u=centro
+  (p = código da pesquisa, u = unidade). Lê as pesquisas da aba (sessionStorage) ou os exemplos de dados.js.
+  Nada é enviado: a resposta fica só na tela.
+-->
+<body class="pub">
+  <p class="pub__prototipo">Protótipo: nenhuma resposta é enviada.</p>
+  <main class="pub__pagina">
+    <div class="pub__cartao" data-pub-tela>
+      <div class="cli" data-pub></div>
+    </div>
+    <p class="pub__rodape"><img src="../assets/icons/logo-opiina-64.png" alt="" width="16" height="16">Pesquisa feita com Opiina</p>
+  </main>
+  <!-- Cadastro opcional: sobe da base da tela depois de "Enviar" -->
+  <div class="cli-pop pub__pop" data-pub-pop hidden></div>
+  <noscript><p class="pub__noscript">Para responder a pesquisa, ative o JavaScript do navegador.</p></noscript>
+</body>
+</html>

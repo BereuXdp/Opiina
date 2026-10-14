@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feedbacks — Opiina</title>
+  <meta name="robots" content="noindex">
+  <!--
+    A aba Ocorrências saiu do menu (decisão do cliente, 2026-10-14): o tratamento (responsável, prazo,
+    etapa e Kanban) foi para dentro de Feedbacks. Este arquivo só leva os links antigos para lá,
+    convertendo os filtros: etapa=abertas → acao=abertas · prazo=vencidas|hoje → acao=… ·
+    responsavel=eu|ninguem → acao=minhas|sem-responsavel · visao, unidade, nota (nps) e abrir seguem iguais.
+  -->
+  <script>
+    (function () {
+      var de = new URLSearchParams(location.search), para = new URLSearchParams();
+      if (de.get('etapa') === 'abertas') para.set('acao', 'abertas');
+      if (de.get('prazo') === 'vencidas') para.set('acao', 'vencidas');
+      if (de.get('prazo') === 'hoje') para.set('acao', 'hoje');
+      if (de.get('responsavel') === 'eu') para.set('acao', 'minhas');
+      if (de.get('responsavel') === 'ninguem') para.set('acao', 'sem-responsavel');
+      ['visao', 'unidade', 'abrir', 'demo', 'perfil'].forEach(function (k) { if (de.get(k)) para.set(k, de.get(k)); });
+      if (de.get('nps')) para.set('nota', de.get('nps'));
+      location.replace('feedbacks.html' + (para.toString() ? '?' + para : ''));
+    })();
+  </script>
+</head>
+<body>
+  <p><a href="feedbacks.html">Ir para Feedbacks</a></p>
+</body>
+</html>

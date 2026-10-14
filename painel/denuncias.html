@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Denúncias — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Login de demonstração: sem ele, volta para o login (protótipo) -->
+  <script>try { if (/[?&]demo=1/.test(location.search)) sessionStorage.setItem('opiina-demo', '1'); if (!sessionStorage.getItem('opiina-demo')) location.replace('../login.html'); } catch (e) {}</script>
+  <!-- Modo escuro: escolha guardada (botão no menu) ou, sem escolha, o tema do sistema. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="painel.js" defer></script>
+  <script src="qrcode.js" defer></script>
+  <script src="denuncias.js" defer></script>
+</head>
+<!--
+  Protótipo: canal de denúncias (ética e conformidade). No app atual, o link e o QR Code ocupam o topo
+  e a lista fica no fim; aqui a lista vem primeiro e "Divulgar o canal" abre numa gaveta.
+  DADOS DE EXEMPLO (dados.js). Alterações ficam só nesta aba.
+-->
+<body data-tela="denuncias">
+  <a class="pular" href="#conteudo" data-fora-do-menu>Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel" data-fora-do-menu>
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do painel" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa">Casa Exemplo</span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <p class="nav__titulo">Visão geral</p>
+          <a class="nav__item" href="index.html" data-nav="dashboard"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Dashboard</a>
+          <a class="nav__item" href="ranking.html" data-nav="ranking"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Ranking</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Atendimento</p>
+          <a class="nav__item" href="feedbacks.html" data-nav="feedbacks"><svg class="icone" aria-hidden="true"><use href="icones.svg#feedbacks"/></svg>Feedbacks<span class="nav__selo" data-selo-vencidas hidden></span></a>
+          <a class="nav__item" href="denuncias.html" data-nav="denuncias"><svg class="icone" aria-hidden="true"><use href="icones.svg#denuncias"/></svg>Denúncias</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Pesquisa e clientes</p>
+          <a class="nav__item" href="pesquisas.html" data-nav="pesquisas"><svg class="icone" aria-hidden="true"><use href="icones.svg#pesquisas"/></svg>Pesquisas</a>
+          <a class="nav__item" href="clientes.html" data-nav="clientes"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Clientes</a>
+          <a class="nav__item" href="breve.html?tela=premios" data-nav="premios"><svg class="icone" aria-hidden="true"><use href="icones.svg#premios"/></svg>Prêmios</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="configuracoes.html" data-nav="configuracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#config"/></svg>Configurações</a>
+        </div>
+      </nav>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true">AS</span>
+        <span class="conta__texto"><span class="conta__nome">Ana Souza</span><span class="conta__perfil">Administradora</span></span>
+        <a class="conta__sair" href="../login.html" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </a>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+
+    <main class="principal" id="conteudo" data-fora-do-menu>
+      <div class="principal__conteudo" data-denuncias>
+        <p class="aviso-prototipo"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>Protótipo com dados de exemplo. As alterações valem só nesta aba.</p>
+
+        <div class="cabeca">
+          <div>
+            <h1 class="cabeca__titulo">Denúncias</h1>
+            <p class="cabeca__desc">Relatos do canal de ética, enviados pela equipe. Ficam separados das pesquisas de clientes.</p>
+          </div>
+          <button class="btn btn--secundario" type="button" data-divulgar aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="icones.svg#link"/></svg>Divulgar o canal</button>
+        </div>
+
+        <p class="den-sigilo"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg><span><strong>Confidencial.</strong> Só os perfis com acesso a Denúncias veem esta tela. Não compartilhe os relatos fora da equipe responsável.</span></p>
+
+        <section class="kpis" aria-label="Resumo das denúncias" data-den-resumo></section>
+
+        <section class="cartao" aria-label="Filtros">
+          <form class="filtros" data-den-filtros>
+            <div class="campo campo--busca">
+              <label for="d-busca">Buscar</label>
+              <input id="d-busca" name="q" type="search" placeholder="Protocolo ou texto do relato" autocomplete="off">
+              <svg class="icone" aria-hidden="true"><use href="icones.svg#busca"/></svg>
+            </div>
+            <div class="campo">
+              <label for="d-situacao">Situação</label>
+              <select id="d-situacao" name="situacao">
+                <option value="abertas">Em aberto</option>
+                <option value="todas">Todas</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="d-prioridade">Prioridade</label>
+              <select id="d-prioridade" name="prioridade"><option value="todas">Todas</option></select>
+            </div>
+            <div class="campo">
+              <label for="d-categoria">Categoria</label>
+              <select id="d-categoria" name="categoria"><option value="todas">Todas</option></select>
+            </div>
+            <div class="campo">
+              <label for="d-unidade">Unidade</label>
+              <select id="d-unidade" name="unidade"><option value="todas">Todas</option></select>
+            </div>
+            <div class="campo">
+              <label for="d-ident">Identificação</label>
+              <select id="d-ident" name="ident">
+                <option value="todas">Todas</option>
+                <option value="anonima">Anônimas</option>
+                <option value="identificada">Identificadas</option>
+              </select>
+            </div>
+          </form>
+          <div class="filtros__rodape">
+            <p class="filtros__contagem" role="status" aria-live="polite" data-den-contagem></p>
+            <button class="btn btn--fantasma" type="button" data-den-limpar>Limpar filtros</button>
+          </div>
+        </section>
+
+        <section class="cartao" aria-label="Lista de denúncias">
+          <div class="tabela-rolagem">
+            <!-- Mesmo esqueleto da lista de Ocorrências (vira cartões no celular): as colunas usam os mesmos data-col -->
+            <table class="tabela oc-tabela den-tabela">
+              <thead>
+                <tr>
+                  <th scope="col">Prioridade</th>
+                  <th scope="col">Denúncia</th>
+                  <th scope="col">Unidade</th>
+                  <th scope="col">Situação</th>
+                  <th scope="col">Identificação</th>
+                </tr>
+              </thead>
+              <tbody data-den-lista></tbody>
+            </table>
+          </div>
+          <p class="vazio" data-den-vazio hidden><strong>Nenhuma denúncia com esses filtros</strong>Escolha "Todas" em Situação ou clique em "Limpar filtros".</p>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Detalhe da denúncia -->
+  <dialog class="gaveta" aria-labelledby="dg-titulo" data-den-gaveta>
+    <div class="gaveta__corpo">
+      <div class="gaveta__topo">
+        <span class="gaveta__id"><span class="visualmente-oculto">Protocolo </span><span data-dg="id"></span></span>
+        <button class="botao-icone" type="button" aria-label="Fechar" data-dg-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+
+      <div class="den-titulo">
+        <div class="den-titulo__selos"><span data-dg="prioridade"></span><span data-dg="situacao"></span></div>
+        <h2 id="dg-titulo" tabindex="-1" data-dg="resumo"></h2>
+      </div>
+
+      <section class="den-relato" aria-labelledby="dg-relato">
+        <h3 id="dg-relato">Relato</h3>
+        <p data-dg="relato"></p>
+      </section>
+
+      <dl class="dados">
+        <div><dt>Categoria</dt><dd data-dg="categoria"></dd></div>
+        <div><dt>Unidade</dt><dd data-dg="unidade"></dd></div>
+        <div><dt>Recebida</dt><dd data-dg="recebida"></dd></div>
+        <div><dt>Identificação</dt><dd data-dg="identificacao"></dd></div>
+      </dl>
+      <p class="den-anonima" data-dg="aviso-anonima"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg>Anônima: o canal não guarda quem enviou. Não tente descobrir quem foi.</p>
+
+      <form class="gaveta__form" data-dg-form>
+        <div class="campos-2">
+          <div class="campo">
+            <label for="dg-situacao">Situação</label>
+            <select id="dg-situacao" name="situacao"></select>
+          </div>
+          <div class="campo">
+            <label for="dg-prioridade">Prioridade</label>
+            <select id="dg-prioridade" name="prioridade"></select>
+          </div>
+        </div>
+        <div class="campo">
+          <label for="dg-anotacao">Anotação interna <span style="font-weight:500;color:var(--mudo)">(opcional)</span></label>
+          <textarea id="dg-anotacao" name="anotacao" aria-describedby="dg-anotacao-dica" placeholder="Ex.: Conversei com o RH; vamos ouvir a equipe do turno da noite."></textarea>
+          <p class="campo__dica" id="dg-anotacao-dica">Só quem tem acesso a Denúncias vê. Quem denunciou não vê.</p>
+        </div>
+        <div class="gaveta__acoes">
+          <button class="btn btn--secundario" type="button" data-dg-fechar>Cancelar</button>
+          <button class="btn btn--primario" type="submit">Salvar</button>
+        </div>
+      </form>
+
+      <section class="historico" aria-labelledby="dg-historico">
+        <h3 class="historico__titulo" id="dg-historico">Histórico</h3>
+        <ul data-dg="historico"></ul>
+      </section>
+    </div>
+  </dialog>
+
+  <!-- Divulgar o canal: link + QR Code (no app atual ficam no topo da tela, antes da lista) -->
+  <dialog class="gaveta" aria-labelledby="dv-titulo" data-divulgar-gaveta>
+    <div class="gaveta__corpo">
+      <div class="gaveta__topo">
+        <h2 class="cfg-gaveta__titulo" id="dv-titulo" tabindex="-1">Divulgar o canal</h2>
+        <button class="botao-icone" type="button" aria-label="Fechar" data-dv-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <p class="cartao__sub">Coloque o link ou o QR Code onde a equipe vê: murais, intranet, e-mails, grupo da equipe.</p>
+
+      <ul class="den-garantias">
+        <li><svg class="icone" aria-hidden="true"><use href="icones.svg#ok"/></svg>Aberto a qualquer pessoa, sem login</li>
+        <li><svg class="icone" aria-hidden="true"><use href="icones.svg#ok"/></svg>Quem denuncia escolhe se quer se identificar</li>
+        <li><svg class="icone" aria-hidden="true"><use href="icones.svg#ok"/></svg>Cada denúncia recebe um protocolo</li>
+      </ul>
+
+      <div class="campo">
+        <label for="dv-link">Link do canal</label>
+        <div class="den-link">
+          <input id="dv-link" type="text" readonly value="https://casaexemplo.opiina.com/canal-etico/casaexemplo" data-dv-link>
+          <button class="btn btn--primario" type="button" data-dv-copiar><svg class="icone" aria-hidden="true"><use href="icones.svg#link"/></svg>Copiar</button>
+        </div>
+        <!-- Protótipo: abre a página do canal deste projeto (mesma aba, para a denúncia enviada aparecer na lista) -->
+        <a class="btn btn--fantasma den-abrir" href="canal.html">Abrir o canal e ver como a equipe vê</a>
+      </div>
+
+      <div class="den-qr">
+        <div class="den-qr__imagem" data-dv-qr></div>
+        <div>
+          <strong>QR Code para imprimir</strong>
+          <p>Quem aponta a câmera do celular abre o canal. Teste antes de imprimir.</p>
+          <button class="btn btn--secundario" type="button" data-dv-baixar>Baixar imagem (PNG)</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <p class="toast" role="status" aria-live="polite" data-toast data-oculto></p>
+</body>
+</html>
