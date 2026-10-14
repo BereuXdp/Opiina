@@ -1343,7 +1343,7 @@ body.pub { min-height: 100svh; background: linear-gradient(180deg, #EAF2FF, #F6F
 .sup__form { gap: 22px; }
 .sup__grupo { display: grid; gap: 14px; min-width: 0; border: 0; padding-top: 18px; border-top: 1px solid var(--linha); }
 .sup__grupo:first-child { padding-top: 0; border-top: 0; }
-.sup__legenda { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 16px; font-weight: 600; }
+.sup__legenda { float: left; width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 0;   /* float: o título fica dentro do grupo, sem a borda passar por ele */ font-size: 16px; font-weight: 600; }
 .sup__legenda span { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--grad); color: #fff; font-size: 13px; }
 .sup__grupo-dica { margin-top: -8px; }
 .sup__fixo { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 10px; background: var(--bg-suave); border: 1px solid var(--linha); font-weight: 600; }

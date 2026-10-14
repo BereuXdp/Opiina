@@ -1,4 +1,4 @@
-// Opiina — suporte (protótipo): abrir chamado (suporte.html) e consultar a ordem de serviço (suporte-consulta.html).
+// Suporte da Dev+ (protótipo; a Dev+ desenvolve o Opiina): abrir chamado (suporte.html) e consultar a ordem de serviço (suporte-consulta.html).
 // Páginas públicas, sem login: servem também para quem não consegue entrar no sistema.
 // Nada é enviado: os chamados ficam neste navegador (localStorage "opiina-demo-suporte"), para a consulta
 // funcionar em outra aba. Do painel, o link chega com ?de=painel e já preenche os dados da conta.
@@ -174,7 +174,7 @@ if (form) {
     const linkConsulta = `suporte-consulta.html${doPainel ? '?de=painel' : ''}`;
     $('[data-sup]').innerHTML = `
       <div class="sup__topo-links">
-        <div class="cli__marca"><img src="../assets/icons/logo-opiina-64.png" alt="">Opiina · Suporte</div>
+        <div class="dev__marca"><img src="../assets/icons/logo-devmais.png" alt="Dev+" width="385" height="96"><span>Suporte</span></div>
         ${doPainel ? '<a class="sup__voltar" href="index.html">Voltar ao painel</a>' : ''}
       </div>
       <div class="cli__fim canal__fim">
@@ -261,7 +261,7 @@ if (consulta) {
     consulta.hidden = true;
     resultado.hidden = false;
     $('[data-sup-titulo]').textContent = `Ordem de serviço ${c.os}`;
-    document.title = `${c.os} — Suporte Opiina`;
+    document.title = `${c.os} — Suporte Dev+`;
     $('.canal__topo .cli__desc').textContent = c.resumo;
 
     resultado.innerHTML = `
@@ -281,7 +281,7 @@ if (consulta) {
         <h2 class="sup__titulo" id="sup-historico">Andamento</h2>
         <ol class="sup__historico">
           ${[...c.historico].reverse().map((h) => `<li class="sup__evento sup__evento--${h.quem}">
-            <span class="sup__quem">${h.quem === 'equipe' ? 'Equipe de suporte' : h.quem === 'voce' ? 'Você' : 'Sistema'}</span>
+            <span class="sup__quem">${h.quem === 'equipe' ? 'Suporte Dev+' : h.quem === 'voce' ? 'Você' : 'Sistema'}</span>
             <time datetime="${new Date(h.quando).toISOString()}">${dataHora(h.quando)}</time>
             <p>${esc(h.texto)}</p>
           </li>`).join('')}
@@ -341,8 +341,8 @@ if (consulta) {
       consulta.os.value = '';
       $('[data-sup-erro]').hidden = true;
       $('[data-sup-titulo]').textContent = 'Consultar ordem de serviço';
-      $('.canal__topo .cli__desc').textContent = 'Veja em que etapa está o seu chamado e o que a equipe de suporte respondeu.';
-      document.title = 'Consultar chamado — Opiina';
+      $('.canal__topo .cli__desc').textContent = 'Veja em que etapa está o seu chamado e o que o suporte da Dev+ respondeu.';
+      document.title = 'Consultar chamado — Dev+';
       consulta.os.focus();
     });
 

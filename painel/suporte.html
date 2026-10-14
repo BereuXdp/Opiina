@@ -3,15 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Suporte — Opiina</title>
+  <title>Suporte — Dev+</title>
   <meta name="robots" content="noindex">
-  <meta name="theme-color" content="#F6F9FF">
-  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
-  <!-- Página pública de suporte: abrir chamado. Sem login (serve também para quem não consegue entrar). Sempre clara. -->
+  <meta name="theme-color" content="#0B1220">
+  <link rel="icon" href="../assets/icons/devmais-64.png" type="image/png">
+  <!-- Suporte da Dev+ (devmais.com): abrir chamado. Sem login (serve também para quem não consegue entrar). Sempre escura, com a identidade da Dev+. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap">
   <link rel="stylesheet" href="painel.css">
+  <link rel="stylesheet" href="suporte.css">
   <script src="dados.js" defer></script>
   <script src="suporte.js" defer></script>
 </head>
@@ -19,19 +20,19 @@
   Protótipo do formulário de suporte. Nada é enviado: o chamado fica só neste navegador (localStorage
   "opiina-demo-suporte") e pode ser consultado em suporte-consulta.html.
 -->
-<body class="pub" data-suporte="abrir">
+<body class="pub dev" data-suporte="abrir">
   <p class="pub__prototipo">Protótipo: o chamado fica só neste navegador.</p>
   <main class="pub__pagina">
     <div class="pub__cartao pub__cartao--largo">
       <div class="canal sup" data-sup>
         <div class="sup__topo-links">
-          <div class="cli__marca"><img src="../assets/icons/logo-opiina-64.png" alt="">Opiina · Suporte</div>
+          <div class="dev__marca"><img src="../assets/icons/logo-devmais.png" alt="Dev+" width="385" height="96"><span>Suporte</span></div>
           <a class="sup__voltar" href="index.html" data-sup-painel hidden>Voltar ao painel</a>
         </div>
 
         <div class="canal__topo">
           <h1 class="cli__titulo">Abrir chamado de suporte</h1>
-          <p class="cli__desc">Conte o que está acontecendo. Você recebe um <strong>número de ordem de serviço</strong> para acompanhar o atendimento.</p>
+          <p class="cli__desc">Fale com o time de suporte da Dev+. Conte o que está acontecendo e você recebe um <strong>número de ordem de serviço</strong> para acompanhar o atendimento.</p>
         </div>
 
         <p class="sup__ja-tem">Já abriu um chamado? <a href="suporte-consulta.html">Consultar ordem de serviço</a></p>
@@ -39,7 +40,7 @@
         <form class="canal__form sup__form" data-sup-form novalidate>
           <fieldset class="sup__grupo">
             <legend class="sup__legenda"><span aria-hidden="true">1</span>Sistema</legend>
-            <!-- Hoje o suporte atende só o Opiina (decisão do cliente, 2026-10-14). Com mais sistemas, vira uma lista. -->
+            <!-- Hoje o suporte da Dev+ atende só o Opiina por aqui (decisão do cliente, 2026-10-14). Com mais sistemas, vira uma lista. -->
             <div class="campo">
               <span class="campo__rotulo" id="s-sistema-rotulo">Qual sistema precisa de suporte?</span>
               <p class="sup__fixo" aria-labelledby="s-sistema-rotulo"><img src="../assets/icons/logo-opiina-64.png" alt="" width="20" height="20">Opiina</p>
@@ -54,7 +55,7 @@
 
           <fieldset class="sup__grupo">
             <legend class="sup__legenda"><span aria-hidden="true">2</span>Seus dados no sistema</legend>
-            <p class="campo__dica sup__grupo-dica">Para localizarmos você no Opiina.</p>
+            <p class="campo__dica sup__grupo-dica">Para localizarmos você no sistema.</p>
             <div class="campos-2">
               <div class="campo">
                 <label for="s-nome">Seu nome <span class="obrigatorio" aria-hidden="true">*</span></label>
@@ -153,7 +154,7 @@
         </form>
       </div>
     </div>
-    <p class="pub__rodape"><img src="../assets/icons/logo-opiina-64.png" alt="" width="16" height="16">Suporte Opiina</p>
+    <p class="pub__rodape">Suporte Dev+ ·&nbsp;<a href="https://devmais.com">devmais.com</a></p>
   </main>
   <noscript><p class="pub__noscript">Para abrir o chamado, ative o JavaScript do navegador.</p></noscript>
 </body>
