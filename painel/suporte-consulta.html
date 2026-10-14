@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Consultar chamado — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F6F9FF">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Página pública de suporte: consultar a ordem de serviço. Sem login. Sempre clara. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="suporte.js" defer></script>
+</head>
+<!--
+  Protótipo da consulta de ordem de serviço. Para ver o chamado, a pessoa confirma número, nome,
+  e-mail, CNPJ e sistema (pedido do cliente): só o número não basta, para ninguém ver o chamado de outra empresa.
+-->
+<body class="pub" data-suporte="consultar">
+  <p class="pub__prototipo">Protótipo: só aparecem chamados abertos neste navegador e o de exemplo. <button class="sup__exemplo" type="button" data-sup-exemplo>Preencher com o exemplo</button></p>
+  <main class="pub__pagina">
+    <div class="pub__cartao pub__cartao--largo">
+      <div class="canal sup" data-sup>
+        <div class="sup__topo-links">
+          <div class="cli__marca"><img src="../assets/icons/logo-opiina-64.png" alt="">Opiina · Suporte</div>
+          <a class="sup__voltar" href="index.html" data-sup-painel hidden>Voltar ao painel</a>
+        </div>
+
+        <div class="canal__topo">
+          <h1 class="cli__titulo" tabindex="-1" data-sup-titulo>Consultar ordem de serviço</h1>
+          <p class="cli__desc">Veja em que etapa está o seu chamado e o que a equipe de suporte respondeu.</p>
+        </div>
+
+        <form class="canal__form sup__form" data-sup-consulta novalidate>
+          <div class="campo">
+            <span class="campo__rotulo" id="c-sistema-rotulo">Sistema</span>
+            <p class="sup__fixo" aria-labelledby="c-sistema-rotulo"><img src="../assets/icons/logo-opiina-64.png" alt="" width="20" height="20">Opiina</p>
+            <input type="hidden" name="sistema" value="Opiina">
+          </div>
+          <div class="campo">
+            <label for="c-os">Número da ordem de serviço <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input id="c-os" name="os" autocomplete="off" spellcheck="false" required placeholder="OS20261014-0000" aria-describedby="c-os-dica c-os-erro">
+            <p class="campo__dica" id="c-os-dica">Está na tela de confirmação de quando você abriu o chamado.</p>
+            <p class="campo__erro" id="c-os-erro" hidden>Informe o número da ordem de serviço.</p>
+          </div>
+          <div class="campos-2">
+            <div class="campo">
+              <label for="c-nome">Seu nome <span class="obrigatorio" aria-hidden="true">*</span></label>
+              <input id="c-nome" name="nome" autocomplete="name" required aria-describedby="c-nome-erro">
+              <p class="campo__erro" id="c-nome-erro" hidden>Escreva seu nome.</p>
+            </div>
+            <div class="campo">
+              <label for="c-email">E-mail <span class="obrigatorio" aria-hidden="true">*</span></label>
+              <input id="c-email" name="email" type="email" autocomplete="email" required aria-describedby="c-email-erro">
+              <p class="campo__erro" id="c-email-erro" hidden>Informe um e-mail válido.</p>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="c-cnpj">CNPJ da empresa <span class="obrigatorio" aria-hidden="true">*</span></label>
+            <input id="c-cnpj" name="cnpj" inputmode="numeric" autocomplete="off" required placeholder="00.000.000/0000-00" aria-describedby="c-cnpj-erro">
+            <p class="campo__erro" id="c-cnpj-erro" hidden>Informe o CNPJ (14 números).</p>
+          </div>
+          <p class="cli__erro cli__erro--geral" role="alert" data-sup-erro hidden></p>
+          <button class="cli__enviar" type="submit">Consultar</button>
+          <p class="sup__ja-tem">Ainda não abriu? <a href="suporte.html">Abrir chamado de suporte</a></p>
+        </form>
+
+        <div class="sup__resultado" data-sup-resultado hidden></div>
+      </div>
+    </div>
+    <p class="pub__rodape"><img src="../assets/icons/logo-opiina-64.png" alt="" width="16" height="16">Suporte Opiina</p>
+  </main>
+  <noscript><p class="pub__noscript">Para consultar o chamado, ative o JavaScript do navegador.</p></noscript>
+</body>
+</html>

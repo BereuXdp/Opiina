@@ -119,8 +119,12 @@
   <symbol id="feedbacks" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M14.5 4.5h4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1v2.5l-3-2.5"/><path d="M3.5 7.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2h-4l-3.5 3v-3a2 2 0 0 1-1.5-2v-6Z"/>
   </symbol>
-  <symbol id="qr"viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+  <symbol id="qr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
     <rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="14" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="3.5" y="14" width="6.5" height="6.5" rx="1"/>
     <path d="M14 14h2.5v2.5H14zM18 18h2.5v2.5H18zM18 14h2.5M14 18v2.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="suporte" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4.5 13.5v-1.5a7.5 7.5 0 0 1 15 0v1.5"/><rect x="3.5" y="13" width="3.5" height="5.5" rx="1.5"/><rect x="17" y="13" width="3.5" height="5.5" rx="1.5"/>
+    <path d="M19 18.5v.5a2.5 2.5 0 0 1-2.5 2.5H13"/>
   </symbol>
 </svg>

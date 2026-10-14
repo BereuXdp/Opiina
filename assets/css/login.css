@@ -157,6 +157,9 @@
 }
 .login__novo a { color: var(--link); font-weight: 600; }
 .login__novo a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.login__ajuda { margin-top: 10px; color: var(--mudo); font-size: 14px; text-align: center; }
+.login__ajuda a { color: var(--link); font-weight: 600; }
+.login__ajuda a:hover { text-decoration: underline; text-underline-offset: 3px; }
 
 .login__credito--mobile { color: var(--mudo); }
 .login__credito--mobile a { color: var(--link); }

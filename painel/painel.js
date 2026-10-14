@@ -220,7 +220,9 @@ $$('[data-nav]').forEach((item) => {
 // ---------- Acesso por perfil ----------
 // Menu: sai o que o perfil não vê (e o grupo que ficar vazio). Configurações fica para todos:
 // quem não configura a empresa entra direto nos próprios dados (nome, e-mail, celular e senha).
+// Suporte também é de todos: abre a página pública de chamados já com os dados da conta.
 $$('[data-nav]').forEach((item) => {
+  if (item.dataset.nav === 'suporte') return;
   if (item.dataset.nav === 'configuracoes' && !pode('configuracoes')) item.href = `configuracoes.html?aba=${pode('atendentes') ? 'atendentes' : 'conta'}`;
   else if (!pode(item.dataset.nav)) item.remove();
 });

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Suporte — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F6F9FF">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Página pública de suporte: abrir chamado. Sem login (serve também para quem não consegue entrar). Sempre clara. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="suporte.js" defer></script>
+</head>
+<!--
+  Protótipo do formulário de suporte. Nada é enviado: o chamado fica só neste navegador (localStorage
+  "opiina-demo-suporte") e pode ser consultado em suporte-consulta.html.
+-->
+<body class="pub" data-suporte="abrir">
+  <p class="pub__prototipo">Protótipo: o chamado fica só neste navegador.</p>
+  <main class="pub__pagina">
+    <div class="pub__cartao pub__cartao--largo">
+      <div class="canal sup" data-sup>
+        <div class="sup__topo-links">
+          <div class="cli__marca"><img src="../assets/icons/logo-opiina-64.png" alt="">Opiina · Suporte</div>
+          <a class="sup__voltar" href="index.html" data-sup-painel hidden>Voltar ao painel</a>
+        </div>
+
+        <div class="canal__topo">
+          <h1 class="cli__titulo">Abrir chamado de suporte</h1>
+          <p class="cli__desc">Conte o que está acontecendo. Você recebe um <strong>número de ordem de serviço</strong> para acompanhar o atendimento.</p>
+        </div>
+
+        <p class="sup__ja-tem">Já abriu um chamado? <a href="suporte-consulta.html">Consultar ordem de serviço</a></p>
+
+        <form class="canal__form sup__form" data-sup-form novalidate>
+          <fieldset class="sup__grupo">
+            <legend class="sup__legenda"><span aria-hidden="true">1</span>Sistema</legend>
+            <!-- Hoje o suporte atende só o Opiina (decisão do cliente, 2026-10-14). Com mais sistemas, vira uma lista. -->
+            <div class="campo">
+              <span class="campo__rotulo" id="s-sistema-rotulo">Qual sistema precisa de suporte?</span>
+              <p class="sup__fixo" aria-labelledby="s-sistema-rotulo"><img src="../assets/icons/logo-opiina-64.png" alt="" width="20" height="20">Opiina</p>
+              <input type="hidden" name="sistema" value="Opiina">
+            </div>
+            <div class="campo">
+              <label for="s-painel">Endereço do seu painel <span class="opcional">(opcional)</span></label>
+              <div class="sup__sufixo"><input id="s-painel" name="painel" autocomplete="off" spellcheck="false" placeholder="suaempresa" aria-describedby="s-painel-dica"><span>.opiina.com</span></div>
+              <p class="campo__dica" id="s-painel-dica">É o endereço que você abre para entrar. Ajuda a achar sua conta mais rápido.</p>
+            </div>
+          </fieldset>
+
+          <fieldset class="sup__grupo">
+            <legend class="sup__legenda"><span aria-hidden="true">2</span>Seus dados no sistema</legend>
+            <p class="campo__dica sup__grupo-dica">Para localizarmos você no Opiina.</p>
+            <div class="campos-2">
+              <div class="campo">
+                <label for="s-nome">Seu nome <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input id="s-nome" name="nome" autocomplete="name" required aria-describedby="s-nome-erro">
+                <p class="campo__erro" id="s-nome-erro" hidden>Escreva seu nome.</p>
+              </div>
+              <div class="campo">
+                <label for="s-email">E-mail que você usa para entrar <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input id="s-email" name="email" type="email" autocomplete="email" required aria-describedby="s-email-erro">
+                <p class="campo__erro" id="s-email-erro" hidden>Informe um e-mail válido.</p>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="sup__grupo">
+            <legend class="sup__legenda"><span aria-hidden="true">3</span>Empresa cadastrada</legend>
+            <div class="campos-2">
+              <div class="campo">
+                <label for="s-empresa">Nome da empresa <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input id="s-empresa" name="empresa" autocomplete="organization" required aria-describedby="s-empresa-erro">
+                <p class="campo__erro" id="s-empresa-erro" hidden>Escreva o nome da empresa.</p>
+              </div>
+              <div class="campo">
+                <label for="s-cnpj">CNPJ <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input id="s-cnpj" name="cnpj" inputmode="numeric" autocomplete="off" required placeholder="00.000.000/0000-00" aria-describedby="s-cnpj-erro">
+                <p class="campo__erro" id="s-cnpj-erro" hidden>Confira o CNPJ: os números não batem.</p>
+              </div>
+            </div>
+            <div class="campo">
+              <label for="s-unidade">Unidade <span class="opcional">(opcional, se o problema for numa unidade)</span></label>
+              <input id="s-unidade" name="unidade" autocomplete="off" placeholder="Ex.: Centro">
+            </div>
+          </fieldset>
+
+          <fieldset class="sup__grupo">
+            <legend class="sup__legenda"><span aria-hidden="true">4</span>Como falar com você</legend>
+            <div class="campos-2">
+              <div class="campo">
+                <label for="s-telefone">WhatsApp ou telefone <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input id="s-telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="(00) 00000-0000" aria-describedby="s-telefone-erro">
+                <p class="campo__erro" id="s-telefone-erro" hidden>Informe o número com DDD.</p>
+              </div>
+              <div class="campo">
+                <label for="s-horario">Melhor horário <span class="opcional">(opcional)</span></label>
+                <select id="s-horario" name="horario">
+                  <option value="">Qualquer horário</option>
+                  <option>Manhã</option><option>Tarde</option><option>Noite</option>
+                </select>
+              </div>
+            </div>
+            <fieldset class="sup__escolha">
+              <legend class="campo__rotulo">Prefere ser chamado por</legend>
+              <div class="sup__pilulas">
+                <label class="sup__pilula"><input type="radio" name="canal" value="WhatsApp" checked><span>WhatsApp</span></label>
+                <label class="sup__pilula"><input type="radio" name="canal" value="E-mail"><span>E-mail</span></label>
+                <label class="sup__pilula"><input type="radio" name="canal" value="Ligação"><span>Ligação</span></label>
+              </div>
+            </fieldset>
+          </fieldset>
+
+          <fieldset class="sup__grupo">
+            <legend class="sup__legenda"><span aria-hidden="true">5</span>O que está acontecendo</legend>
+            <div class="campos-2">
+              <div class="campo">
+                <label for="s-tipo">Tipo de pedido <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <select id="s-tipo" name="tipo" required aria-describedby="s-tipo-erro"><option value="">Escolha</option></select>
+                <p class="campo__erro" id="s-tipo-erro" hidden>Escolha o tipo de pedido.</p>
+              </div>
+              <div class="campo">
+                <label for="s-area">Onde no sistema <span class="opcional">(opcional)</span></label>
+                <select id="s-area" name="area"><option value="">Não sei / geral</option></select>
+              </div>
+            </div>
+            <div class="campo">
+              <label for="s-resumo">Resumo em uma frase <span class="obrigatorio" aria-hidden="true">*</span></label>
+              <input id="s-resumo" name="resumo" maxlength="120" required autocomplete="off" placeholder="Ex.: O QR Code da unidade Orla não abre a pesquisa" aria-describedby="s-resumo-erro">
+              <p class="campo__erro" id="s-resumo-erro" hidden>Escreva um resumo curto.</p>
+            </div>
+            <div class="campo">
+              <label for="s-descricao">Conte com detalhes <span class="obrigatorio" aria-hidden="true">*</span></label>
+              <textarea id="s-descricao" name="descricao" rows="6" required aria-describedby="s-descricao-dica s-descricao-erro" placeholder="O que você tentou fazer, o que apareceu na tela e desde quando acontece."></textarea>
+              <p class="campo__dica" id="s-descricao-dica">Nunca escreva sua senha. A equipe de suporte não pede senha.</p>
+              <p class="campo__erro" id="s-descricao-erro" hidden>Conte um pouco mais (pelo menos 20 caracteres).</p>
+            </div>
+            <fieldset class="canal__ident">
+              <legend class="campo__rotulo">Quanto isso atrapalha?</legend>
+              <label class="cl-opcao"><input type="radio" name="impacto" value="Não consigo usar"><span><strong>Não consigo usar o sistema</strong>Travou o trabalho da equipe.</span></label>
+              <label class="cl-opcao"><input type="radio" name="impacto" value="Atrapalha" checked><span><strong>Atrapalha, mas dá para usar</strong>Uma parte não funciona como deveria.</span></label>
+              <label class="cl-opcao"><input type="radio" name="impacto" value="Dúvida"><span><strong>É só uma dúvida</strong>Nada parou.</span></label>
+            </fieldset>
+          </fieldset>
+
+          <p class="campo__dica">Usamos estes dados para localizar sua conta e responder este chamado.</p>
+          <p class="cli__erro cli__erro--geral" role="alert" data-sup-erro hidden></p>
+          <button class="cli__enviar" type="submit">Abrir chamado</button>
+        </form>
+      </div>
+    </div>
+    <p class="pub__rodape"><img src="../assets/icons/logo-opiina-64.png" alt="" width="16" height="16">Suporte Opiina</p>
+  </main>
+  <noscript><p class="pub__noscript">Para abrir o chamado, ative o JavaScript do navegador.</p></noscript>
+</body>
+</html>

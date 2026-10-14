@@ -1335,6 +1335,77 @@ body.pub { min-height: 100svh; background: linear-gradient(180deg, #EAF2FF, #F6F
 .canal__protocolo strong { font-size: 24px; letter-spacing: .04em; font-variant-numeric: tabular-nums; user-select: all; }
 .canal__fim .cli__desc strong { color: var(--texto); }
 
+/* Suporte público: abrir chamado (suporte.html) e consultar a ordem de serviço (suporte-consulta.html) */
+.sup__topo-links { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.sup__voltar, .sup__ja-tem a { color: var(--link); font-size: 14px; font-weight: 600; }
+.sup__voltar:hover, .sup__ja-tem a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.sup__ja-tem { color: var(--mudo); font-size: 14px; }
+.sup__form { gap: 22px; }
+.sup__grupo { display: grid; gap: 14px; min-width: 0; border: 0; padding-top: 18px; border-top: 1px solid var(--linha); }
+.sup__grupo:first-child { padding-top: 0; border-top: 0; }
+.sup__legenda { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; font-size: 16px; font-weight: 600; }
+.sup__legenda span { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--grad); color: #fff; font-size: 13px; }
+.sup__grupo-dica { margin-top: -8px; }
+.sup__fixo { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 10px; background: var(--bg-suave); border: 1px solid var(--linha); font-weight: 600; }
+.sup__sufixo { display: flex; align-items: stretch; }
+.sup__sufixo input { flex: 1; min-width: 0; border-radius: 10px 0 0 10px !important; }
+.sup__sufixo span { display: grid; place-items: center; padding: 0 12px; border: 1px solid var(--linha-forte); border-left: 0; border-radius: 0 10px 10px 0; background: var(--bg-suave); color: var(--mudo); font-size: 15px; }
+.sup__escolha { display: grid; gap: 8px; border: 0; min-width: 0; }
+.sup__escolha legend { margin-bottom: 8px; }
+.sup__pilulas { display: flex; flex-wrap: wrap; gap: 8px; }
+.sup__pilula { position: relative; cursor: pointer; }
+.sup__pilula input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.sup__pilula span { display: grid; place-items: center; min-height: 44px; padding: 0 18px; border: 1px solid var(--linha-forte); border-radius: 999px; background: #fff; font-size: 15px; font-weight: 600; }
+.sup__pilula:hover span { border-color: var(--acento); }
+.sup__pilula input:checked + span { border-color: var(--primario); background: var(--selecionado); color: var(--link); }
+.sup__pilula input:focus-visible + span { outline: 3px solid var(--acento); outline-offset: 3px; }
+.sup__acompanhar { margin-top: 8px; text-decoration: none; }
+.sup .cli__titulo:focus { outline: none; }
+
+.sup__resultado { display: grid; gap: 22px; }
+.sup__situacao { display: grid; gap: 8px; justify-items: start; padding: 16px; border-radius: 14px; background: var(--bg-suave); }
+.sup__situacao .etapa { font-size: 14px; padding: 4px 12px; }
+.sup__situacao p { color: var(--mudo); }
+.sup__etapas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; counter-reset: etapa; }
+.sup__etapas li { position: relative; display: grid; justify-items: center; gap: 6px; color: var(--mudo); font-size: 12px; font-weight: 600; text-align: center; line-height: 1.25; }
+.sup__etapas li::before { content: ""; position: absolute; top: 11px; right: 50%; width: 100%; height: 2px; background: var(--linha-forte); z-index: 0; }
+.sup__etapas li:first-child::before { display: none; }
+.sup__bolinha { position: relative; z-index: 1; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--linha-forte); background: #fff; }
+.sup__bolinha .icone { width: 14px; height: 14px; }
+.sup__etapa--feita { color: var(--texto); }
+.sup__etapa--feita::before, .sup__etapa--atual::before { background: var(--primario) !important; }
+.sup__etapa--feita .sup__bolinha { border-color: transparent; background: var(--grad); color: #fff; }
+.sup__etapa--atual { color: var(--link); }
+.sup__etapa--atual .sup__bolinha { border-color: var(--primario); box-shadow: 0 0 0 4px var(--selecionado); }
+.sup__etapa--atual .sup__bolinha::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--primario); }
+@media (max-width: 459px) { .sup__etapas li { font-size: 11px; } }
+.sup__pedido { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: 12px; background: var(--violeta-fundo); font-size: 15px; }
+.sup__pedido .icone { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--ia); }
+.sup__bloco { display: grid; gap: 12px; }
+.sup__titulo { font-size: 17px; font-weight: 600; }
+.sup__historico { display: grid; gap: 10px; }
+.sup__evento { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--linha); }
+.sup__evento p { grid-column: 1 / -1; font-size: 15px; overflow-wrap: anywhere; }
+.sup__evento time { color: var(--mudo); font-size: 13px; }
+.sup__quem { font-size: 13px; font-weight: 700; }
+.sup__evento--equipe { border-color: rgba(37, 99, 235, .3); background: var(--selecionado); }
+.sup__evento--equipe .sup__quem { color: var(--link); }
+.sup__evento--sistema { border-style: dashed; }
+.sup__evento--sistema p { color: var(--mudo); }
+.sup__responder { display: grid; gap: 12px; justify-items: start; }
+.sup__responder .campo { width: 100%; }
+.sup__responder textarea { font-size: 16px; }
+.sup__dados { border: 1px solid var(--linha); border-radius: 12px; }
+.sup__dados summary { padding: 14px; font-weight: 600; cursor: pointer; }
+.sup__dados dl { display: grid; gap: 10px; padding: 0 14px 14px; font-size: 15px; }
+.sup__dados dt { color: var(--mudo); font-size: 13px; font-weight: 600; }
+.sup__dados dd { overflow-wrap: anywhere; }
+.sup__descricao { white-space: pre-line; }
+.sup__acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.sup__simular, .pub__prototipo .sup__exemplo { color: var(--mudo); font-size: 13px; }
+.sup__simular button, .sup__exemplo { padding: 0; border: 0; background: none; color: var(--link); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.pub__prototipo .sup__exemplo { color: inherit; }
+
 /* Cadastro: folha que sobe da base da tela inteira */
 .pub__pop { position: fixed; inset: 0; z-index: 50; border-radius: 0; align-items: center; }
 .pub__pop .cli-pop__fundo { position: fixed; }
