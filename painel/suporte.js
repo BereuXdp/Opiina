@@ -107,7 +107,8 @@ function avisoGeral(form, n) {
 }
 
 // Vindo do painel (?de=painel): link de volta e dados da conta já preenchidos
-const doPainel = new URLSearchParams(location.search).get('de') === 'painel';
+// Fora do painel (cópia no repositório da Dev+, sem dados.js), D não existe e nada é preenchido.
+const doPainel = Boolean(D) && new URLSearchParams(location.search).get('de') === 'painel';
 function dadosDoPainel() {
   let perfilId = 'admin', cfg = null;
   try { perfilId = sessionStorage.getItem('opiina-demo-perfil') || 'admin'; } catch { /* usa admin */ }
