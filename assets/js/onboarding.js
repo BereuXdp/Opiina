@@ -182,7 +182,7 @@ function mostrarSucesso() {
   const preencher = (chave, texto) => { sucesso.querySelector(`[data-s="${chave}"]`).textContent = texto; };
 
   const texto = sucesso.querySelector('[data-sucesso-texto]');
-  texto.textContent = `${nome ? `Tudo pronto, ${nome}. ` : 'Tudo pronto. '}${empresa ? `A conta de ${empresa}` : 'Sua conta'} no Opiina foi criada.`;
+  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Agora falta o pagamento do plano.`;
   preencher('plano', `${plano.nome} · ${plano.preco} por mês`);
   preencher('endereco', endereco.textContent);
   preencher('email', valor('admin-email'));
@@ -194,6 +194,12 @@ function mostrarSucesso() {
   window.scrollTo(0, 0);
   sucesso.querySelector('[data-sucesso-titulo]').focus();
 }
+
+// "Ir para o pagamento": no app, abre o Checkout da Stripe do plano escolhido. O protótipo não cobra nada.
+document.querySelector('[data-pagar]').addEventListener('click', () => {
+  document.querySelector('[data-pagar-status]').textContent =
+    'Protótipo: no app, este botão leva à página de pagamento da Stripe. Nada foi cobrado.';
+});
 
 regras.forEach((regra) => {
   regra.campo.addEventListener('input', () => {

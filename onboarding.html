@@ -203,7 +203,7 @@
           <p class="login__sub" data-sucesso-texto></p>
 
           <dl class="onb__resumo">
-            <div><dt>Plano</dt><dd data-s="plano"></dd></div>
+            <div><dt>Plano a pagar</dt><dd data-s="plano"></dd></div>
             <div><dt>Endereço do painel</dt><dd data-s="endereco"></dd></div>
             <div><dt>E-mail de acesso</dt><dd data-s="email"></dd></div>
             <div><dt>Primeira unidade</dt><dd data-s="unidade"></dd></div>
@@ -211,16 +211,20 @@
 
           <h2 class="onb__passos-titulo">Próximos passos</h2>
           <ol class="onb__passos">
+            <li><span><strong>Pague o plano na Stripe.</strong> Você sai desta página e vai para a página de pagamento.</span></li>
             <li>Entre no painel com o e-mail e a senha que você acabou de criar.</li>
             <li>Monte a primeira pesquisa NPS da unidade.</li>
-            <li>Cadastre os atendentes, para saber quem atendeu cada cliente.</li>
           </ol>
 
-          <div class="onb__acoes onb__acoes--sucesso">
-            <a class="btn btn--contorno btn--grande" href="index.html">Voltar ao site</a>
-            <a class="btn btn--solido btn--grande" href="login.html">Entrar no painel</a>
+          <!-- No app, o botão leva ao Checkout da Stripe do plano escolhido. No protótipo, só avisa. -->
+          <div class="onb__pagar">
+            <button class="btn btn--solido btn--grande btn--largo" type="button" data-pagar>
+              <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>
+              Ir para o pagamento
+            </button>
+            <p class="onb__pagar-nota">O pagamento é feito na página da <strong>Stripe</strong>.</p>
           </div>
-          <p class="onb__prototipo">Protótipo: nenhuma conta foi criada de verdade.</p>
+          <p class="onb__prototipo" role="status" aria-live="polite" data-pagar-status>Protótipo: nenhuma conta foi criada de verdade.</p>
         </div>
       </div>
 
