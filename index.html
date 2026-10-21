@@ -27,6 +27,11 @@
       <symbol id="brilho" viewBox="0 0 24 24">
         <path d="M12 2.6c.55 0 .88.55 1.08 2.1.62 4.7 1.52 5.6 6.22 6.22 1.55.2 2.1.53 2.1 1.08s-.55.88-2.1 1.08c-4.7.62-5.6 1.52-6.22 6.22-.2 1.55-.53 2.1-1.08 2.1s-.88-.55-1.08-2.1c-.62-4.7-1.52-5.6-6.22-6.22C3.15 12.88 2.6 12.55 2.6 12s.55-.88 2.1-1.08c4.7-.62 5.6-1.52 6.22-6.22.2-1.55.53-2.1 1.08-2.1Z"/>
       </symbol>
+      <!-- Ícones da seção Canal de denúncias (traço) -->
+      <symbol id="d-anonimo" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5M12 14.5v2"/></symbol>
+      <symbol id="d-qr" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="14" y="3.5" width="6.5" height="6.5" rx="1"/><rect x="3.5" y="14" width="6.5" height="6.5" rx="1"/><path d="M14 14h2.5v2.5H14zM18 18h2.5v2.5H18zM18 14h2.5M14 18v2.5"/></symbol>
+      <symbol id="d-protocolo" viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9.5A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z"/><path d="M14 3.5v4h4M9 12h6M9 15.5h4"/></symbol>
+      <symbol id="d-etapas" viewBox="0 0 24 24"><path d="M4 6.5l1.8 1.8L9 5M4 12.5l1.8 1.8L9 11M12.5 7h7.5M12.5 13h7.5M12.5 19h7.5M4.5 18.5h4"/></symbol>
     </defs>
   </svg>
 
@@ -169,6 +174,40 @@
         <li class="passo revelar"><b aria-hidden="true">02</b><h3>Veja o que importa</h3><p>A nota e o comentário chegam no mesmo lugar. Você enxerga onde a casa está ganhando ou perdendo.</p></li>
         <li class="passo revelar"><b aria-hidden="true">03</b><h3>Resolva no Kanban</h3><p>Cada ocorrência vira um card. A equipe trata, você acompanha — sem planilha, sem conversa perdida.</p></li>
       </ol>
+    </div>
+  </section>
+
+  <!-- Canal de denúncias (pedido do cliente, 2026-10-21). Só fatos verificados: site atual + painel real (só olhando, 2026-10-13). -->
+  <section class="sec" id="denuncias" aria-labelledby="denuncias-titulo">
+    <div class="sec__in denuncia">
+      <div class="denuncia__texto">
+        <span class="tag revelar">Canal de denúncias</span>
+        <h2 class="revelar" id="denuncias-titulo">Um canal pra equipe <em>relatar o que vê</em></h2>
+        <p class="sub revelar">Cada unidade tem um link só pra isso, separado da pesquisa de clientes. A equipe relata o que acontece no trabalho, e a gestão acompanha cada caso no painel. Canal alinhado às obrigações trabalhistas.</p>
+        <p class="denuncia__rotulo revelar">16 categorias, entre elas:</p>
+        <ul class="denuncia__categorias revelar" aria-label="Exemplos de categorias">
+          <li>Assédio moral</li><li>Assédio sexual</li><li>Discriminação</li><li>Racismo</li>
+          <li>Fraude</li><li>Segurança do trabalho</li><li>LGPD e privacidade</li><li>Conduta inadequada</li>
+        </ul>
+      </div>
+      <ul class="denuncia__lista">
+        <li class="denuncia__item revelar">
+          <svg aria-hidden="true"><use href="#d-anonimo"/></svg>
+          <div><h3>Anônimo ou com nome</h3><p>Quem relata escolhe se quer se identificar.</p></div>
+        </li>
+        <li class="denuncia__item revelar" style="--d:.08s">
+          <svg aria-hidden="true"><use href="#d-qr"/></svg>
+          <div><h3>Link e QR Code por unidade</h3><p>Fácil de divulgar no mural, no vestiário ou no grupo da equipe.</p></div>
+        </li>
+        <li class="denuncia__item revelar" style="--d:.16s">
+          <svg aria-hidden="true"><use href="#d-protocolo"/></svg>
+          <div><h3>Protocolo para cada relato</h3><p>Cada denúncia ganha um número próprio e fica registrada.</p></div>
+        </li>
+        <li class="denuncia__item revelar" style="--d:.24s">
+          <svg aria-hidden="true"><use href="#d-etapas"/></svg>
+          <div><h3>Acompanhamento até a conclusão</h3><p>Situação e prioridade em cada caso: recebida, em análise, em investigação, aguardando informações, concluída.</p></div>
+        </li>
+      </ul>
     </div>
   </section>
 
