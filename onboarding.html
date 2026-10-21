@@ -192,6 +192,36 @@
           </div>
           <p class="formulario__status" role="status" aria-live="polite" data-status></p>
         </form>
+
+        <!-- Sucesso: substitui título e formulário depois de "Criar conta" (pedido do cliente, 2026-10-21).
+             Os dados vêm do próprio formulário, nada vai para o endereço da página. -->
+        <div class="onb__sucesso" data-sucesso hidden>
+          <span class="modal__icone modal__icone--ok onb__sucesso-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </span>
+          <h1 class="login__titulo" tabindex="-1" data-sucesso-titulo>Conta criada!</h1>
+          <p class="login__sub" data-sucesso-texto></p>
+
+          <dl class="onb__resumo">
+            <div><dt>Plano</dt><dd data-s="plano"></dd></div>
+            <div><dt>Endereço do painel</dt><dd data-s="endereco"></dd></div>
+            <div><dt>E-mail de acesso</dt><dd data-s="email"></dd></div>
+            <div><dt>Primeira unidade</dt><dd data-s="unidade"></dd></div>
+          </dl>
+
+          <h2 class="onb__passos-titulo">Próximos passos</h2>
+          <ol class="onb__passos">
+            <li>Entre no painel com o e-mail e a senha que você acabou de criar.</li>
+            <li>Monte a primeira pesquisa NPS da unidade.</li>
+            <li>Cadastre os atendentes, para saber quem atendeu cada cliente.</li>
+          </ol>
+
+          <div class="onb__acoes onb__acoes--sucesso">
+            <a class="btn btn--contorno btn--grande" href="index.html">Voltar ao site</a>
+            <a class="btn btn--solido btn--grande" href="login.html">Entrar no painel</a>
+          </div>
+          <p class="onb__prototipo">Protótipo: nenhuma conta foi criada de verdade.</p>
+        </div>
       </div>
 
       <p class="login__credito login__credito--mobile">Desenvolvido por <a href="https://devmais.com">Dev+</a></p>

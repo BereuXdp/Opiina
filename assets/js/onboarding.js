@@ -169,8 +169,31 @@ formulario.addEventListener('submit', (evento) => {
     invalidos[0].campo.focus();
     return;
   }
-  status.textContent = 'Protótipo visual: no app, a conta é criada pelo sistema do Opiina.';
+  mostrarSucesso();
 });
+
+// ---------- Tela de sucesso (no mesmo cartão; o painel da marca continua com o plano) ----------
+function mostrarSucesso() {
+  const valor = (id) => document.getElementById(id).value.trim();
+  const plano = PLANOS[opcoesPlano.find((o) => o.checked).value];
+  const nome = valor('admin-nome').split(/\s+/)[0];
+  const empresa = valor('fantasia') || valor('razao');
+  const sucesso = document.querySelector('[data-sucesso]');
+  const preencher = (chave, texto) => { sucesso.querySelector(`[data-s="${chave}"]`).textContent = texto; };
+
+  const texto = sucesso.querySelector('[data-sucesso-texto]');
+  texto.textContent = `${nome ? `Tudo pronto, ${nome}. ` : 'Tudo pronto. '}${empresa ? `A conta de ${empresa}` : 'Sua conta'} no Opiina foi criada.`;
+  preencher('plano', `${plano.nome} · ${plano.preco} por mês`);
+  preencher('endereco', endereco.textContent);
+  preencher('email', valor('admin-email'));
+  preencher('unidade', valor('unidade-nome') || 'Unidade 1');
+
+  document.querySelectorAll('.onb__cartao > .login__titulo, .onb__cartao > .login__sub, [data-onboarding], .onb__entrar').forEach((el) => { el.hidden = true; });
+  sucesso.hidden = false;
+  document.title = 'Conta criada — Opiina';
+  window.scrollTo(0, 0);
+  sucesso.querySelector('[data-sucesso-titulo]').focus();
+}
 
 regras.forEach((regra) => {
   regra.campo.addEventListener('input', () => {
