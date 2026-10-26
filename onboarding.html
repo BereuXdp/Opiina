@@ -62,7 +62,7 @@
 
       <div class="login__cartao onb__cartao">
         <h1 class="login__titulo">Crie sua conta</h1>
-        <p class="login__sub">Escolha o plano e cadastre a empresa, quem vai administrar o painel e a primeira unidade.</p>
+        <p class="login__sub">Teste grátis por 7 dias. Escolha o plano que vai usar depois e cadastre a empresa, quem vai administrar o painel e a primeira unidade.</p>
 
         <form class="formulario onb__form" data-onboarding novalidate>
           <!-- 1. Plano (pré-marcado por ?plan=start|pro|redes; obrigatório) -->
@@ -203,7 +203,8 @@
           <p class="login__sub" data-sucesso-texto></p>
 
           <dl class="onb__resumo">
-            <div><dt>Plano a pagar</dt><dd data-s="plano"></dd></div>
+            <div><dt>Teste grátis</dt><dd data-s="teste"></dd></div>
+            <div><dt>Plano depois do teste</dt><dd data-s="plano"></dd></div>
             <div><dt>Endereço do painel</dt><dd data-s="endereco"></dd></div>
             <div><dt>E-mail de acesso</dt><dd data-s="email"></dd></div>
             <div><dt>Primeira unidade</dt><dd data-s="unidade"></dd></div>
@@ -211,20 +212,16 @@
 
           <h2 class="onb__passos-titulo">Próximos passos</h2>
           <ol class="onb__passos">
-            <li><span><strong>Pague o plano na Stripe.</strong> Você sai desta página e vai para a página de pagamento.</span></li>
             <li>Entre no painel com o e-mail e a senha que você acabou de criar.</li>
             <li>Monte a primeira pesquisa NPS da unidade.</li>
+            <li><span><strong>Até <span data-s="fim"></span>, assine o plano.</strong> O pagamento é feito na página da Stripe. Sem plano, a conta fica inativa depois do teste.</span></li>
           </ol>
 
-          <!-- No app, o botão leva ao Checkout da Stripe do plano escolhido. No protótipo, só avisa. -->
           <div class="onb__pagar">
-            <button class="btn btn--solido btn--grande btn--largo" type="button" data-pagar>
-              <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg>
-              Ir para o pagamento
-            </button>
-            <p class="onb__pagar-nota">O pagamento é feito na página da <strong>Stripe</strong>.</p>
+            <a class="btn btn--solido btn--grande btn--largo" href="login.html">Entrar no painel</a>
+            <p class="onb__pagar-nota">O painel avisa na véspera do fim do teste.</p>
           </div>
-          <p class="onb__prototipo" role="status" aria-live="polite" data-pagar-status>Protótipo: nenhuma conta foi criada de verdade.</p>
+          <p class="onb__prototipo">Protótipo: nenhuma conta foi criada de verdade.</p>
         </div>
       </div>
 

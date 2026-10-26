@@ -438,7 +438,8 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 .ptag--rede { background: #F1E8FF; color: var(--ia); }
 .plano h3 { font-size: 24px; }
 .plano__desc { margin-top: 6px; color: var(--mudo); font-size: 15px; }
-.plano__preco { margin: 18px 0 22px; font-size: 38px; font-weight: 600; letter-spacing: -.04em; }
+.plano__preco { margin: 18px 0 22px; font-size: clamp(30px, 3.2vw, 38px); font-weight: 600; letter-spacing: -.04em; white-space: nowrap; }   /* "R$ 697,00" não quebra em telas médias */
+.plano__teste { margin: -14px 0 18px; color: var(--link); font-size: 14px; font-weight: 600; }
 .plano__preco small { margin-left: 4px; color: var(--mudo); font-size: 14px; font-weight: 500; letter-spacing: 0; }
 .plano ul { flex: 1; margin-bottom: 26px; }
 .plano li { padding-block: 7px; color: #3B4A66; font-size: 15px; }

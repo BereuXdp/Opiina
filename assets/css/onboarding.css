@@ -131,6 +131,7 @@
 .plano-resumo__preco { margin-top: 6px; font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
 .plano-resumo__preco small { margin-left: 4px; font-size: 15px; font-weight: 500; opacity: .85; }
 .plano-resumo__desc { margin-top: 8px; max-width: 34ch; opacity: .9; }
+.plano-resumo__teste { display: inline-block; margin-top: 12px; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .16); font-size: 14px; font-weight: 600; }
 .plano-resumo__trocar { display: inline-flex; align-items: center; min-height: 44px; margin-top: 18px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 .plano-resumo--claro { color: #fff; }

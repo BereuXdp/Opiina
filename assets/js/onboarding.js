@@ -62,6 +62,7 @@ function montarResumo() {
   preco.append(el('small', '', '/mês'));
   resumo.append(preco);
   resumo.append(el('p', 'plano-resumo__desc', plano.desc));
+  resumo.append(el('p', 'plano-resumo__teste', 'Começa com 7 dias grátis. Você só paga se continuar.'));
   const lista = el('ul', 'login__lista');
   plano.itens.forEach((item) => lista.append(el('li', '', item)));
   resumo.append(lista);
@@ -182,8 +183,12 @@ function mostrarSucesso() {
   const preencher = (chave, texto) => { sucesso.querySelector(`[data-s="${chave}"]`).textContent = texto; };
 
   const texto = sucesso.querySelector('[data-sucesso-texto]');
-  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Agora falta o pagamento do plano.`;
-  preencher('plano', `${plano.nome} · ${plano.preco} por mês`);
+  // Teste grátis de 7 dias: hoje é o dia 1, o último é daqui a 6 dias; a cobrança começa no dia seguinte
+  const dia = (deslocamento) => { const d = new Date(); d.setDate(d.getDate() + deslocamento); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); };
+  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Seu teste grátis de 7 dias começou hoje.`;
+  preencher('teste', `Hoje até ${dia(6)}`);
+  preencher('plano', `${plano.nome} · ${plano.preco} por mês, a partir de ${dia(7)}`);
+  preencher('fim', dia(6));
   preencher('endereco', endereco.textContent);
   preencher('email', valor('admin-email'));
   preencher('unidade', valor('unidade-nome') || 'Unidade 1');
@@ -194,12 +199,6 @@ function mostrarSucesso() {
   window.scrollTo(0, 0);
   sucesso.querySelector('[data-sucesso-titulo]').focus();
 }
-
-// "Ir para o pagamento": no app, abre o Checkout da Stripe do plano escolhido. O protótipo não cobra nada.
-document.querySelector('[data-pagar]').addEventListener('click', () => {
-  document.querySelector('[data-pagar-status]').textContent =
-    'Protótipo: no app, este botão leva à página de pagamento da Stripe. Nada foi cobrado.';
-});
 
 regras.forEach((regra) => {
   regra.campo.addEventListener('input', () => {

@@ -306,7 +306,8 @@ atualizarSeloVencidas();
 
 // Sair: encerra a sessão de demonstração
 $$('[data-sair]').forEach((link) => link.addEventListener('click', () => {
-  try { sessionStorage.removeItem('opiina-demo'); sessionStorage.removeItem(CHAVE_OC); } catch { /* ignora */ }
+  // Os avisos do teste grátis voltam na próxima entrada (o do último dia aparece a cada entrada)
+  try { ['opiina-demo', CHAVE_OC, 'opiina-demo-aviso-vespera', 'opiina-demo-aviso-ultimo'].forEach((k) => sessionStorage.removeItem(k)); } catch { /* ignora */ }
 }));
 
 // Tela "em breve": mostra o nome da tela pedida
@@ -593,4 +594,195 @@ function iniciarDashboard() {
   const anterior = {};
 
   desenhar();
+}
+
+// ---------- Teste grátis de 7 dias (decisão do cliente, 2026-10-26) ----------
+// Dia 1 = dia do cadastro; dia 7 = último dia. Véspera (dia 6): aviso uma vez por sessão.
+// Último dia: pop-up com os planos a cada entrada (sessão); dá para fechar e usar até o fim do dia.
+// Depois do dia 7, sem plano, a conta fica inativa. Na demonstração, o dia é escolhido no rodapé do menu.
+const CHAVE_TESTE = 'opiina-demo-teste';
+const PLANOS_TESTE = [
+  { id: 'start', nome: 'Start', preco: 'R$ 147,00', desc: 'NPS e ocorrências para a sua unidade.' },
+  { id: 'pro', nome: 'Pro', preco: 'R$ 297,00', desc: 'NPS, dashboard e Kanban para a sua unidade.', destaque: true },
+  { id: 'redes', nome: 'Redes', preco: 'R$ 697,00', desc: 'NPS e atendimento em todas as suas unidades.' },
+];
+const OPCOES_TESTE = [
+  ['1', 'Dia 1 de 7'], ['3', 'Dia 3 de 7'], ['5', 'Dia 5 de 7'], ['6', 'Dia 6 (véspera do fim)'], ['7', 'Dia 7 (último dia)'],
+  ['inativa', 'Teste encerrado (conta inativa)'], ['assinante', 'Plano já assinado'],
+];
+const estadoTeste = (() => {
+  try { const v = sessionStorage.getItem(CHAVE_TESTE); if (OPCOES_TESTE.some(([id]) => id === v)) return v; } catch { /* usa o padrão */ }
+  return '3';
+})();
+const diaTeste = Number(estadoTeste) || null;   // null = inativa ou assinante
+const ADMIN_DA_CONTA = D.usuarios.find((u) => u.perfil === 'admin').nome;
+const souAdmin = perfilId === 'admin';
+const dataDia = (deslocamento) => dataCurta(diaRelativo(deslocamento));
+const fimDoTeste = diaTeste ? 7 - diaTeste : -1;   // em dias a partir de hoje (inativa: terminou ontem)
+
+function lembrarAviso(chave) {
+  try { if (sessionStorage.getItem(chave)) return false; sessionStorage.setItem(chave, '1'); } catch { /* sem armazenamento: mostra */ }
+  return true;
+}
+
+// Seletor da demonstração, junto do "Ver como"
+$('.ver-como')?.insertAdjacentHTML('beforeend', `
+  <label for="sim-teste" class="ver-como__segundo">Teste grátis <span>(demonstração)</span></label>
+  <select id="sim-teste">${OPCOES_TESTE.map(([id, nome]) => `<option value="${id}"${id === estadoTeste ? ' selected' : ''}>${nome}</option>`).join('')}</select>`);
+$('#sim-teste')?.addEventListener('change', (e) => {
+  try {
+    sessionStorage.setItem(CHAVE_TESTE, e.target.value);
+    ['opiina-demo-aviso-vespera', 'opiina-demo-aviso-ultimo'].forEach((k) => sessionStorage.removeItem(k));
+  } catch { /* ignora */ }
+  location.reload();
+});
+
+// Janela dos avisos (criada uma vez; mesmo visual das confirmações)
+function janelaTeste() {
+  let dlg = $('[data-teste-janela]');
+  if (!dlg) {
+    document.body.insertAdjacentHTML('beforeend', `
+      <dialog class="confirmar teste-janela" aria-labelledby="teste-titulo" aria-describedby="teste-texto" data-teste-janela></dialog>`);
+    dlg = $('[data-teste-janela]');
+  }
+  return dlg;
+}
+
+function cartoesPlanos() {
+  return `<fieldset class="teste-planos">
+    <legend class="visualmente-oculto">Escolha o plano</legend>
+    ${PLANOS_TESTE.map((p) => `
+      <label class="teste-plano${p.destaque ? ' teste-plano--destaque' : ''}">
+        <input type="radio" name="plano-teste" value="${p.id}"${p.destaque ? ' checked' : ''}>
+        <span class="teste-plano__nome">${p.nome}${p.destaque ? ' <em>Mais popular</em>' : ''}</span>
+        <span class="teste-plano__preco">${p.preco}<small>/mês</small></span>
+        <span class="teste-plano__desc">${p.desc}</span>
+      </label>`).join('')}
+  </fieldset>`;
+}
+
+// Escolher o plano: no app, abre o Checkout da Stripe. Aqui, aviso + simulação do pagamento aprovado.
+function ligarAssinatura(caixa) {
+  const botao = $('[data-teste-assinar]', caixa);
+  if (!botao) return;
+  const escolhido = () => PLANOS_TESTE.find((x) => x.id === $('input[name="plano-teste"]:checked', caixa).value);
+  const atualizar = () => { const p = escolhido(); botao.textContent = `Assinar o ${p.nome} · ${p.preco}/mês`; };
+  caixa.addEventListener('change', atualizar);
+  atualizar();
+  botao.addEventListener('click', () => {
+    const p = escolhido();
+    const nota = $('[data-teste-nota]', caixa);
+    nota.hidden = false;
+    nota.innerHTML = `Protótipo: no app, este botão leva à página de pagamento da <strong>Stripe</strong>.
+      <button type="button" class="teste-simular" data-teste-simular>Simular pagamento aprovado</button>`;
+    $('[data-teste-simular]', nota).addEventListener('click', () => {
+      try { sessionStorage.setItem(CHAVE_TESTE, 'assinante'); sessionStorage.setItem('opiina-demo-plano-novo', p.nome); } catch { /* ignora */ }
+      location.reload();
+    });
+  });
+}
+
+function abrirAvisoTeste(tipo) {
+  const dlg = janelaTeste();
+  const ate = dataDia(fimDoTeste);
+  const amanha = dataDia(fimDoTeste + 1);
+  const recado = `<p class="teste-recado">${icone('pessoa')}<span>Quem escolhe o plano é a pessoa que administra a conta: <strong>${esc(ADMIN_DA_CONTA)}</strong>. Avise para a equipe não ficar sem o painel.</span></p>`;
+  const conteudos = {
+    vespera: {
+      icone: 'relogio', classe: 'confirmar__icone teste-icone--alerta',
+      titulo: 'Seu teste grátis acaba amanhã',
+      texto: `O teste de 7 dias termina em <strong>${ate}</strong>. ${souAdmin ? 'Escolha um plano' : 'A conta precisa de um plano'} para continuar usando o Opiina sem interrupção.`,
+      corpo: souAdmin ? '' : recado,
+      acoes: souAdmin
+        ? '<button class="btn btn--secundario" type="button" data-teste-fechar>Agora não</button><button class="btn btn--primario" type="button" data-teste-ver-planos>Ver planos</button>'
+        : '<button class="btn btn--primario" type="button" data-teste-fechar>Entendi</button>',
+    },
+    ultimo: {
+      icone: 'alerta', classe: 'confirmar__icone confirmar__icone--perigo',
+      titulo: 'Hoje é o último dia do teste grátis',
+      texto: `${souAdmin ? 'Escolha um plano para continuar' : 'A conta precisa de um plano para continuar'}. Sem plano, a conta fica <strong>inativa a partir de amanhã (${amanha})</strong> e a equipe não consegue mais usar o painel.`,
+      corpo: souAdmin ? cartoesPlanos() : recado,
+      acoes: souAdmin
+        ? '<button class="btn btn--secundario" type="button" data-teste-fechar>Continuar no teste hoje</button><button class="btn btn--primario" type="button" data-teste-assinar>Assinar</button>'
+        : '<button class="btn btn--primario" type="button" data-teste-fechar>Entendi</button>',
+    },
+    planos: {
+      icone: 'premios', classe: 'confirmar__icone',
+      titulo: 'Escolha seu plano',
+      texto: diaTeste ? `Seu teste grátis vai até <strong>${ate}</strong>. O pagamento é feito na página da Stripe.` : 'O pagamento é feito na página da Stripe.',
+      corpo: cartoesPlanos(),
+      acoes: '<button class="btn btn--secundario" type="button" data-teste-fechar>Agora não</button><button class="btn btn--primario" type="button" data-teste-assinar>Assinar</button>',
+    },
+  };
+  const c = conteudos[tipo];
+  dlg.innerHTML = `
+    <span class="${c.classe}" aria-hidden="true">${icone(c.icone)}</span>
+    <h2 id="teste-titulo">${c.titulo}</h2>
+    <p id="teste-texto">${c.texto}</p>
+    ${c.corpo}
+    <p class="teste-nota" data-teste-nota hidden></p>
+    <div class="confirmar__acoes">${c.acoes}</div>`;
+  $$('[data-teste-fechar]', dlg).forEach((b) => b.addEventListener('click', () => dlg.close()));
+  $('[data-teste-ver-planos]', dlg)?.addEventListener('click', () => abrirAvisoTeste('planos'));
+  ligarAssinatura(dlg);
+  if (!dlg.open) dlg.showModal();
+  $('[data-teste-fechar]', dlg)?.focus();
+}
+
+// Conta inativa: cobre o painel inteiro. Não fecha; só sai escolhendo um plano ou saindo da conta.
+function mostrarContaInativa() {
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="inativa" role="dialog" aria-modal="true" aria-labelledby="inativa-titulo" data-inativa>
+      <div class="inativa__cartao">
+        <span class="confirmar__icone confirmar__icone--perigo" aria-hidden="true">${icone('cadeado')}</span>
+        <h1 id="inativa-titulo" tabindex="-1">Sua conta está inativa</h1>
+        <p>O teste grátis de 7 dias terminou em <strong>${dataDia(-1)}</strong> sem um plano escolhido.
+          ${souAdmin ? 'Escolha um plano para reativar o painel.' : `Para reativar, quem administra a conta (<strong>${esc(ADMIN_DA_CONTA)}</strong>) precisa escolher um plano.`}</p>
+        ${souAdmin ? cartoesPlanos() : ''}
+        <p class="teste-nota" data-teste-nota hidden></p>
+        <div class="confirmar__acoes">
+          <a class="btn btn--secundario" href="../login.html" data-sair-inativa>Sair</a>
+          ${souAdmin ? '<button class="btn btn--primario" type="button" data-teste-assinar>Assinar</button>' : ''}
+        </div>
+        <p class="inativa__demo">Protótipo: <button type="button" class="teste-simular" data-inativa-voltar>voltar para o dia 3 do teste</button></p>
+      </div>
+    </div>`);
+  const tela = $('[data-inativa]');
+  // O painel por trás fica fora do alcance do teclado e do leitor de tela
+  $$('body > *:not([data-inativa])').forEach((el) => el.setAttribute('inert', ''));
+  $('[data-sair-inativa]', tela).addEventListener('click', () => {
+    try { sessionStorage.removeItem('opiina-demo'); } catch { /* ignora */ }
+  });
+  // Só na demonstração: o seletor do menu fica inacessível com a conta inativa
+  $('[data-inativa-voltar]', tela).addEventListener('click', () => {
+    try { sessionStorage.setItem(CHAVE_TESTE, '3'); } catch { /* ignora */ }
+    location.reload();
+  });
+  ligarAssinatura(tela);
+  $('h1', tela).focus();
+}
+
+// Faixa no topo de todas as telas do painel
+function faixaTeste() {
+  const principal = $('.principal');
+  let novo = null;
+  try { novo = sessionStorage.getItem('opiina-demo-plano-novo'); sessionStorage.removeItem('opiina-demo-plano-novo'); } catch { /* ignora */ }
+  if (novo) avisar(`Pagamento aprovado. Plano ${novo} ativo.`);
+  if (!principal || !diaTeste) return;
+  const urgente = diaTeste >= 6;
+  const quando = diaTeste === 7 ? 'hoje é o último dia' : diaTeste === 6 ? 'acaba amanhã' : `faltam ${8 - diaTeste} dias`;
+  principal.insertAdjacentHTML('afterbegin', `
+    <div class="teste-faixa${urgente ? ' teste-faixa--urgente' : ''}">
+      ${icone('relogio')}
+      <p><strong>Teste grátis: ${quando}</strong> <span>(dia ${diaTeste} de 7, até ${dataDia(fimDoTeste)})</span></p>
+      ${souAdmin ? '<button class="btn btn--primario teste-faixa__botao" type="button" data-teste-escolher>Escolher plano</button>' : `<span class="teste-faixa__admin">Quem assina é ${esc(ADMIN_DA_CONTA)}</span>`}
+    </div>`);
+  $('[data-teste-escolher]')?.addEventListener('click', () => abrirAvisoTeste('planos'));
+}
+
+if ($('.principal')) {
+  faixaTeste();
+  if (estadoTeste === 'inativa') mostrarContaInativa();
+  else if (diaTeste === 7 && lembrarAviso('opiina-demo-aviso-ultimo')) abrirAvisoTeste('ultimo');
+  else if (diaTeste === 6 && lembrarAviso('opiina-demo-aviso-vespera')) abrirAvisoTeste('vespera');
 }
