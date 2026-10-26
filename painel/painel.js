@@ -700,11 +700,14 @@ function abrirAvisoTeste(tipo) {
     ultimo: {
       icone: 'alerta', classe: 'confirmar__icone confirmar__icone--perigo',
       titulo: 'Hoje é o último dia do teste grátis',
-      texto: `${souAdmin ? 'Escolha um plano para continuar' : 'A conta precisa de um plano para continuar'}. Sem plano, a conta fica <strong>inativa a partir de amanhã (${amanha})</strong> e a equipe não consegue mais usar o painel.`,
+      // Trava o painel (cliente, 2026-10-26: "não quero que o usuário tenha a opção de continuar usando"):
+      // não fecha; só sai assinando um plano ou saindo da conta.
+      travado: true,
+      texto: souAdmin
+        ? `Para continuar usando o Opiina, escolha um plano. Sem plano, a conta fica <strong>inativa a partir de amanhã (${amanha})</strong>.`
+        : `Para continuar usando o Opiina, a conta precisa de um plano. Sem plano, ela fica <strong>inativa a partir de amanhã (${amanha})</strong>.`,
       corpo: souAdmin ? cartoesPlanos() : recado,
-      acoes: souAdmin
-        ? '<button class="btn btn--secundario" type="button" data-teste-fechar>Continuar no teste hoje</button><button class="btn btn--primario" type="button" data-teste-assinar>Assinar</button>'
-        : '<button class="btn btn--primario" type="button" data-teste-fechar>Entendi</button>',
+      acoes: `<a class="btn btn--secundario" href="../login.html" data-teste-sair>Sair</a>${souAdmin ? '<button class="btn btn--primario" type="button" data-teste-assinar>Assinar</button>' : ''}`,
     },
     planos: {
       icone: 'premios', classe: 'confirmar__icone',
@@ -724,9 +727,32 @@ function abrirAvisoTeste(tipo) {
     <div class="confirmar__acoes">${c.acoes}</div>`;
   $$('[data-teste-fechar]', dlg).forEach((b) => b.addEventListener('click', () => dlg.close()));
   $('[data-teste-ver-planos]', dlg)?.addEventListener('click', () => abrirAvisoTeste('planos'));
+  $('[data-teste-sair]', dlg)?.addEventListener('click', () => {
+    try { ['opiina-demo', 'opiina-demo-aviso-vespera'].forEach((k) => sessionStorage.removeItem(k)); } catch { /* ignora */ }
+  });
   ligarAssinatura(dlg);
+  if (c.travado) {
+    travarJanela(dlg);
+    // Só na demonstração: com o painel travado, o seletor do menu fica inacessível
+    dlg.insertAdjacentHTML('beforeend', '<p class="inativa__demo">Protótipo: <button type="button" class="teste-simular" data-teste-voltar>voltar para o dia 3 do teste</button></p>');
+    $('[data-teste-voltar]', dlg).addEventListener('click', () => {
+      try { sessionStorage.setItem(CHAVE_TESTE, '3'); } catch { /* ignora */ }
+      delete dlg.dataset.travada;
+      location.reload();
+    });
+  } else delete dlg.dataset.travada;
   if (!dlg.open) dlg.showModal();
-  $('[data-teste-fechar]', dlg)?.focus();
+  ($('[data-teste-fechar]', dlg) || $('h2', dlg)).focus();
+}
+
+// Janela que não fecha: Esc e clique fora não funcionam; se o navegador fechar mesmo assim, ela volta.
+function travarJanela(dlg) {
+  dlg.dataset.travada = '';
+  $('h2', dlg).tabIndex = -1;
+  if (dlg.dataset.travaLigada) return;
+  dlg.dataset.travaLigada = '1';
+  dlg.addEventListener('cancel', (e) => { if ('travada' in dlg.dataset) e.preventDefault(); });
+  dlg.addEventListener('close', () => { if ('travada' in dlg.dataset) dlg.showModal(); });
 }
 
 // Conta inativa: cobre o painel inteiro. Não fecha; só sai escolhendo um plano ou saindo da conta.
@@ -783,6 +809,6 @@ function faixaTeste() {
 if ($('.principal')) {
   faixaTeste();
   if (estadoTeste === 'inativa') mostrarContaInativa();
-  else if (diaTeste === 7 && lembrarAviso('opiina-demo-aviso-ultimo')) abrirAvisoTeste('ultimo');
+  else if (diaTeste === 7) abrirAvisoTeste('ultimo');   // em toda tela: o painel fica travado até assinar
   else if (diaTeste === 6 && lembrarAviso('opiina-demo-aviso-vespera')) abrirAvisoTeste('vespera');
 }
