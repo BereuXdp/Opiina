@@ -1711,3 +1711,16 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 .cfg-integ__nome { display: grid; flex: 1; min-width: 0; }
 .cfg-integ__nome strong { font-size: 15px; }
 .cfg-integ__nome span { color: var(--mudo); font-size: 13px; overflow-wrap: anywhere; }
+.cfg-chave__icone { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 8px; background: var(--selecionado); color: var(--link); }
+.cfg-chave__icone .icone { width: 16px; height: 16px; }
+.cfg-chave__final { font-variant-numeric: tabular-nums; letter-spacing: .04em; color: var(--texto); font-weight: 600; }
+.cfg-chave__acoes { display: flex; gap: 2px; }
+.cfg-chave__acoes .btn { min-height: 36px; padding: 0 10px; }
+.cfg-chave__remover { color: var(--perigo); }
+@media (max-width: 639px) {
+  .cfg-integ li { flex-wrap: wrap; }
+  .cfg-chave__acoes { width: 100%; justify-content: flex-end; }
+}
+/* Nome e detalhes ganham a largura; selo e botões descem para a linha de baixo quando falta espaço */
+.cfg-integ li { flex-wrap: wrap; }
+.cfg-integ__nome { flex: 1 1 260px; }

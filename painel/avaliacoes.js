@@ -310,6 +310,10 @@ function iniciarAvaliacoes() {
     const atual = av.conexoes[id] || {};
     // Google e iFood pedem autorização antes de escolher as lojas; já conectados, vão direto para a lista
     const autorizou = !['google', 'ifood'].includes(id) || avPlatConectada(id);
+    // Tripadvisor usa chave de API, cadastrada em Configurações › Integrações › Chaves de API
+    let chaves = [];
+    try { chaves = JSON.parse(localStorage.getItem('opiina-demo-chaves')) || []; } catch { /* sem chaves */ }
+    const faltaChave = id === 'tripadvisor' && !chaves.some((k) => k.tipo === 'tripadvisor') && !avPlatConectada(id);
     const linhas = p.porUnidade ? D.unidades : ['_empresa'];
     const nomeLinha = (u) => (u === '_empresa' ? 'Empresa' : u);
     const campoDe = (u, i) => {
@@ -348,7 +352,12 @@ function iniciarAvaliacoes() {
           <button class="btn btn--primario" type="button" data-ac-entrar>Já autorizei</button>
           <p class="campo__dica">Protótipo: o código é de exemplo e a autorização é simulada.</p>
         </div>` : ''}
-      <form class="gaveta__form" data-ac-form novalidate ${autorizou ? '' : 'hidden'}>
+      ${faltaChave ? `
+        <div class="av-autorizar">
+          <p><strong>Falta a chave de API do Tripadvisor.</strong> Cadastre a chave em Configurações › Integrações e volte aqui para escolher as páginas das unidades.</p>
+          <a class="btn btn--primario" href="configuracoes.html?aba=integracoes">Cadastrar a chave de API</a>
+        </div>` : ''}
+      <form class="gaveta__form" data-ac-form novalidate ${autorizou && !faltaChave ? '' : 'hidden'}>
         ${linhas.map((u, i) => `
           <div class="campo">
             <label for="ac-${i}">${nomeLinha(u)}${p.porUnidade ? ` <span class="opcional">· ${c.campo}</span>` : ` <span class="opcional">· ${c.campo}</span>`}</label>

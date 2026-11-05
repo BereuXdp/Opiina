@@ -696,7 +696,120 @@ function desenharIntegracoes() {
       </form>`}`;
 
   desenharIntegAvaliacoes();
+  desenharChavesApi();
 }
+
+// ----- Chaves de API (pedido do cliente, 2026-11-05: "um local para adicionar a API") -----
+// Só para os sistemas que usam chave. Google e iFood conectam por autorização (aba Avaliações); a Muito Mais
+// tem a chave no próprio cartão. SEGURANÇA: depois de salva, a chave não aparece mais. No protótipo, nem é
+// guardada: fica só o final (4 caracteres). No app, ela vai para o servidor, guardada cifrada.
+const CHAVE_APIS = 'opiina-demo-chaves';   // localStorage: a aba Avaliações também lê (Tripadvisor)
+const TIPOS_API = {
+  tripadvisor: { nome: 'Tripadvisor', uso: 'Avaliações', dica: 'A chave da API do Tripadvisor (Terra) fica na sua conta de desenvolvedor do Tripadvisor. O uso é pago por consulta.', estado: ['Pronta para usar', 'publicada'] },
+  reclameaqui: { nome: 'Reclame Aqui (HugMe)', uso: 'Avaliações', dica: 'O Reclame Aqui libera a chave para quem contrata o HugMe. A integração ainda está em análise.', estado: ['Aguardando confirmação', 'rascunho'] },
+  outra: { nome: 'Outra API', uso: 'Outro sistema', dica: 'Para um sistema que ainda não está na lista. A equipe do Opiina confere e liga a API ao painel.', estado: ['Aguardando a equipe Opiina', 'rascunho'] },
+};
+const lerChaves = () => { try { return JSON.parse(localStorage.getItem(CHAVE_APIS)) || []; } catch { return []; } };
+const gravarChaves = (lista) => { try { localStorage.setItem(CHAVE_APIS, JSON.stringify(lista)); } catch { /* ignora */ } };
+
+function desenharChavesApi() {
+  const caixa = $('[data-integ-chaves]');
+  if (!caixa) return;
+  const chaves = lerChaves();
+  caixa.innerHTML = `
+    <div class="cfg__topo">
+      <div><h3 class="cartao__titulo">Chaves de API</h3>
+      <p class="cartao__sub">Cadastre a chave de API de cada sistema. Por segurança, depois de salva ela não aparece mais: fica só o final.</p></div>
+      <button class="btn btn--primario" type="button" data-chave-nova>${icone('mais')}Adicionar chave de API</button>
+    </div>
+    ${chaves.length ? `<ul class="cfg-integ">${chaves.map((c, i) => {
+      const t = TIPOS_API[c.tipo];
+      return `<li>
+        <span class="cfg-chave__icone" aria-hidden="true">${icone('cadeado')}</span>
+        <span class="cfg-integ__nome"><strong>${esc(c.nome)}</strong>
+          <span><span class="cfg-chave__final" aria-label="Chave terminada em ${esc(c.final)}">•••• ${esc(c.final)}</span> · ${esc(t.uso)} · adicionada ${dataCurta(new Date(c.criadaEm))} por ${esc(c.por)}${c.endereco ? ` · ${esc(c.endereco)}` : ''}</span></span>
+        ${situacao(...t.estado)}
+        <span class="cfg-chave__acoes">
+          <button class="btn btn--fantasma" type="button" data-chave-trocar="${i}">Trocar</button>
+          <button class="btn btn--fantasma cfg-chave__remover" type="button" data-chave-remover="${i}">Remover</button>
+        </span>
+      </li>`;
+    }).join('')}</ul>` : '<p class="mudo">Nenhuma chave cadastrada.</p>'}
+    <p class="campo__dica">Google e iFood não usam chave: conectam por autorização, na aba <a class="link-texto" href="avaliacoes.html">Avaliações</a>. A chave da Muito Mais fica no cartão acima.</p>`;
+}
+
+function abrirChave(indice) {
+  const chaves = lerChaves();
+  const atual = indice != null ? chaves[indice] : null;
+  // Cada sistema tem uma chave só (menos "Outra API"): os que já têm ficam fora da lista
+  const livres = Object.entries(TIPOS_API).filter(([id]) => id === 'outra' || !chaves.some((c) => c.tipo === id));
+  const tipoInicial = atual ? atual.tipo : livres[0][0];
+  abrirGaveta({
+    titulo: atual ? `Trocar a chave: ${atual.nome}` : 'Adicionar chave de API',
+    botao: atual ? 'Salvar a nova chave' : 'Salvar chave',
+    campos: `
+      ${atual ? `<p class="cartao__sub">A chave atual (•••• ${esc(atual.final)}) deixa de valer quando você salvar a nova.</p>`
+        : htmlSelect({ id: 'ch-tipo', rotulo: 'Sistema', opcoes: livres.map(([id, t]) => [id, t.nome]), valor: tipoInicial })}
+      <p class="campo__dica" data-ch-dica>${TIPOS_API[tipoInicial].dica}</p>
+      <div data-ch-outra ${tipoInicial === 'outra' && !atual ? '' : 'hidden'}>
+        ${htmlCampo({ id: 'ch-nome', rotulo: 'Nome do sistema', obrigatorio: true, erro: 'Escreva o nome do sistema.' })}
+        ${htmlCampo({ id: 'ch-endereco', rotulo: 'Endereço da API', tipo: 'url', obrigatorio: true, dica: 'Começa com https://', erro: 'Informe um endereço que comece com https://', extra: 'placeholder="https://api.exemplo.com" spellcheck="false" autocomplete="off"' })}
+      </div>
+      ${htmlCampo({ id: 'ch-chave', rotulo: 'Chave de API', tipo: 'password', obrigatorio: true, dica: 'Cole a chave inteira. Ela não aparece de novo depois de salva.', erro: 'Cole a chave de API (pelo menos 8 caracteres, sem espaços).', extra: 'autocomplete="off" spellcheck="false"' })}`,
+    salvar: () => {
+      const tipo = atual ? atual.tipo : valorDe('ch-tipo');
+      const ehOutra = tipo === 'outra' && !atual;
+      const chave = document.getElementById('ch-chave');
+      const regras = [[chave, chave.value.trim().length < 8 || /\s/.test(chave.value.trim())]];
+      if (ehOutra) {
+        const nome = document.getElementById('ch-nome');
+        const end = document.getElementById('ch-endereco');
+        regras.unshift([nome, !nome.value.trim()], [end, !/^https:\/\/\S+\.\S+/.test(end.value.trim())]);
+      }
+      if (!validar(regras)) return false;
+      const registro = {
+        tipo,
+        nome: atual ? atual.nome : (ehOutra ? valorDe('ch-nome') : TIPOS_API[tipo].nome),
+        endereco: atual ? atual.endereco : (ehOutra ? valorDe('ch-endereco') : ''),
+        final: chave.value.trim().slice(-4),   // só o final; a chave inteira nunca é guardada no protótipo
+        criadaEm: Date.now(),
+        por: cfg.usuarios[INDICE_EU].nome,
+      };
+      chave.value = '';
+      if (atual) chaves[indice] = registro; else chaves.push(registro);
+      gravarChaves(chaves);
+      desenharChavesApi();
+      avisar(`${atual ? 'Chave trocada' : 'Chave salva'}: ${registro.nome} (protótipo: nada foi enviado)`);
+      return true;
+    },
+  });
+  // Trocar o sistema muda a explicação e mostra os campos de "Outra API"
+  document.getElementById('ch-tipo')?.addEventListener('change', (e) => {
+    $('[data-ch-dica]').textContent = TIPOS_API[e.target.value].dica;
+    $('[data-ch-outra]').hidden = e.target.value !== 'outra';
+  });
+}
+
+document.addEventListener('click', async (e) => {
+  if (e.target.closest('[data-chave-nova]')) { abrirChave(null); return; }
+  const trocar = e.target.closest('[data-chave-trocar]');
+  if (trocar) { abrirChave(Number(trocar.dataset.chaveTrocar)); return; }
+  const remover = e.target.closest('[data-chave-remover]');
+  if (!remover) return;
+  const chaves = lerChaves();
+  const c = chaves[Number(remover.dataset.chaveRemover)];
+  const sim = await confirmar({
+    titulo: `Remover a chave: ${c.nome}?`,
+    texto: c.tipo === 'tripadvisor' ? 'As avaliações do Tripadvisor deixam de ser atualizadas até uma nova chave ser cadastrada.' : 'O Opiina deixa de usar esta chave.',
+    botao: 'Remover', perigo: true, icone: 'lixeira',
+  });
+  $('[data-confirmar]').close();
+  if (!sim) return;
+  chaves.splice(Number(remover.dataset.chaveRemover), 1);
+  gravarChaves(chaves);
+  desenharChavesApi();
+  avisar(`Chave removida: ${c.nome}`);
+});
 
 // Plataformas de avaliação: só o resumo. A conexão acontece na aba Avaliações (um lugar só para conectar),
 // e este cartão lê o mesmo estado guardado por ela (localStorage "opiina-demo-avaliacoes").
