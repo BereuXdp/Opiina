@@ -14,17 +14,17 @@ window.OPIINA_DEMO = {
   // os outros veem só "Minha conta".
   perfis: {
     admin:     { nome: 'Administrador', pessoa: 'Administradora', descricao: 'Vê e configura tudo, inclusive usuários e integrações.',
-                 telas: ['dashboard', 'ranking', 'ocorrencias', 'denuncias', 'feedbacks', 'pesquisas', 'clientes', 'premios', 'atendentes', 'configuracoes'] },
+                 telas: ['dashboard', 'ranking', 'ocorrencias', 'denuncias', 'feedbacks', 'avaliacoes', 'pesquisas', 'clientes', 'premios', 'atendentes', 'configuracoes'] },
     marketing: { nome: 'Marketing', pessoa: 'Marketing', descricao: 'Feedbacks, pesquisas, clientes e prêmios, com os números do Dashboard e do Ranking.',
-                 telas: ['dashboard', 'ranking', 'feedbacks', 'pesquisas', 'clientes', 'premios'] },
+                 telas: ['dashboard', 'ranking', 'feedbacks', 'avaliacoes', 'pesquisas', 'clientes', 'premios'] },
     gestor:    { nome: 'Gestor', pessoa: 'Gestor', descricao: 'Cuida do atendimento das unidades: ocorrências e números.', proposta: true,
                  // Atendentes: o gestor cadastra os das unidades dele (pedido do cliente, 2026-10-14)
-                 telas: ['dashboard', 'ranking', 'ocorrencias', 'feedbacks', 'pesquisas', 'clientes', 'atendentes'] },
+                 telas: ['dashboard', 'ranking', 'ocorrencias', 'feedbacks', 'avaliacoes', 'pesquisas', 'clientes', 'atendentes'] },
   },
   areas: [
     { id: 'dashboard', nome: 'Dashboard' }, { id: 'ranking', nome: 'Ranking' },
     // "ocorrencias" não é mais item do menu: é a permissão de TRATAR feedbacks (responsável, prazo, etapa, Kanban)
-    { id: 'feedbacks', nome: 'Feedbacks' }, { id: 'ocorrencias', nome: 'Tratar feedbacks (responsável, prazo, Kanban)' },
+    { id: 'feedbacks', nome: 'Feedbacks' }, { id: 'avaliacoes', nome: 'Avaliações (Google, iFood, Tripadvisor, Reclame Aqui)' }, { id: 'ocorrencias', nome: 'Tratar feedbacks (responsável, prazo, Kanban)' },
     { id: 'denuncias', nome: 'Denúncias' }, { id: 'pesquisas', nome: 'Pesquisas' }, { id: 'clientes', nome: 'Clientes' }, { id: 'premios', nome: 'Prêmios' },
     { id: 'atendentes', nome: 'Atendentes (só das próprias unidades)' },
     { id: 'configuracoes', nome: 'Configurações' },
@@ -297,4 +297,62 @@ window.OPIINA_DEMO = {
     { id: 'OC-1035', nota: 6,  unidade: 'Shopping Norte', tema: 'Limpeza',         etapa: 'Resolvida',          responsavel: 'Bruno Lima',  prazo: -1, criada: -7, cliente: 'Gustavo N.',      atendente: null,
       comentario: 'Mesa pegajosa quando sentamos.' },
   ],
+  // ---------- Avaliações externas (aba Avaliações, 2026-11-05). Tudo fictício. ----------
+  // As 4 plataformas são as que o app atual já cita no Dashboard ("Google, iFood, Tripadvisor e Reclame Aqui").
+  // porUnidade: a conexão é por unidade. horas: de quanto em quanto tempo o cache daquela plataforma é atualizado.
+  // Pesquisa das APIs (2026-11-05, ver memoria.md): Google (Business Profile API) e iFood (Merchant API, módulo Review)
+  // deixam ler e guardar as avaliações do próprio restaurante; Tripadvisor (Terra) é pago por consulta e o contrato
+  // define o que pode ser guardado; Reclame Aqui não tem API pública (só via HugMe, pago, a confirmar).
+  plataformas: [
+    { id: 'google',      nome: 'Google',       sigla: 'G',  cor: '#1A73E8', porUnidade: true,  escala: 'estrelas', horas: 6 },
+    { id: 'ifood',       nome: 'iFood',        sigla: 'iF', cor: '#EA1D2C', porUnidade: true,  escala: 'estrelas', horas: 6 },
+    { id: 'tripadvisor', nome: 'Tripadvisor',  sigla: 'T',  cor: '#00AA6C', porUnidade: true,  escala: 'bolhas', horas: 24 },
+    { id: 'reclameaqui', nome: 'Reclame Aqui', sigla: 'RA', cor: '#5C8A1E', porUnidade: false, escala: 'reclamacao', emAnalise: true },
+  ],
+  // Conexões iniciais da demonstração (unidade → identificação na plataforma)
+  conexoes: {
+    google:      { 'Centro': 'Casa Exemplo – Centro', 'Shopping Norte': 'Casa Exemplo – Shopping Norte' },
+    ifood:       { 'Centro': 'Casa Exemplo Centro', 'Orla': 'Casa Exemplo Orla' },   // lojas autorizadas no Portal do Parceiro
+    tripadvisor: {},
+    reclameaqui: {},
+  },
+  // Avaliações já guardadas no cache. dias: negativo = há N dias; nota de 1 a 5; resposta = resposta da casa na plataforma.
+  avaliacoes: [
+    { id: 'g-101', plataforma: 'google', unidade: 'Centro', nota: 5, dias: 0,  hora: '11:20', autor: 'Mariana R.', texto: 'Comida ótima e atendimento rápido. O garçom indicou o prato do dia e acertou em cheio.' },
+    { id: 'g-102', plataforma: 'google', unidade: 'Shopping Norte', nota: 2, dias: -1, hora: '21:05', autor: 'Paulo S.', texto: 'Demorou mais de 40 minutos para o prato chegar. A comida estava boa, mas a espera estragou o almoço.' },
+    { id: 'g-103', plataforma: 'google', unidade: 'Centro', nota: 4, dias: -2, hora: '13:48', autor: 'Larissa M.', texto: 'Ambiente agradável. Só achei a música um pouco alta.', resposta: 'Obrigado, Larissa! Já ajustamos o volume no salão.' },
+    { id: 'g-104', plataforma: 'google', unidade: 'Shopping Norte', nota: 5, dias: -3, hora: '19:30', autor: 'Rodrigo F.', texto: '', resposta: 'Valeu, Rodrigo! Volte sempre.' },
+    { id: 'g-105', plataforma: 'google', unidade: 'Centro', nota: 1, dias: -4, hora: '20:12', autor: 'Fernanda L.', texto: 'Pedi sem cebola e veio com cebola. Quando reclamei, trocaram, mas sem pedir desculpa.' },
+    { id: 'g-106', plataforma: 'google', unidade: 'Shopping Norte', nota: 4, dias: -6, hora: '12:40', autor: 'Bianca T.', texto: 'Bom custo-benefício para almoço no shopping.' },
+    { id: 'g-107', plataforma: 'google', unidade: 'Centro', nota: 5, dias: -8, hora: '14:02', autor: 'Eduardo P.', texto: 'Melhor feijoada da região. Atendimento da Júlia foi excelente.', resposta: 'Que bom, Eduardo! Vamos passar o elogio para a Júlia.' },
+    { id: 'g-108', plataforma: 'google', unidade: 'Shopping Norte', nota: 3, dias: -11, hora: '18:55', autor: 'Camila V.', texto: 'Comida boa, mas a mesa estava suja quando sentamos.' },
+    { id: 'g-109', plataforma: 'google', unidade: 'Centro', nota: 5, dias: -15, hora: '13:10', autor: 'Thiago N.', texto: 'Sempre volto. Equipe simpática.' },
+    { id: 'g-110', plataforma: 'google', unidade: 'Shopping Norte', nota: 2, dias: -19, hora: '20:44', autor: 'Juliana C.', texto: 'Cobraram a taxa de serviço duas vezes. Resolveram, mas demorou.', resposta: 'Juliana, pedimos desculpas pelo erro na conta. Já revisamos o processo no caixa.' },
+    { id: 'g-111', plataforma: 'google', unidade: 'Centro', nota: 4, dias: -24, hora: '12:25', autor: 'Marcos A.', texto: 'Prato bem servido. Sobremesa poderia ser melhor.' },
+    { id: 'i-201', plataforma: 'ifood', unidade: 'Centro', nota: 5, dias: 0, hora: '12:58', autor: 'Cliente iFood', texto: 'Chegou quentinho e bem embalado.' },
+    { id: 'i-202', plataforma: 'ifood', unidade: 'Orla', nota: 2, dias: -1, hora: '20:31', autor: 'Cliente iFood', texto: 'Faltou o refrigerante do pedido.' },
+    { id: 'i-203', plataforma: 'ifood', unidade: 'Orla', nota: 4, dias: -2, hora: '19:47', autor: 'Cliente iFood', texto: 'Gostoso, mas atrasou uns 15 minutos.' },
+    { id: 'i-204', plataforma: 'ifood', unidade: 'Centro', nota: 5, dias: -3, hora: '13:15', autor: 'Cliente iFood', texto: '', resposta: 'Obrigado pela avaliação!' },
+    { id: 'i-205', plataforma: 'ifood', unidade: 'Centro', nota: 3, dias: -5, hora: '12:20', autor: 'Cliente iFood', texto: 'Arroz veio frio.' },
+    { id: 'i-206', plataforma: 'ifood', unidade: 'Orla', nota: 5, dias: -7, hora: '21:02', autor: 'Cliente iFood', texto: 'Porção generosa, vale o preço.' },
+    { id: 'i-207', plataforma: 'ifood', unidade: 'Orla', nota: 1, dias: -9, hora: '20:15', autor: 'Cliente iFood', texto: 'Pedido veio trocado e o restaurante não atendeu o telefone.' },
+    { id: 'i-208', plataforma: 'ifood', unidade: 'Centro', nota: 4, dias: -13, hora: '12:44', autor: 'Cliente iFood', texto: 'Bom, peço sempre.' },
+    { id: 'i-209', plataforma: 'ifood', unidade: 'Orla', nota: 5, dias: -20, hora: '19:20', autor: 'Cliente iFood', texto: 'Entrega rápida.' },
+  ],
+  // Avaliações que "chegam" quando o cache é atualizado na demonstração (simulam o que a plataforma devolveria)
+  avaliacoesNovas: [
+    { id: 'g-120', plataforma: 'google', unidade: 'Centro', nota: 5, autor: 'Patrícia O.', texto: 'Atendimento impecável, voltaremos com a família.' },
+    { id: 'i-220', plataforma: 'ifood', unidade: 'Orla', nota: 3, autor: 'Cliente iFood', texto: 'Batata chegou murcha.' },
+    { id: 'g-121', plataforma: 'google', unidade: 'Shopping Norte', nota: 4, autor: 'Diego M.', texto: 'Gostei do almoço executivo.' },
+    { id: 'i-221', plataforma: 'ifood', unidade: 'Centro', nota: 5, autor: 'Cliente iFood', texto: '' },
+    { id: 'g-122', plataforma: 'google', unidade: 'Centro', nota: 2, autor: 'Renata B.', texto: 'Fila grande na hora do almoço e ninguém organizando.' },
+  ],
+  // Exemplos que aparecem quando a pessoa conecta uma plataforma ainda não conectada (demonstração)
+  avaliacoesAoConectar: {
+    tripadvisor: [
+      { plataforma: 'tripadvisor', nota: 5, autor: 'Viajante de SP', texto: 'Ótima vista e peixe fresco. Recomendo para o pôr do sol.' },
+      { plataforma: 'tripadvisor', nota: 4, autor: 'Ana_Rio', texto: 'Comida boa, preço um pouco alto para a região.' },
+      { plataforma: 'tripadvisor', nota: 3, autor: 'Turista 2026', texto: 'Serviço lento no fim de semana.' },
+    ],
+  },
 };

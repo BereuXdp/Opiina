@@ -1,0 +1,416 @@
+// Opiina — painel (protótipo): Avaliações externas (Google, iFood, Tripadvisor, Reclame Aqui). Pedido do cliente, 2026-11-05.
+// Usa utilidades de painel.js ($, $$, esc, icone, avisar, D, souAdmin…).
+// CACHE: as avaliações ficam guardadas e só são buscadas de novo quando o cache vence (AV_INTERVALO) ou quando
+// alguém pede "Atualizar agora" (no máximo uma vez a cada AV_ESPERA). No protótipo, a "busca" é simulada e o cache
+// fica no navegador (localStorage); no app, ele fica no servidor e uma rotina atualiza sozinha (ver specs/design.md).
+
+const AV_CHAVE = 'opiina-demo-avaliacoes';
+const AV_INTERVALO = 6 * 60 * 60 * 1000;   // atualização automática: a cada 6 horas
+const AV_ESPERA = 15 * 60 * 1000;          // "Atualizar agora": no máximo a cada 15 minutos
+const AV_POR_PAGINA = 12;
+const AV_PLAT = Object.fromEntries(D.plataformas.map((p) => [p.id, p]));
+
+// Instante (ms) de uma avaliação de exemplo: "dias" relativos a hoje + "hora"
+function avInstante(a) {
+  if (a.ts) return a.ts;
+  const d = diaRelativo(a.dias);
+  const [h, m] = (a.hora || '12:00').split(':').map(Number);
+  d.setHours(h, m, 0, 0);
+  return Math.min(d.getTime(), Date.now() - 60e3);   // "hoje" nunca no futuro
+}
+
+// ----- Estado guardado (o "cache" da demonstração) -----
+const av = (() => {
+  let salvo = null;
+  try { salvo = JSON.parse(localStorage.getItem(AV_CHAVE)); } catch { /* sem armazenamento */ }
+  if (salvo?.atualizadoEm) return salvo;
+  const inicio = Date.now() - 47 * 60e3;   // a demonstração começa com o cache atualizado há 47 min
+  return {
+    atualizadoEm: inicio,
+    porPlataforma: { google: inicio, ifood: inicio },
+    conexoes: structuredClone(D.conexoes),
+    extras: [],          // avaliações que chegaram nas atualizações da demonstração
+  };
+})();
+const avSalvar = () => { try { localStorage.setItem(AV_CHAVE, JSON.stringify(av)); } catch { /* vale só nesta página */ } };
+
+const avConectada = (plat, unidade) => (AV_PLAT[plat].porUnidade ? Boolean(av.conexoes[plat]?.[unidade]) : Boolean(av.conexoes[plat]?._empresa));
+const avPlatConectada = (plat) => Object.keys(av.conexoes[plat] || {}).length > 0;
+// Só aparecem as avaliações de plataformas (e unidades) conectadas
+const avTodas = () => [...D.avaliacoes, ...av.extras]
+  .map((a) => ({ ...a, ts: avInstante(a) }))
+  .filter((a) => avConectada(a.plataforma, a.unidade));
+
+function avQuando(ms) {
+  const d = new Date(ms);
+  const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const dia = new Date(d); dia.setHours(0, 0, 0, 0);
+  const dif = Math.round((hoje - dia) / 864e5);
+  if (dif === 0) return `hoje às ${hora}`;
+  if (dif === 1) return `ontem às ${hora}`;
+  return `${dataCurta(d)} às ${hora}`;
+}
+function avHa(ms) {
+  const min = Math.max(0, Math.round((Date.now() - ms) / 60e3));
+  if (min < 1) return 'agora há pouco';
+  if (min < 60) return `há ${min} min`;
+  const h = Math.floor(min / 60);
+  return `há ${h} h${min % 60 ? ` ${min % 60} min` : ''}`;
+}
+const avMedia = (lista) => {
+  const comNota = lista.filter((a) => a.nota);
+  return comNota.length ? comNota.reduce((s, a) => s + a.nota, 0) / comNota.length : null;
+};
+const avNum = (n) => n.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+function avNotaHtml(a) {
+  const p = AV_PLAT[a.plataforma];
+  if (p.escala === 'reclamacao') {
+    const ok = a.situacao === 'Respondida';
+    return `<span class="av-recl${ok ? ' av-recl--ok' : ''}">Reclamação · ${esc(a.situacao)}</span>`;
+  }
+  const marca = p.escala === 'bolhas' ? 'av-bolhas' : 'av-estrelas';
+  return `<span class="${marca}" role="img" aria-label="Nota ${a.nota} de 5">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= a.nota ? 'cheia' : ''}" aria-hidden="true"></i>`).join('')}</span>`;
+}
+const avSelo = (plat) => `<span class="av-sigla" style="--cor:${AV_PLAT[plat].cor}" aria-hidden="true">${AV_PLAT[plat].sigla}</span>`;
+
+if ($('[data-avaliacoes]')) iniciarAvaliacoes();
+
+function iniciarAvaliacoes() {
+  const form = $('[data-av-filtros]');
+  const padrao = { q: '', plataforma: 'todas', unidade: 'todas', nota: 'todas', periodo: '30', resposta: 'todas' };
+  const params = new URLSearchParams(location.search);
+  const estado = { ...padrao };
+  Object.keys(padrao).forEach((k) => { if (params.get(k)) estado[k] = params.get(k); });
+  D.plataformas.filter((p) => !p.emAnalise).forEach((p) => form.plataforma.add(new Option(p.nome, p.id)));
+  D.unidades.forEach((u) => form.unidade.add(new Option(u, u)));
+  Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
+  let mostrando = AV_POR_PAGINA;
+  let atualizando = false;
+
+  // ----- Barra do cache -----
+  function desenharCache() {
+    const proxima = av.atualizadoEm + AV_INTERVALO;
+    const liberaEm = av.atualizadoEm + AV_ESPERA;
+    const espera = Date.now() < liberaEm;
+    $('[data-av-cache]').innerHTML = `
+      <span class="av-cache__icone" aria-hidden="true">${icone(atualizando ? 'relogio' : 'ok')}</span>
+      <div class="av-cache__texto">
+        <p><strong>${atualizando ? 'Buscando avaliações novas…' : `Atualizado ${avQuando(av.atualizadoEm)}`}</strong>${atualizando ? '' : ` <span>(${avHa(av.atualizadoEm)})</span>`}</p>
+        <p class="av-cache__sub">As avaliações ficam guardadas e se atualizam sozinhas: Google e iFood a cada 6 horas, Tripadvisor uma vez por dia. Próxima atualização: ${avQuando(proxima)}.</p>
+      </div>
+      <div class="av-cache__acao">
+        <button class="btn btn--secundario" type="button" data-av-atualizar${atualizando || espera ? ' disabled' : ''}${espera && !atualizando ? ` aria-describedby="av-espera"` : ''}>${atualizando ? 'Atualizando…' : 'Atualizar agora'}</button>
+        ${espera && !atualizando ? `<span class="av-cache__espera" id="av-espera">Pode atualizar de novo às ${new Date(liberaEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>` : ''}
+      </div>
+      <p class="av-cache__demo">Protótipo: <button type="button" class="teste-simular" data-av-vencer>simular 6 horas sem atualizar</button></p>`;
+    $('[data-av-atualizar]').addEventListener('click', () => atualizar(false));
+    $('[data-av-vencer]').addEventListener('click', () => {
+      const atras = AV_INTERVALO + 60e3;
+      av.atualizadoEm -= atras;
+      Object.keys(av.porPlataforma).forEach((id) => { av.porPlataforma[id] -= atras; });
+      avSalvar();
+      location.reload();
+    });
+  }
+
+  // Busca nas plataformas conectadas (simulada): traz as avaliações que ainda não estavam no cache
+  function atualizar(automatica) {
+    if (atualizando) return;
+    atualizando = true;
+    desenharCache();
+    $('[data-av-lista]').setAttribute('aria-busy', 'true');
+    setTimeout(() => {
+      const ja = new Set(av.extras.map((a) => a.id));
+      // Cada plataforma só é consultada quando o cache dela venceu (o Tripadvisor cobra por consulta: 1 vez por dia)
+      const agora = Date.now();
+      const limite = (p) => (automatica || p.horas >= 24 ? p.horas * 3600e3 : AV_ESPERA);   // o botão não fura o limite diário
+      const vencida = (p) => !p.emAnalise && avPlatConectada(p.id) && agora - (av.porPlataforma[p.id] || 0) >= limite(p);
+      const consultar = new Set(D.plataformas.filter(vencida).map((p) => p.id));
+      const novas = D.avaliacoesNovas
+        .filter((a) => !ja.has(a.id) && consultar.has(a.plataforma) && avConectada(a.plataforma, a.unidade))
+        .slice(0, automatica ? 3 : 2)
+        .map((a, i) => ({ ...a, ts: agora - (i + 1) * 7 * 60e3 }));
+      av.extras.push(...novas);
+      av.atualizadoEm = agora;
+      consultar.forEach((id) => { av.porPlataforma[id] = agora; });
+      avSalvar();
+      atualizando = false;
+      $('[data-av-lista]').removeAttribute('aria-busy');
+      desenharTudo();
+      avisar(novas.length ? `${novas.length} ${novas.length === 1 ? 'avaliação nova' : 'avaliações novas'}` : 'Nenhuma avaliação nova desde a última atualização');
+      agendar();
+    }, 1400);
+  }
+
+  // Enquanto a tela está aberta, a atualização automática acontece sozinha quando o cache vence
+  let relogio = null;
+  function agendar() {
+    clearTimeout(relogio);
+    const falta = av.atualizadoEm + AV_INTERVALO - Date.now();
+    relogio = setTimeout(() => atualizar(true), Math.max(falta, 0));
+  }
+  // A cada minuto, os textos "há X min" e o botão (que libera depois da espera) se atualizam
+  setInterval(() => { if (!atualizando) desenharCache(); }, 60e3);
+
+  // ----- Cartões das plataformas -----
+  function desenharPlataformas() {
+    const todas = avTodas().filter((a) => a.ts >= Date.now() - 90 * 864e5);
+    $('[data-av-plataformas]').innerHTML = D.plataformas.map((p) => {
+      const ligada = avPlatConectada(p.id);
+      const lista = todas.filter((a) => a.plataforma === p.id);
+      const media = avMedia(lista);
+      const unidades = p.porUnidade ? Object.keys(av.conexoes[p.id] || {}) : [];
+      const onde = p.porUnidade ? (unidades.length === D.unidades.length ? 'Todas as unidades' : unidades.join(', ')) : 'Página da empresa';
+      // Reclame Aqui: sem API pública confirmada (só via HugMe, pago). Fica visível, mas sem conexão.
+      if (p.emAnalise) {
+        return `<article class="cartao av-plat av-plat--off">
+          <div class="av-plat__topo">${avSelo(p.id)}<h3>${p.nome}</h3><span class="selo-dev">Em análise</span></div>
+          <p class="av-plat__onde">O Reclame Aqui não tem uma API pública para ler as reclamações. Estamos vendo como conectar.</p>
+        </article>`;
+      }
+      const botao = souAdmin
+        ? `<button class="btn btn--${ligada ? 'fantasma' : 'secundario'}" type="button" data-av-conectar="${p.id}" aria-haspopup="dialog">${ligada ? 'Gerenciar' : 'Conectar'}</button>`
+        : (ligada ? '' : '<span class="av-plat__admin">Quem conecta é o administrador</span>');
+      return `<article class="cartao av-plat${ligada ? '' : ' av-plat--off'}">
+        <div class="av-plat__topo">${avSelo(p.id)}<h3>${p.nome}</h3>
+          <span class="av-plat__estado${ligada ? ' av-plat__estado--on' : ''}">${ligada ? 'Conectada' : 'Não conectada'}</span></div>
+        ${ligada ? `
+          <p class="av-plat__nota">${media ? avNum(media) : '–'}<small> de 5 · ${lista.length} em 90 dias</small></p>
+          <p class="av-plat__onde">${esc(onde)}</p>
+          <p class="av-plat__quando">Atualizada ${avQuando(av.porPlataforma[p.id] || av.atualizadoEm)} · ${p.horas === 24 ? '1 vez por dia' : `a cada ${p.horas} horas`}</p>`
+        : `<p class="av-plat__onde">Conecte para ver as avaliações das unidades aqui. ${p.horas === 24 ? 'Atualiza 1 vez por dia.' : `Atualiza a cada ${p.horas} horas.`}</p>`}
+        ${botao}
+      </article>`;
+    }).join('');
+    $$('[data-av-conectar]').forEach((b) => b.addEventListener('click', () => abrirConexao(b.dataset.avConectar)));
+  }
+
+  // ----- Resumo + lista -----
+  const noPeriodo = () => avTodas().filter((a) => a.ts >= Date.now() - Number(estado.periodo) * 864e5)
+    .filter((a) => estado.unidade === 'todas' || a.unidade === estado.unidade || (!a.unidade && estado.unidade === 'todas'));
+
+  function filtrar() {
+    const q = estado.q.trim().toLowerCase();
+    return noPeriodo().filter((a) => {
+      if (estado.plataforma !== 'todas' && a.plataforma !== estado.plataforma) return false;
+      if (estado.nota === 'baixas' && !(a.nota && a.nota <= 2)) return false;
+      if (estado.nota === 'altas' && !(a.nota >= 4)) return false;
+      if (estado.nota === '3' && a.nota !== 3) return false;
+      if (estado.resposta === 'sem' && a.resposta) return false;
+      if (estado.resposta === 'com' && !a.resposta) return false;
+      if (q && !`${a.texto || ''} ${a.titulo || ''} ${a.autor}`.toLowerCase().includes(q)) return false;
+      return true;
+    }).sort((a, b) => b.ts - a.ts);
+  }
+
+  function desenharResumo() {
+    const lista = noPeriodo();
+    const media = avMedia(lista);
+    const baixas = lista.filter((a) => a.nota && a.nota <= 2).length;
+    const semResposta = lista.filter((a) => !a.resposta).length;
+    const per = `Últimos ${estado.periodo} dias`;
+    $('[data-av-resumo]').innerHTML = `
+      <article class="kpi"><p class="kpi__rotulo">Nota média</p><p class="kpi__valor">${media ? avNum(media) : '–'}<small>de 5</small></p><p class="kpi__nota">${per}, todas as plataformas com nota</p></article>
+      <article class="kpi"><p class="kpi__rotulo">Avaliações</p><p class="kpi__valor">${lista.length}</p><p class="kpi__nota">${per}</p></article>
+      <article class="kpi${baixas ? ' kpi--alerta' : ''}"><p class="kpi__rotulo"><a class="kpi__link" href="#" data-av-atalho="baixas">Notas baixas (1 e 2)</a></p><p class="kpi__valor">${baixas}</p><p class="kpi__nota">${baixas ? 'Clique para ver' : 'Nenhuma no período'}</p></article>
+      <article class="kpi"><p class="kpi__rotulo"><a class="kpi__link" href="#" data-av-atalho="sem">Sem resposta da casa</a></p><p class="kpi__valor">${semResposta}</p><p class="kpi__nota">Respostas ficam na própria plataforma</p></article>`;
+    $$('[data-av-atalho]').forEach((l) => l.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (l.dataset.avAtalho === 'baixas') estado.nota = 'baixas'; else estado.resposta = 'sem';
+      Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
+      mostrando = AV_POR_PAGINA;
+      sincronizarEndereco();
+      desenharLista();
+      $('[data-av-lista]').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    }));
+  }
+
+  function htmlItem(a) {
+    const p = AV_PLAT[a.plataforma];
+    const nova = av.extras.some((x) => x.id === a.id) && a.ts > Date.now() - 864e5;
+    return `<li class="cartao av-item">
+      <div class="av-item__topo">
+        ${avSelo(a.plataforma)}
+        <span class="av-item__meta"><strong>${p.nome}</strong>${a.unidade ? ` · ${esc(a.unidade)}` : ''} · <time datetime="${new Date(a.ts).toISOString()}">${avQuando(a.ts)}</time></span>
+        ${nova ? '<span class="av-novo">Nova</span>' : ''}
+      </div>
+      <div class="av-item__nota">${avNotaHtml(a)}<span class="av-item__autor">${esc(a.autor)}</span></div>
+      ${a.titulo ? `<p class="av-item__titulo">${esc(a.titulo)}</p>` : ''}
+      ${a.texto ? `<p class="av-item__texto">“${esc(a.texto)}”</p>` : '<p class="fb-item__sem">Só a nota, sem comentário</p>'}
+      ${a.resposta ? `<div class="av-resposta"><span>Resposta da casa</span><p>${esc(a.resposta)}</p></div>` : ''}
+      <button class="btn btn--fantasma av-item__ver" type="button" data-av-ver="${p.nome}">${icone('link')}Ver no ${p.nome}</button>
+    </li>`;
+  }
+
+  function desenharLista() {
+    const lista = filtrar();
+    const n = lista.length;
+    $('[data-av-contagem]').textContent = `${n} ${n === 1 ? 'avaliação' : 'avaliações'}`;
+    $('[data-av-lista]').innerHTML = lista.slice(0, mostrando).map(htmlItem).join('');
+    $('[data-av-vazio]').hidden = n > 0;
+    $('[data-av-mais]').hidden = n <= mostrando;
+    $$('[data-av-ver]').forEach((b) => b.addEventListener('click', () => avisar(`No app, abre esta avaliação no ${b.dataset.avVer}.`)));
+  }
+
+  function desenharTudo() { desenharCache(); desenharPlataformas(); desenharResumo(); desenharLista(); }
+
+  function sincronizarEndereco() {
+    const p = new URLSearchParams();
+    Object.keys(padrao).forEach((k) => { if (estado[k] !== padrao[k]) p.set(k, estado[k]); });
+    history.replaceState(null, '', `${location.pathname}${p.toString() ? `?${p}` : ''}`);
+  }
+  form.addEventListener('input', () => {
+    Object.keys(padrao).forEach((k) => { if (form[k]) estado[k] = form[k].value; });
+    mostrando = AV_POR_PAGINA;
+    sincronizarEndereco();
+    desenharResumo();
+    desenharLista();
+  });
+  form.addEventListener('submit', (e) => e.preventDefault());
+  $('[data-av-limpar]').addEventListener('click', () => {
+    Object.assign(estado, padrao);
+    Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
+    mostrando = AV_POR_PAGINA;
+    sincronizarEndereco();
+    desenharResumo();
+    desenharLista();
+  });
+  $('[data-av-mais]').addEventListener('click', () => { mostrando += AV_POR_PAGINA; desenharLista(); });
+
+  // ----- Conectar / gerenciar uma plataforma (gaveta) -----
+  // Como cada plataforma se conecta (pesquisa das APIs em 2026-11-05; ver memoria.md):
+  // Google: Business Profile API, com OAuth da conta que administra o perfil. iFood: Merchant API (módulo Review);
+  // o restaurante digita um código no Portal do Parceiro e clica em "Autorizar". Tripadvisor: Terra (pago por consulta);
+  // guarda-se só o ID do local, o resto depende do contrato.
+  const COMO = {
+    google: {
+      texto: 'Entre com a conta Google que administra o Perfil da Empresa das unidades e escolha qual perfil é de cada unidade.',
+      campo: 'Perfil no Google',
+      nota: 'O perfil precisa estar verificado no Google.',
+    },
+    ifood: {
+      texto: 'O iFood libera as avaliações quando a loja autoriza o Opiina no Portal do Parceiro.',
+      campo: 'Loja no iFood',
+    },
+    tripadvisor: {
+      texto: 'Cole o endereço da página de cada unidade no Tripadvisor.',
+      campo: 'Página no Tripadvisor', exemplo: 'https://www.tripadvisor.com.br/Restaurant_Review-…', dominio: 'tripadvisor',
+      nota: 'O Tripadvisor cobra por consulta; por isso a atualização é diária.',
+    },
+  };
+  const CODIGO_IFOOD = 'QWER-7K2D';   // exemplo: no app, o código vem do iFood e vale por pouco tempo
+  const gaveta = $('[data-av-gaveta]');
+  const corpo = $('[data-av-gaveta-corpo]');
+
+  function abrirConexao(id) {
+    const p = AV_PLAT[id];
+    const c = COMO[id];
+    const atual = av.conexoes[id] || {};
+    // Google e iFood pedem autorização antes de escolher as lojas; já conectados, vão direto para a lista
+    const autorizou = !['google', 'ifood'].includes(id) || avPlatConectada(id);
+    const linhas = p.porUnidade ? D.unidades : ['_empresa'];
+    const nomeLinha = (u) => (u === '_empresa' ? 'Empresa' : u);
+    const campoDe = (u, i) => {
+      const valor = atual[u] || '';
+      if (id === 'google' || id === 'ifood') {
+        // Depois da autorização, a plataforma devolve os perfis/lojas da conta: é só escolher qual é de cada unidade
+        const opcoes = ['', ...D.unidades.map((x) => (id === 'google' ? `Casa Exemplo – ${x}` : `Casa Exemplo ${x}`))];
+        return `<select id="ac-${i}" name="${esc(u)}">${opcoes.map((o) => `<option value="${esc(o)}"${o === valor ? ' selected' : ''}>${o || 'Não ligar'}</option>`).join('')}</select>`;
+      }
+      return `<input id="ac-${i}" name="${esc(u)}" value="${esc(valor)}" placeholder="${esc(c.exemplo)}" autocomplete="off" spellcheck="false" aria-describedby="ac-${i}-erro">`;
+    };
+    corpo.innerHTML = `
+      <div class="gaveta__topo">
+        <h2 class="cfg-gaveta__titulo av-gaveta__titulo" id="ac-titulo" tabindex="-1">${avSelo(id)}${avPlatConectada(id) ? p.nome : `Conectar o ${p.nome}`}</h2>
+        <button class="botao-icone" type="button" aria-label="Fechar" data-ac-fechar>${icone('fechar')}</button>
+      </div>
+      <p class="cartao__sub">${c.texto}</p>
+      <ul class="den-garantias">
+        <li>${icone('ok')}O Opiina só lê as avaliações. As respostas continuam sendo feitas no ${p.nome}.</li>
+        <li>${icone('ok')}${p.horas === 24 ? 'As avaliações se atualizam sozinhas uma vez por dia.' : `As avaliações ficam guardadas e se atualizam sozinhas a cada ${p.horas} horas.`}</li>
+        ${c.nota ? `<li>${icone('alerta')}${c.nota}</li>` : ''}
+      </ul>
+      ${id === 'google' && !autorizou ? `
+        <div class="av-autorizar" data-ac-autorizar>
+          <button class="btn btn--primario" type="button" data-ac-entrar>Entrar com o Google</button>
+          <p class="campo__dica">Protótipo: a entrada é simulada. No app, abre a tela de autorização do Google.</p>
+        </div>` : ''}
+      ${id === 'ifood' && !autorizou ? `
+        <div class="av-autorizar" data-ac-autorizar>
+          <ol class="av-passos">
+            <li>Entre no <strong>Portal do Parceiro iFood</strong> com a conta da loja.</li>
+            <li>Digite este código e clique em <strong>Autorizar</strong>:
+              <span class="av-codigo"><strong data-ac-codigo>${CODIGO_IFOOD}</strong><button class="btn btn--fantasma" type="button" data-ac-copiar>${icone('link')}Copiar código</button></span></li>
+            <li>Volte aqui e clique em "Já autorizei".</li>
+          </ol>
+          <button class="btn btn--primario" type="button" data-ac-entrar>Já autorizei</button>
+          <p class="campo__dica">Protótipo: o código é de exemplo e a autorização é simulada.</p>
+        </div>` : ''}
+      <form class="gaveta__form" data-ac-form novalidate ${autorizou ? '' : 'hidden'}>
+        ${linhas.map((u, i) => `
+          <div class="campo">
+            <label for="ac-${i}">${nomeLinha(u)}${p.porUnidade ? ` <span class="opcional">· ${c.campo}</span>` : ` <span class="opcional">· ${c.campo}</span>`}</label>
+            ${campoDe(u, i)}
+            <p class="campo__erro" id="ac-${i}-erro" hidden>Este endereço não parece ser do ${p.nome}.</p>
+          </div>`).join('')}
+        <p class="campo__dica">${p.porUnidade ? 'Deixe em branco a unidade que não está nesta plataforma.' : 'Deixe em branco para desconectar.'}</p>
+        <div class="gaveta__acoes">
+          <button class="btn btn--secundario" type="button" data-ac-fechar>Cancelar</button>
+          <button class="btn btn--primario" type="submit">Salvar conexões</button>
+        </div>
+      </form>`;
+    $$('[data-ac-fechar]', corpo).forEach((b) => b.addEventListener('click', () => gaveta.close()));
+    $('[data-ac-entrar]', corpo)?.addEventListener('click', () => {
+      $('[data-ac-autorizar]', corpo).hidden = true;
+      $('[data-ac-form]', corpo).hidden = false;
+      avisar(id === 'google' ? 'Conta Google conectada (simulação). Escolha o perfil de cada unidade.' : 'Autorização do iFood recebida (simulação). Escolha a loja de cada unidade.');
+      $('select', corpo).focus();
+    });
+    $('[data-ac-copiar]', corpo)?.addEventListener('click', async (ev) => {
+      try { await navigator.clipboard.writeText(CODIGO_IFOOD); avisar('Código copiado'); }
+      catch { getSelection().selectAllChildren($('[data-ac-codigo]', corpo)); avisar('Código selecionado: copie com Ctrl+C'); }
+      ev.currentTarget.blur();
+    });
+    $('[data-ac-form]', corpo).addEventListener('submit', (e) => {
+      e.preventDefault();
+      const campos = $$('input, select', e.currentTarget);
+      let erro = null;
+      campos.forEach((cp) => {
+        const ruim = c.dominio && cp.value.trim() && !cp.value.toLowerCase().includes(c.dominio);
+        if (ruim) cp.setAttribute('aria-invalid', 'true'); else cp.removeAttribute('aria-invalid');
+        $(`#${cp.id}-erro`, corpo) && ($(`#${cp.id}-erro`, corpo).hidden = !ruim);
+        if (ruim && !erro) erro = cp;
+      });
+      if (erro) { erro.focus(); return; }
+      const antes = new Set(Object.keys(av.conexoes[id] || {}));
+      const novo = {};
+      campos.forEach((cp) => { if (cp.value.trim()) novo[cp.name] = cp.value.trim(); });
+      av.conexoes[id] = novo;
+      // Demonstração: quem acabou de conectar Tripadvisor ou Reclame Aqui já vê avaliações chegando
+      const recem = Object.keys(novo).filter((u) => !antes.has(u));
+      let importadas = 0;
+      (D.avaliacoesAoConectar[id] || []).length && recem.forEach((u) => {
+        D.avaliacoesAoConectar[id].forEach((modelo, i) => {
+          const idNovo = `${id}-${slug(u)}-${i}`;
+          if (av.extras.some((x) => x.id === idNovo)) return;
+          av.extras.push({ ...modelo, id: idNovo, unidade: u === '_empresa' ? null : u, ts: Date.now() - (i * 3 + 1) * 864e5 });
+          importadas += 1;
+        });
+      });
+      av.porPlataforma[id] = Date.now();
+      avSalvar();
+      gaveta.close();
+      desenharTudo();
+      const n = Object.keys(novo).length;
+      avisar(n ? `${p.nome}: ${n} ${p.porUnidade ? (n === 1 ? 'unidade conectada' : 'unidades conectadas') : 'página conectada'}${importadas ? ` · ${importadas} avaliações importadas` : ''}` : `${p.nome} desconectado`);
+    });
+    gaveta.showModal();
+    $('#ac-titulo', corpo).focus();
+  }
+
+  desenharTudo();
+  // Cache vencido ao abrir a tela: atualiza na hora. Senão, agenda para quando vencer.
+  if (Date.now() - av.atualizadoEm >= AV_INTERVALO) atualizar(true); else agendar();
+}
