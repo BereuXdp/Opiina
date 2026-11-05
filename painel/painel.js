@@ -814,7 +814,7 @@ if ($('.principal')) {
 }
 
 // ---------- Tour da primeira entrada (pedido do cliente, 2026-11-05) ----------
-// Aparece sozinho na primeira entrada (guardado no navegador) e pode ser revisto pelo botão "Ver o tour" no menu.
+// Aparece sozinho só na primeira entrada (guardado no navegador). Não há botão para rever (decisão do cliente, 2026-11-05).
 // Cada passo destaca um item do menu com uma explicação curta. Só entram as telas que o perfil enxerga.
 // No celular (menu em gaveta), os passos aparecem centralizados, sem destaque.
 const CHAVE_TOUR = 'opiina-demo-tour-visto';
@@ -877,7 +877,7 @@ function iniciarTour({ automatico }) {
       corpo = `
         <span class="tour__selo tour__selo--fim">${icone('ok')}</span>
         <h2 id="tour-titulo" tabindex="-1">Pronto!</h2>
-        <p id="tour-texto">${podeCriar ? 'Um bom começo é criar a primeira pesquisa da unidade.' : 'Agora é só explorar.'} Para ver o tour de novo, use "Ver o tour" no fim do menu.</p>
+        <p id="tour-texto">${podeCriar ? 'Um bom começo é criar a primeira pesquisa da unidade.' : 'Agora é só explorar.'}</p>
         <div class="tour__acoes">${podeCriar ? '<button class="btn btn--secundario" type="button" data-tour-sair>Fechar</button><a class="btn btn--primario" href="pesquisa-nova.html" data-tour-sair>Criar a primeira pesquisa</a>' : '<button class="btn btn--primario" type="button" data-tour-sair>Fechar</button>'}</div>`;
     } else {
       const p = passos[atual];
@@ -924,14 +924,6 @@ function iniciarTour({ automatico }) {
   addEventListener('resize', posicionar);
   desenhar();
 }
-
-// Botão "Ver o tour" no rodapé do menu (logo acima do Modo escuro)
-$('[data-tema-botao]')?.insertAdjacentHTML('beforebegin', `
-  <button class="tema" type="button" data-tour-abrir><span class="tema__icone" aria-hidden="true">${icone('ok')}</span>Ver o tour</button>`);
-$('[data-tour-abrir]')?.addEventListener('click', () => {
-  if (telaMovel.matches) $('[data-menu-fechar]')?.click();   // no celular, fecha a gaveta do menu antes
-  iniciarTour({ automatico: false });
-});
 
 // Primeira entrada: abre sozinho. Espera o aviso do teste grátis (véspera) ser fechado; com o painel travado
 // (último dia do teste ou conta inativa), não abre.

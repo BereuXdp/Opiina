@@ -61,6 +61,4 @@ function iniciarAjuda() {
     history.replaceState(null, '', url);
   }));
 
-  // "Ver o tour do painel": o mesmo tour da primeira entrada
-  $('[data-ajuda-tour]').addEventListener('click', () => iniciarTour({ automatico: false }));
 }
