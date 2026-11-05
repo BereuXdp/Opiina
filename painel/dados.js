@@ -24,7 +24,7 @@ window.OPIINA_DEMO = {
   areas: [
     { id: 'dashboard', nome: 'Dashboard' }, { id: 'ranking', nome: 'Ranking' },
     // "ocorrencias" não é mais item do menu: é a permissão de TRATAR feedbacks (responsável, prazo, etapa, Kanban)
-    { id: 'feedbacks', nome: 'Feedbacks' }, { id: 'avaliacoes', nome: 'Avaliações (Google, iFood, Tripadvisor, Reclame Aqui)' }, { id: 'ocorrencias', nome: 'Tratar feedbacks (responsável, prazo, Kanban)' },
+    { id: 'feedbacks', nome: 'Feedbacks' }, { id: 'avaliacoes', nome: 'Avaliações (Google, iFood, Tripadvisor)' }, { id: 'ocorrencias', nome: 'Tratar feedbacks (responsável, prazo, Kanban)' },
     { id: 'denuncias', nome: 'Denúncias' }, { id: 'pesquisas', nome: 'Pesquisas' }, { id: 'clientes', nome: 'Clientes' }, { id: 'premios', nome: 'Prêmios' },
     { id: 'atendentes', nome: 'Atendentes (só das próprias unidades)' },
     { id: 'configuracoes', nome: 'Configurações' },
@@ -298,23 +298,21 @@ window.OPIINA_DEMO = {
       comentario: 'Mesa pegajosa quando sentamos.' },
   ],
   // ---------- Avaliações externas (aba Avaliações, 2026-11-05). Tudo fictício. ----------
-  // As 4 plataformas são as que o app atual já cita no Dashboard ("Google, iFood, Tripadvisor e Reclame Aqui").
+  // Plataformas: Google, iFood e Tripadvisor. O Reclame Aqui saiu a pedido do cliente (2026-11-05: "não precisa").
   // porUnidade: a conexão é por unidade. horas: de quanto em quanto tempo o cache daquela plataforma é atualizado.
   // Pesquisa das APIs (2026-11-05, ver memoria.md): Google (Business Profile API) e iFood (Merchant API, módulo Review)
   // deixam ler e guardar as avaliações do próprio restaurante; Tripadvisor (Terra) é pago por consulta e o contrato
-  // define o que pode ser guardado; Reclame Aqui não tem API pública (só via HugMe, pago, a confirmar).
+  // define o que pode ser guardado.
   plataformas: [
     { id: 'google',      nome: 'Google',       sigla: 'G',  cor: '#1A73E8', porUnidade: true,  escala: 'estrelas', horas: 6 },
     { id: 'ifood',       nome: 'iFood',        sigla: 'iF', cor: '#EA1D2C', porUnidade: true,  escala: 'estrelas', horas: 6 },
     { id: 'tripadvisor', nome: 'Tripadvisor',  sigla: 'T',  cor: '#00AA6C', porUnidade: true,  escala: 'bolhas', horas: 24 },
-    { id: 'reclameaqui', nome: 'Reclame Aqui', sigla: 'RA', cor: '#5C8A1E', porUnidade: false, escala: 'reclamacao', emAnalise: true },
   ],
   // Conexões iniciais da demonstração (unidade → identificação na plataforma)
   conexoes: {
     google:      { 'Centro': 'Casa Exemplo – Centro', 'Shopping Norte': 'Casa Exemplo – Shopping Norte' },
     ifood:       { 'Centro': 'Casa Exemplo Centro', 'Orla': 'Casa Exemplo Orla' },   // lojas autorizadas no Portal do Parceiro
     tripadvisor: {},
-    reclameaqui: {},
   },
   // Avaliações já guardadas no cache. dias: negativo = há N dias; nota de 1 a 5; resposta = resposta da casa na plataforma.
   avaliacoes: [

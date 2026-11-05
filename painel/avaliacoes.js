@@ -1,4 +1,4 @@
-// Opiina — painel (protótipo): Avaliações externas (Google, iFood, Tripadvisor, Reclame Aqui). Pedido do cliente, 2026-11-05.
+// Opiina — painel (protótipo): Avaliações externas (Google, iFood, Tripadvisor). Pedido do cliente, 2026-11-05.
 // Usa utilidades de painel.js ($, $$, esc, icone, avisar, D…). Aqui só se veem as avaliações:
 // conectar as plataformas fica em Configurações › Integrações (configuracoes.js), com o mesmo estado guardado.
 // CACHE: as avaliações ficam guardadas e só são buscadas de novo quando o cache vence (AV_INTERVALO) ou quando
@@ -164,13 +164,6 @@ function iniciarAvaliacoes() {
       const media = avMedia(lista);
       const unidades = p.porUnidade ? Object.keys(av.conexoes[p.id] || {}) : [];
       const onde = p.porUnidade ? (unidades.length === D.unidades.length ? 'Todas as unidades' : unidades.join(', ')) : 'Página da empresa';
-      // Reclame Aqui: sem API pública confirmada (só via HugMe, pago). Fica visível, mas sem conexão.
-      if (p.emAnalise) {
-        return `<article class="cartao av-plat av-plat--off">
-          <div class="av-plat__topo">${avSelo(p.id)}<h3>${p.nome}</h3><span class="selo-dev">Em análise</span></div>
-          <p class="av-plat__onde">O Reclame Aqui não tem uma API pública para ler as reclamações. Estamos vendo como conectar.</p>
-        </article>`;
-      }
       // Aqui só se vê; conectar fica em Configurações › Integrações (cliente, 2026-11-05)
       return `<article class="cartao av-plat${ligada ? '' : ' av-plat--off'}">
         <div class="av-plat__topo">${avSelo(p.id)}<h3>${p.nome}</h3>
