@@ -1829,3 +1829,20 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 .ajuda-item .btn { margin-top: 14px; }
 .ajuda-fim { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
 @media (prefers-reduced-motion: reduce) { .ajuda-item > summary::after { transition: none; } }
+/* Tutorial ilustrado: capturas do próprio painel (geradas por tools/capturas-ajuda.mjs) */
+.ajuda-selo { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 6px; background: var(--bg-suave); color: var(--link); font-size: 13px; font-weight: 600; vertical-align: 1px; white-space: nowrap; }
+.ajuda-passos { gap: 22px !important; }
+.ajuda-passos li > p { margin-bottom: 10px; }
+.ajuda-fig { margin: 0; max-width: 520px; }
+.ajuda-fig--larga { max-width: 100%; }
+.ajuda-fig--estreita { max-width: 330px; }
+.ajuda-fig img {
+  display: block; width: 100%; height: auto;
+  border: 1px solid var(--linha-forte); border-radius: 12px;
+  background: #F6F9FF; box-shadow: 0 6px 20px rgba(10, 26, 51, .08);
+}
+.ajuda-fig a { display: block; border-radius: 12px; cursor: zoom-in; }
+@media (max-width: 560px) {
+  /* No celular, a imagem usa a largura toda do cartão (sem o recuo do número do passo) */
+  .ajuda-passos .ajuda-fig { margin-left: -36px; max-width: none; }
+}
