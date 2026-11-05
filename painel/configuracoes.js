@@ -783,6 +783,7 @@ document.addEventListener('click', async (e) => {
   if (!remover) return;
   const chaves = lerChaves();
   const c = chaves[Number(remover.dataset.chaveRemover)];
+  if (!c) { desenharChavesApi(); return; }   // a lista mudou em outra aba: redesenha com o que está guardado
   const sim = await confirmar({
     titulo: 'Remover esta chave de API?',
     texto: `A chave terminada em <strong>${esc(c.final)}</strong> deixa de ser usada pelo Opiina.`,
@@ -796,18 +797,78 @@ document.addEventListener('click', async (e) => {
   avisar('Chave removida');
 });
 
-// Plataformas de avaliação: só o resumo. A conexão acontece na aba Avaliações (um lugar só para conectar),
-// e este cartão lê o mesmo estado guardado por ela (localStorage "opiina-demo-avaliacoes").
+// Plataformas de avaliação: a conexão acontece aqui, na própria linha da plataforma, sem gaveta
+// (cliente, 2026-11-05: "adiciona esses meios de conexão aqui; não quero ir para a aba Avaliações").
+// O estado é o mesmo da aba Avaliações (localStorage "opiina-demo-avaliacoes"): o que conecta aqui aparece lá.
+// Google e iFood: o restaurante só AUTORIZA (as chaves de desenvolvedor são da Dev+, no servidor).
+// Tripadvisor: endereço da página de cada unidade. Reclame Aqui: sem API pública (em análise).
+const CHAVE_AV = 'opiina-demo-avaliacoes';
+const CODIGO_IFOOD_DEMO = 'QWER-7K2D';   // exemplo: no app, o código vem do iFood e vale por pouco tempo
+let integAberta = null;                  // plataforma com os passos abertos
+let integAutorizou = new Set();          // Google/iFood já autorizados nesta abertura (simulação)
+
+function lerAvaliacoesEstado() {
+  try { const s = JSON.parse(localStorage.getItem(CHAVE_AV)); if (s?.atualizadoEm) return s; } catch { /* usa o inicial */ }
+  const inicio = Date.now() - 47 * 60e3;   // igual ao começo da aba Avaliações
+  return { atualizadoEm: inicio, porPlataforma: { google: inicio, ifood: inicio }, conexoes: structuredClone(D.conexoes), extras: [] };
+}
+const gravarAvaliacoesEstado = (s) => { try { localStorage.setItem(CHAVE_AV, JSON.stringify(s)); } catch { /* ignora */ } };
+
+function passosConexao(p, ligadas) {
+  const nomes = cfg.unidades.map((u) => u.nome);
+  const autorizada = ligadas.length > 0 || integAutorizou.has(p.id);
+  const opcoes = (u) => ['', ...nomes.map((x) => (p.id === 'google' ? `Casa Exemplo – ${x}` : `Casa Exemplo ${x}`))]
+    .map((o) => `<option value="${esc(o)}"${o === (lerAvaliacoesEstado().conexoes[p.id]?.[u] || '') ? ' selected' : ''}>${o || 'Não ligar'}</option>`).join('');
+  // 1º passo: autorizar (Google e iFood). Já conectada, vai direto para a escolha das unidades.
+  if (p.id === 'google' && !autorizada) {
+    return `<div class="cfg-integ__passos">
+      <p>Entre com a conta Google que administra o Perfil da Empresa dos restaurantes e clique em <strong>Permitir</strong>.</p>
+      <div class="cfg-integ__botoes"><button class="btn btn--primario" type="button" data-integ-autorizar="google">Entrar com o Google</button>
+      <button class="btn btn--secundario" type="button" data-integ-fechar>Cancelar</button></div>
+      <p class="campo__dica">Protótipo: a entrada é simulada. No app, abre a tela de permissão do Google.</p>
+    </div>`;
+  }
+  if (p.id === 'ifood' && !autorizada) {
+    return `<div class="cfg-integ__passos">
+      <ol class="av-passos">
+        <li>Entre no <strong>Portal do Parceiro iFood</strong> com a conta da loja.</li>
+        <li>Cole este código e clique em <strong>Autorizar</strong>:
+          <span class="av-codigo"><strong data-integ-codigo>${CODIGO_IFOOD_DEMO}</strong><button class="btn btn--fantasma" type="button" data-integ-copiar>${icone('link')}Copiar código</button></span></li>
+        <li>Volte aqui e clique em "Já autorizei".</li>
+      </ol>
+      <div class="cfg-integ__botoes"><button class="btn btn--primario" type="button" data-integ-autorizar="ifood">Já autorizei</button>
+      <button class="btn btn--secundario" type="button" data-integ-fechar>Cancelar</button></div>
+      <p class="campo__dica">Protótipo: o código é de exemplo e a autorização é simulada.</p>
+    </div>`;
+  }
+  // 2º passo: qual perfil/loja/página é de cada unidade
+  const atual = lerAvaliacoesEstado().conexoes[p.id] || {};
+  const campo = (u, i) => (p.id === 'tripadvisor'
+    ? `<input id="ig-${i}" name="${esc(u)}" value="${esc(atual[u] || '')}" placeholder="https://www.tripadvisor.com.br/Restaurant_Review-…" autocomplete="off" spellcheck="false" aria-describedby="ig-${i}-erro">`
+    : `<select id="ig-${i}" name="${esc(u)}">${opcoes(u)}</select>`);
+  const rotulo = { google: 'Perfil no Google', ifood: 'Loja no iFood', tripadvisor: 'Página no Tripadvisor' }[p.id];
+  return `<form class="cfg-integ__passos" data-integ-form="${p.id}" novalidate>
+    ${p.id === 'tripadvisor' ? '<p>Cole o endereço da página de cada unidade no Tripadvisor. O Tripadvisor cobra por consulta; por isso a atualização é diária.</p>'
+      : `<p>${p.id === 'google' ? 'Conta Google autorizada.' : 'Loja autorizada no iFood.'} Escolha ${p.id === 'google' ? 'o perfil' : 'a loja'} de cada unidade.</p>`}
+    ${nomes.map((u, i) => `<div class="campo">
+      <label for="ig-${i}">${esc(u)} <span class="opcional">· ${rotulo}</span></label>
+      ${campo(u, i)}
+      <p class="campo__erro" id="ig-${i}-erro" hidden>Este endereço não parece ser do Tripadvisor.</p>
+    </div>`).join('')}
+    <p class="campo__dica">Deixe em branco (ou "Não ligar") a unidade que não está nesta plataforma.</p>
+    <div class="cfg-integ__botoes"><button class="btn btn--primario" type="submit">Salvar conexões</button>
+    <button class="btn btn--secundario" type="button" data-integ-fechar>Cancelar</button></div>
+  </form>`;
+}
+
 function desenharIntegAvaliacoes() {
   const caixa = $('[data-integ-avaliacoes]');
   if (!caixa) return;
-  let conexoes = D.conexoes;
-  try { conexoes = JSON.parse(localStorage.getItem('opiina-demo-avaliacoes'))?.conexoes || D.conexoes; } catch { /* usa os exemplos */ }
+  const conexoes = lerAvaliacoesEstado().conexoes;
   caixa.innerHTML = `
     <div class="cfg__topo">
       <div><h3 class="cartao__titulo">Plataformas de avaliação</h3>
-      <p class="cartao__sub">Google, iFood, Tripadvisor e Reclame Aqui. As avaliações aparecem na aba Avaliações e se atualizam sozinhas.</p></div>
-      <a class="btn btn--secundario" href="avaliacoes.html">Conectar e gerenciar</a>
+      <p class="cartao__sub">Conecte cada plataforma aqui. As avaliações aparecem na aba <a class="link-texto" href="avaliacoes.html">Avaliações</a> e se atualizam sozinhas.</p></div>
     </div>
     <ul class="cfg-integ">
       ${D.plataformas.map((p) => {
@@ -816,11 +877,76 @@ function desenharIntegAvaliacoes() {
           : unidades.length ? situacao('Conectada', 'publicada') : situacao('Não conectada', 'arquivada');
         const detalhe = p.emAnalise ? 'Sem API pública por enquanto'
           : unidades.length ? (unidades.length === cfg.unidades.length ? 'Todas as unidades' : unidades.map(esc).join(', ')) : 'Nenhuma unidade';
-        return `<li><span class="av-sigla" style="--cor:${p.cor}" aria-hidden="true">${p.sigla}</span>
-          <span class="cfg-integ__nome"><strong>${p.nome}</strong><span>${detalhe}</span></span>${estado}</li>`;
+        const aberta = integAberta === p.id;
+        const botao = p.emAnalise || aberta ? ''
+          : `<button class="btn btn--${unidades.length ? 'fantasma' : 'secundario'}" type="button" data-integ-abrir="${p.id}" aria-expanded="false">${unidades.length ? 'Gerenciar' : 'Conectar'}</button>`;
+        return `<li${aberta ? ' class="cfg-integ--aberta"' : ''}><span class="av-sigla" style="--cor:${p.cor}" aria-hidden="true">${p.sigla}</span>
+          <span class="cfg-integ__nome"><strong id="ig-nome-${p.id}">${p.nome}</strong><span>${detalhe}</span></span>${estado}${botao}
+          ${aberta ? `<div class="cfg-integ__painel" role="region" aria-labelledby="ig-nome-${p.id}">${passosConexao(p, unidades)}</div>` : ''}</li>`;
       }).join('')}
     </ul>`;
+  const painel = $('.cfg-integ__painel', caixa);
+  if (painel) ($('select, input', painel) || $('button', painel)).focus();
 }
+
+function fecharInteg(id) {
+  integAberta = null;
+  integAutorizou = new Set();
+  desenharIntegAvaliacoes();
+  $(`[data-integ-abrir="${id}"]`)?.focus();
+}
+
+document.addEventListener('click', async (e) => {
+  const abrir = e.target.closest('[data-integ-abrir]');
+  if (abrir) { integAberta = abrir.dataset.integAbrir; integAutorizou = new Set(); desenharIntegAvaliacoes(); return; }
+  if (e.target.closest('[data-integ-fechar]')) { fecharInteg(integAberta); return; }
+  const autorizar = e.target.closest('[data-integ-autorizar]');
+  if (autorizar) {
+    integAutorizou.add(autorizar.dataset.integAutorizar);
+    desenharIntegAvaliacoes();
+    avisar(autorizar.dataset.integAutorizar === 'google' ? 'Conta Google autorizada (simulação). Escolha o perfil de cada unidade.' : 'Autorização do iFood recebida (simulação). Escolha a loja de cada unidade.');
+    return;
+  }
+  if (e.target.closest('[data-integ-copiar]')) {
+    try { await navigator.clipboard.writeText(CODIGO_IFOOD_DEMO); avisar('Código copiado'); }
+    catch { getSelection().selectAllChildren($('[data-integ-codigo]')); avisar('Código selecionado: copie com Ctrl+C'); }
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && e.target.closest?.('.cfg-integ__painel')) fecharInteg(integAberta);
+});
+document.addEventListener('submit', (e) => {
+  const form = e.target.closest('[data-integ-form]');
+  if (!form) return;
+  e.preventDefault();
+  const id = form.dataset.integForm;
+  const p = D.plataformas.find((x) => x.id === id);
+  const campos = $$('input, select', form);
+  if (id === 'tripadvisor') {
+    const regras = campos.map((c) => [c, Boolean(c.value.trim()) && !c.value.toLowerCase().includes('tripadvisor')]);
+    if (!validar(regras)) return;
+  }
+  const estado = lerAvaliacoesEstado();
+  const antes = new Set(Object.keys(estado.conexoes[id] || {}));
+  const novo = {};
+  campos.forEach((c) => { if (c.value.trim()) novo[c.name] = c.value.trim(); });
+  estado.conexoes[id] = novo;
+  // Demonstração: quem acabou de conectar o Tripadvisor já vê avaliações chegando na aba Avaliações
+  let importadas = 0;
+  Object.keys(novo).filter((u) => !antes.has(u)).forEach((u) => {
+    (D.avaliacoesAoConectar[id] || []).forEach((modelo, i) => {
+      const idNovo = `${id}-${slug(u)}-${i}`;
+      if (estado.extras.some((x) => x.id === idNovo)) return;
+      estado.extras.push({ ...modelo, id: idNovo, unidade: u, ts: Date.now() - (i * 3 + 1) * 864e5 });
+      importadas += 1;
+    });
+  });
+  estado.porPlataforma[id] = Date.now();
+  gravarAvaliacoesEstado(estado);
+  const n = Object.keys(novo).length;
+  fecharInteg(id);
+  avisar(n ? `${p.nome}: ${n} ${n === 1 ? 'unidade conectada' : 'unidades conectadas'}${importadas ? ` · ${importadas} avaliações importadas` : ''}` : `${p.nome} desconectado`);
+});
 document.addEventListener('submit', (e) => {
   if (e.target.matches('[data-mm-conectar]')) {
     e.preventDefault();

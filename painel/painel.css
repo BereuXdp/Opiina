@@ -1724,3 +1724,10 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 /* Nome e detalhes ganham a largura; selo e botões descem para a linha de baixo quando falta espaço */
 .cfg-integ li { flex-wrap: wrap; }
 .cfg-integ__nome { flex: 1 1 260px; }
+/* Conexão das plataformas dentro da linha (Integrações) */
+.cfg-integ--aberta { border-color: var(--acento) !important; box-shadow: 0 0 0 1px var(--acento); }
+.cfg-integ__painel { flex-basis: 100%; padding-top: 12px; border-top: 1px dashed var(--linha-forte); }
+.cfg-integ__passos { display: grid; gap: 12px; }
+.cfg-integ__passos > p:first-child { font-size: 14px; }
+.cfg-integ__passos .campo { max-width: 520px; }
+.cfg-integ__botoes { display: flex; flex-wrap: wrap; gap: 8px; }
