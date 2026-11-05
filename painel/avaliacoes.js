@@ -1,5 +1,6 @@
 // Opiina — painel (protótipo): Avaliações externas (Google, iFood, Tripadvisor, Reclame Aqui). Pedido do cliente, 2026-11-05.
-// Usa utilidades de painel.js ($, $$, esc, icone, avisar, D, souAdmin…).
+// Usa utilidades de painel.js ($, $$, esc, icone, avisar, D…). Aqui só se veem as avaliações:
+// conectar as plataformas fica em Configurações › Integrações (configuracoes.js), com o mesmo estado guardado.
 // CACHE: as avaliações ficam guardadas e só são buscadas de novo quando o cache vence (AV_INTERVALO) ou quando
 // alguém pede "Atualizar agora" (no máximo uma vez a cada AV_ESPERA). No protótipo, a "busca" é simulada e o cache
 // fica no navegador (localStorage); no app, ele fica no servidor e uma rotina atualiza sozinha (ver specs/design.md).
@@ -170,9 +171,7 @@ function iniciarAvaliacoes() {
           <p class="av-plat__onde">O Reclame Aqui não tem uma API pública para ler as reclamações. Estamos vendo como conectar.</p>
         </article>`;
       }
-      const botao = souAdmin
-        ? `<button class="btn btn--${ligada ? 'fantasma' : 'secundario'}" type="button" data-av-conectar="${p.id}" aria-haspopup="dialog">${ligada ? 'Gerenciar' : 'Conectar'}</button>`
-        : (ligada ? '' : '<span class="av-plat__admin">Quem conecta é o administrador</span>');
+      // Aqui só se vê; conectar fica em Configurações › Integrações (cliente, 2026-11-05)
       return `<article class="cartao av-plat${ligada ? '' : ' av-plat--off'}">
         <div class="av-plat__topo">${avSelo(p.id)}<h3>${p.nome}</h3>
           <span class="av-plat__estado${ligada ? ' av-plat__estado--on' : ''}">${ligada ? 'Conectada' : 'Não conectada'}</span></div>
@@ -180,11 +179,9 @@ function iniciarAvaliacoes() {
           <p class="av-plat__nota">${media ? avNum(media) : '–'}<small> de 5 · ${lista.length} em 90 dias</small></p>
           <p class="av-plat__onde">${esc(onde)}</p>
           <p class="av-plat__quando">Atualizada ${avQuando(av.porPlataforma[p.id] || av.atualizadoEm)} · ${p.horas === 24 ? '1 vez por dia' : `a cada ${p.horas} horas`}</p>`
-        : `<p class="av-plat__onde">Conecte para ver as avaliações das unidades aqui. ${p.horas === 24 ? 'Atualiza 1 vez por dia.' : `Atualiza a cada ${p.horas} horas.`}</p>`}
-        ${botao}
+        : '<p class="av-plat__onde">Ainda não conectada.</p>'}
       </article>`;
     }).join('');
-    $$('[data-av-conectar]').forEach((b) => b.addEventListener('click', () => abrirConexao(b.dataset.avConectar)));
   }
 
   // ----- Resumo + lista -----
@@ -278,137 +275,6 @@ function iniciarAvaliacoes() {
     desenharLista();
   });
   $('[data-av-mais]').addEventListener('click', () => { mostrando += AV_POR_PAGINA; desenharLista(); });
-
-  // ----- Conectar / gerenciar uma plataforma (gaveta) -----
-  // Como cada plataforma se conecta (pesquisa das APIs em 2026-11-05; ver memoria.md):
-  // Google: Business Profile API, com OAuth da conta que administra o perfil. iFood: Merchant API (módulo Review);
-  // o restaurante digita um código no Portal do Parceiro e clica em "Autorizar". Tripadvisor: Terra (pago por consulta);
-  // guarda-se só o ID do local, o resto depende do contrato.
-  const COMO = {
-    google: {
-      texto: 'Entre com a conta Google que administra o Perfil da Empresa das unidades e escolha qual perfil é de cada unidade.',
-      campo: 'Perfil no Google',
-      nota: 'O perfil precisa estar verificado no Google.',
-    },
-    ifood: {
-      texto: 'O iFood libera as avaliações quando a loja autoriza o Opiina no Portal do Parceiro.',
-      campo: 'Loja no iFood',
-    },
-    tripadvisor: {
-      texto: 'Cole o endereço da página de cada unidade no Tripadvisor.',
-      campo: 'Página no Tripadvisor', exemplo: 'https://www.tripadvisor.com.br/Restaurant_Review-…', dominio: 'tripadvisor',
-      nota: 'O Tripadvisor cobra por consulta; por isso a atualização é diária.',
-    },
-  };
-  const CODIGO_IFOOD = 'QWER-7K2D';   // exemplo: no app, o código vem do iFood e vale por pouco tempo
-  const gaveta = $('[data-av-gaveta]');
-  const corpo = $('[data-av-gaveta-corpo]');
-
-  function abrirConexao(id) {
-    const p = AV_PLAT[id];
-    const c = COMO[id];
-    const atual = av.conexoes[id] || {};
-    // Google e iFood pedem autorização antes de escolher as lojas; já conectados, vão direto para a lista
-    const autorizou = !['google', 'ifood'].includes(id) || avPlatConectada(id);
-    const linhas = p.porUnidade ? D.unidades : ['_empresa'];
-    const nomeLinha = (u) => (u === '_empresa' ? 'Empresa' : u);
-    const campoDe = (u, i) => {
-      const valor = atual[u] || '';
-      if (id === 'google' || id === 'ifood') {
-        // Depois da autorização, a plataforma devolve os perfis/lojas da conta: é só escolher qual é de cada unidade
-        const opcoes = ['', ...D.unidades.map((x) => (id === 'google' ? `Casa Exemplo – ${x}` : `Casa Exemplo ${x}`))];
-        return `<select id="ac-${i}" name="${esc(u)}">${opcoes.map((o) => `<option value="${esc(o)}"${o === valor ? ' selected' : ''}>${o || 'Não ligar'}</option>`).join('')}</select>`;
-      }
-      return `<input id="ac-${i}" name="${esc(u)}" value="${esc(valor)}" placeholder="${esc(c.exemplo)}" autocomplete="off" spellcheck="false" aria-describedby="ac-${i}-erro">`;
-    };
-    corpo.innerHTML = `
-      <div class="gaveta__topo">
-        <h2 class="cfg-gaveta__titulo av-gaveta__titulo" id="ac-titulo" tabindex="-1">${avSelo(id)}${avPlatConectada(id) ? p.nome : `Conectar o ${p.nome}`}</h2>
-        <button class="botao-icone" type="button" aria-label="Fechar" data-ac-fechar>${icone('fechar')}</button>
-      </div>
-      <p class="cartao__sub">${c.texto}</p>
-      <ul class="den-garantias">
-        <li>${icone('ok')}O Opiina só lê as avaliações. As respostas continuam sendo feitas no ${p.nome}.</li>
-        <li>${icone('ok')}${p.horas === 24 ? 'As avaliações se atualizam sozinhas uma vez por dia.' : `As avaliações ficam guardadas e se atualizam sozinhas a cada ${p.horas} horas.`}</li>
-        ${c.nota ? `<li>${icone('alerta')}${c.nota}</li>` : ''}
-      </ul>
-      ${id === 'google' && !autorizou ? `
-        <div class="av-autorizar" data-ac-autorizar>
-          <button class="btn btn--primario" type="button" data-ac-entrar>Entrar com o Google</button>
-          <p class="campo__dica">Protótipo: a entrada é simulada. No app, abre a tela de autorização do Google.</p>
-        </div>` : ''}
-      ${id === 'ifood' && !autorizou ? `
-        <div class="av-autorizar" data-ac-autorizar>
-          <ol class="av-passos">
-            <li>Entre no <strong>Portal do Parceiro iFood</strong> com a conta da loja.</li>
-            <li>Digite este código e clique em <strong>Autorizar</strong>:
-              <span class="av-codigo"><strong data-ac-codigo>${CODIGO_IFOOD}</strong><button class="btn btn--fantasma" type="button" data-ac-copiar>${icone('link')}Copiar código</button></span></li>
-            <li>Volte aqui e clique em "Já autorizei".</li>
-          </ol>
-          <button class="btn btn--primario" type="button" data-ac-entrar>Já autorizei</button>
-          <p class="campo__dica">Protótipo: o código é de exemplo e a autorização é simulada.</p>
-        </div>` : ''}
-      <form class="gaveta__form" data-ac-form novalidate ${autorizou ? '' : 'hidden'}>
-        ${linhas.map((u, i) => `
-          <div class="campo">
-            <label for="ac-${i}">${nomeLinha(u)}${p.porUnidade ? ` <span class="opcional">· ${c.campo}</span>` : ` <span class="opcional">· ${c.campo}</span>`}</label>
-            ${campoDe(u, i)}
-            <p class="campo__erro" id="ac-${i}-erro" hidden>Este endereço não parece ser do ${p.nome}.</p>
-          </div>`).join('')}
-        <p class="campo__dica">${p.porUnidade ? 'Deixe em branco a unidade que não está nesta plataforma.' : 'Deixe em branco para desconectar.'}</p>
-        <div class="gaveta__acoes">
-          <button class="btn btn--secundario" type="button" data-ac-fechar>Cancelar</button>
-          <button class="btn btn--primario" type="submit">Salvar conexões</button>
-        </div>
-      </form>`;
-    $$('[data-ac-fechar]', corpo).forEach((b) => b.addEventListener('click', () => gaveta.close()));
-    $('[data-ac-entrar]', corpo)?.addEventListener('click', () => {
-      $('[data-ac-autorizar]', corpo).hidden = true;
-      $('[data-ac-form]', corpo).hidden = false;
-      avisar(id === 'google' ? 'Conta Google conectada (simulação). Escolha o perfil de cada unidade.' : 'Autorização do iFood recebida (simulação). Escolha a loja de cada unidade.');
-      $('select', corpo).focus();
-    });
-    $('[data-ac-copiar]', corpo)?.addEventListener('click', async (ev) => {
-      try { await navigator.clipboard.writeText(CODIGO_IFOOD); avisar('Código copiado'); }
-      catch { getSelection().selectAllChildren($('[data-ac-codigo]', corpo)); avisar('Código selecionado: copie com Ctrl+C'); }
-      ev.currentTarget.blur();
-    });
-    $('[data-ac-form]', corpo).addEventListener('submit', (e) => {
-      e.preventDefault();
-      const campos = $$('input, select', e.currentTarget);
-      let erro = null;
-      campos.forEach((cp) => {
-        const ruim = c.dominio && cp.value.trim() && !cp.value.toLowerCase().includes(c.dominio);
-        if (ruim) cp.setAttribute('aria-invalid', 'true'); else cp.removeAttribute('aria-invalid');
-        $(`#${cp.id}-erro`, corpo) && ($(`#${cp.id}-erro`, corpo).hidden = !ruim);
-        if (ruim && !erro) erro = cp;
-      });
-      if (erro) { erro.focus(); return; }
-      const antes = new Set(Object.keys(av.conexoes[id] || {}));
-      const novo = {};
-      campos.forEach((cp) => { if (cp.value.trim()) novo[cp.name] = cp.value.trim(); });
-      av.conexoes[id] = novo;
-      // Demonstração: quem acabou de conectar Tripadvisor ou Reclame Aqui já vê avaliações chegando
-      const recem = Object.keys(novo).filter((u) => !antes.has(u));
-      let importadas = 0;
-      (D.avaliacoesAoConectar[id] || []).length && recem.forEach((u) => {
-        D.avaliacoesAoConectar[id].forEach((modelo, i) => {
-          const idNovo = `${id}-${slug(u)}-${i}`;
-          if (av.extras.some((x) => x.id === idNovo)) return;
-          av.extras.push({ ...modelo, id: idNovo, unidade: u === '_empresa' ? null : u, ts: Date.now() - (i * 3 + 1) * 864e5 });
-          importadas += 1;
-        });
-      });
-      av.porPlataforma[id] = Date.now();
-      avSalvar();
-      gaveta.close();
-      desenharTudo();
-      const n = Object.keys(novo).length;
-      avisar(n ? `${p.nome}: ${n} ${p.porUnidade ? (n === 1 ? 'unidade conectada' : 'unidades conectadas') : 'página conectada'}${importadas ? ` · ${importadas} avaliações importadas` : ''}` : `${p.nome} desconectado`);
-    });
-    gaveta.showModal();
-    $('#ac-titulo', corpo).focus();
-  }
 
   desenharTudo();
   // Cache vencido ao abrir a tela: atualiza na hora. Senão, agenda para quando vencer.
