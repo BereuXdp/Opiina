@@ -673,7 +673,7 @@ function desenharIntegracoes() {
   caixa.innerHTML = `
     <div class="cfg__topo">
       <div><h3 class="cartao__titulo">Muito Mais ${mm.conectado ? situacao('Conectado', 'publicada') : situacao('Desconectado', 'arquivada')}</h3>
-      <p class="cartao__sub">Liga a conta Muito Mais ao Opiina para gerar vouchers por unidade.</p></div>
+      <p class="cartao__sub">Liga a conta Muito Mais ao Opiina para gerar vouchers por unidade. Os vouchers são usados em Prêmios, que ainda está em desenvolvimento.</p></div>
       ${mm.conectado ? '<button class="btn btn--perigo" type="button" data-mm-desconectar>Desconectar</button>' : ''}
     </div>
     ${mm.conectado ? `
@@ -695,9 +695,33 @@ function desenharIntegracoes() {
         <button class="btn btn--primario" type="submit">Conectar</button>
       </form>`}`;
 
-  const comLink = cfg.unidades.filter((u) => u.google);
-  const semLink = cfg.unidades.filter((u) => !u.google);
-  $('[data-google-resumo]').innerHTML = `<strong>${comLink.length} de ${cfg.unidades.length}</strong> unidades com link do Google.${semLink.length ? ` Falta: ${semLink.map((u) => esc(u.nome)).join(', ')}.` : ''}`;
+  desenharIntegAvaliacoes();
+}
+
+// Plataformas de avaliação: só o resumo. A conexão acontece na aba Avaliações (um lugar só para conectar),
+// e este cartão lê o mesmo estado guardado por ela (localStorage "opiina-demo-avaliacoes").
+function desenharIntegAvaliacoes() {
+  const caixa = $('[data-integ-avaliacoes]');
+  if (!caixa) return;
+  let conexoes = D.conexoes;
+  try { conexoes = JSON.parse(localStorage.getItem('opiina-demo-avaliacoes'))?.conexoes || D.conexoes; } catch { /* usa os exemplos */ }
+  caixa.innerHTML = `
+    <div class="cfg__topo">
+      <div><h3 class="cartao__titulo">Plataformas de avaliação</h3>
+      <p class="cartao__sub">Google, iFood, Tripadvisor e Reclame Aqui. As avaliações aparecem na aba Avaliações e se atualizam sozinhas.</p></div>
+      <a class="btn btn--secundario" href="avaliacoes.html">Conectar e gerenciar</a>
+    </div>
+    <ul class="cfg-integ">
+      ${D.plataformas.map((p) => {
+        const unidades = Object.keys(conexoes[p.id] || {});
+        const estado = p.emAnalise ? '<span class="selo-dev">Em análise</span>'
+          : unidades.length ? situacao('Conectada', 'publicada') : situacao('Não conectada', 'arquivada');
+        const detalhe = p.emAnalise ? 'Sem API pública por enquanto'
+          : unidades.length ? (unidades.length === cfg.unidades.length ? 'Todas as unidades' : unidades.map(esc).join(', ')) : 'Nenhuma unidade';
+        return `<li><span class="av-sigla" style="--cor:${p.cor}" aria-hidden="true">${p.sigla}</span>
+          <span class="cfg-integ__nome"><strong>${p.nome}</strong><span>${detalhe}</span></span>${estado}</li>`;
+      }).join('')}
+    </ul>`;
 }
 document.addEventListener('submit', (e) => {
   if (e.target.matches('[data-mm-conectar]')) {

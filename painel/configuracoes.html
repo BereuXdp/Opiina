@@ -93,7 +93,7 @@
             <a href="?aba=unidades" data-aba-link="unidades"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Unidades</a>
             <a href="?aba=atendentes" data-aba-link="atendentes"><svg class="icone" aria-hidden="true"><use href="icones.svg#pessoa"/></svg>Atendentes</a>
             <a href="?aba=usuarios" data-aba-link="usuarios"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg>Usuários e perfis</a>
-            <a href="?aba=integracoes" data-aba-link="integracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#plug"/></svg>Integrações<span class="visualmente-oculto">, </span><span class="selo-dev cfg__dev">Em desenvolvimento</span></a>
+            <a href="?aba=integracoes" data-aba-link="integracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#plug"/></svg>Integrações</a>
             <a href="?aba=conta" data-aba-link="conta"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Minha conta</a>
           </nav>
 
@@ -235,22 +235,14 @@
 
             <!-- ===== Integrações ===== -->
             <section class="cfg__pilha" data-aba="integracoes" aria-labelledby="t-integracoes" hidden>
-              <!-- EM DESENVOLVIMENTO (decisão do cliente, 2026-10-14: "não iremos usar agora").
-                   O conteúdo abaixo fica guardado e escondido; para liberar, tirar o "hidden" dos dois cartões e do aviso. -->
-              <div class="cartao breve" data-integracoes-dev>
-                <span class="breve__icone" aria-hidden="true"><svg class="icone"><use href="icones.svg#plug"/></svg></span>
-                <h2 class="cabeca__titulo" id="t-integracoes">Integrações <span class="selo-dev">Em desenvolvimento</span></h2>
-                <p>As conexões com outros sistemas (como a Muito Mais, para vouchers, e as avaliações do Google) ainda estão sendo definidas. Esta área chega quando estiver pronta.</p>
+              <!-- Ativada a pedido do cliente em 2026-11-05 (antes "Em desenvolvimento", 2026-10-14). -->
+              <div class="cfg__intro">
+                <h2 class="cartao__titulo" id="t-integracoes">Integrações</h2>
+                <p class="cartao__sub">Sistemas ligados ao Opiina. Só o administrador conecta e desconecta.</p>
               </div>
-              <div class="cartao cfg__cartao" data-muitomais hidden></div>
-              <div class="cartao cfg__cartao" hidden>
-                <div class="cfg__topo">
-                  <div><h3 class="cartao__titulo">Google (avaliações)</h3>
-                  <p class="cartao__sub">O link do Google de cada unidade fica no cadastro dela.</p></div>
-                  <a class="btn btn--secundario" href="?aba=unidades" data-aba-link="unidades">Ver unidades</a>
-                </div>
-                <p data-google-resumo></p>
-              </div>
+              <div class="cartao cfg__cartao" data-muitomais></div>
+              <!-- Plataformas de avaliação: o resumo vem da aba Avaliações, que é onde elas se conectam -->
+              <div class="cartao cfg__cartao" data-integ-avaliacoes></div>
             </section>
 
             <!-- ===== Minha conta ===== -->

@@ -1703,3 +1703,11 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 .av-codigo { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 6px; }
 .av-codigo strong { padding: 6px 12px; border: 1.5px dashed var(--linha-forte); border-radius: 8px; background: var(--superficie); font-size: 18px; letter-spacing: .08em; font-variant-numeric: tabular-nums; user-select: all; }
 .den-garantias li:has(use[href$="#alerta"]) .icone { color: var(--alerta); }
+
+/* Configurações › Integrações ativada (2026-11-05) */
+.cfg__intro { display: grid; gap: 4px; }
+.cfg-integ { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.cfg-integ li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--linha); border-radius: var(--raio); }
+.cfg-integ__nome { display: grid; flex: 1; min-width: 0; }
+.cfg-integ__nome strong { font-size: 15px; }
+.cfg-integ__nome span { color: var(--mudo); font-size: 13px; overflow-wrap: anywhere; }
