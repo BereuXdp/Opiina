@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Central de ajuda — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Login de demonstração: sem ele, volta para o login (protótipo) -->
+  <script>try { if (/[?&]demo=1/.test(location.search)) sessionStorage.setItem('opiina-demo', '1'); if (!sessionStorage.getItem('opiina-demo')) location.replace('../login.html'); } catch (e) {}</script>
+  <!-- Modo escuro: escolha guardada (botão no menu) ou, sem escolha, o tema do sistema. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <script src="dados.js" defer></script>
+  <script src="painel.js" defer></script>
+  <script src="ajuda.js" defer></script>
+</head>
+<!--
+  Protótipo: Central de ajuda (pedido do cliente, 2026-11-05). Tutoriais curtos das dúvidas frequentes,
+  só com o que o painel já faz. Cada tutorial é um <details> com id (link direto: ajuda.html?d=id).
+-->
+<body data-tela="ajuda">
+  <a class="pular" href="#conteudo" data-fora-do-menu>Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel" data-fora-do-menu>
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do painel" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="index.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa">Casa Exemplo</span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <p class="nav__titulo">Visão geral</p>
+          <a class="nav__item" href="index.html" data-nav="dashboard"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Dashboard</a>
+          <a class="nav__item" href="ranking.html" data-nav="ranking"><svg class="icone" aria-hidden="true"><use href="icones.svg#ranking"/></svg>Ranking</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Atendimento</p>
+          <a class="nav__item" href="feedbacks.html" data-nav="feedbacks"><svg class="icone" aria-hidden="true"><use href="icones.svg#feedbacks"/></svg>Feedbacks<span class="nav__selo" data-selo-vencidas hidden></span></a>
+          <a class="nav__item" href="avaliacoes.html" data-nav="avaliacoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#estrela"/></svg>Avaliações</a>
+          <a class="nav__item" href="denuncias.html" data-nav="denuncias"><svg class="icone" aria-hidden="true"><use href="icones.svg#denuncias"/></svg>Denúncias</a>
+        </div>
+        <div class="nav__grupo">
+          <p class="nav__titulo">Pesquisa e clientes</p>
+          <a class="nav__item" href="pesquisas.html" data-nav="pesquisas"><svg class="icone" aria-hidden="true"><use href="icones.svg#pesquisas"/></svg>Pesquisas</a>
+          <a class="nav__item" href="clientes.html" data-nav="clientes"><svg class="icone" aria-hidden="true"><use href="icones.svg#clientes"/></svg>Clientes</a>
+          <a class="nav__item" href="breve.html?tela=premios" data-nav="premios"><svg class="icone" aria-hidden="true"><use href="icones.svg#premios"/></svg>Prêmios</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="configuracoes.html" data-nav="configuracoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#config"/></svg>Configurações</a>
+          <a class="nav__item" href="ajuda.html" data-nav="ajuda"><svg class="icone" aria-hidden="true"><use href="icones.svg#ajuda"/></svg>Central de ajuda</a>
+          <a class="nav__item" href="suporte.html?de=painel" data-nav="suporte"><svg class="icone" aria-hidden="true"><use href="icones.svg#suporte"/></svg>Suporte</a>
+        </div>
+      </nav>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true">AS</span>
+        <span class="conta__texto"><span class="conta__nome">Ana Souza</span><span class="conta__perfil">Administradora</span></span>
+        <a class="conta__sair" href="../login.html" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </a>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+    
+<main class="principal" id="conteudo" data-fora-do-menu>
+      <div class="principal__conteudo" data-ajuda>
+        <div class="cabeca">
+          <div>
+            <h1 class="cabeca__titulo">Central de ajuda</h1>
+            <p class="cabeca__desc">Tutoriais curtos para as dúvidas mais comuns. Cada um leva direto para a tela certa.</p>
+          </div>
+          <button class="btn btn--secundario" type="button" data-ajuda-tour>Ver o tour do painel</button>
+        </div>
+
+        <section class="cartao ajuda-busca" aria-label="Buscar na ajuda">
+          <div class="campo campo--busca">
+            <label for="ajuda-q">O que você quer fazer?</label>
+            <input id="ajuda-q" type="search" placeholder="Ex.: QR Code, conectar Google, trocar senha" autocomplete="off" aria-describedby="ajuda-contagem">
+            <svg class="icone" aria-hidden="true"><use href="icones.svg#busca"/></svg>
+          </div>
+          <p class="filtros__contagem" id="ajuda-contagem" role="status" aria-live="polite" data-ajuda-contagem></p>
+        </section>
+
+        <!-- Cada <details> é um tutorial. data-precisa: some para quem não tem a tela (painel.js). id: link direto (?d=id). -->
+        <section class="ajuda-grupo" aria-labelledby="ag-comecando" data-ajuda-grupo>
+          <h2 class="ajuda-grupo__titulo" id="ag-comecando">Primeiros passos</h2>
+
+          <details class="ajuda-item" id="primeira-pesquisa" data-precisa="pesquisas">
+            <summary>Como criar e publicar a primeira pesquisa</summary>
+            <ol>
+              <li>No menu, abra <strong>Pesquisas</strong> e clique em <strong>Nova pesquisa</strong>.</li>
+              <li>Preencha as 3 etapas: <em>Sobre a pesquisa</em> (nome e unidades), <em>Perguntas</em> e <em>Atendente e contato</em>.</li>
+              <li>Confira tudo na prévia <em>Como o cliente vê</em>: dá para responder como se fosse o cliente.</li>
+              <li>Clique em <strong>Publicar</strong>, revise o resumo, marque <em>"Revisei a pesquisa e a prévia"</em> e publique.</li>
+            </ol>
+            <p class="ajuda-item__dica">Depois de publicada, a pesquisa não pode mais ser editada. Até lá, use <strong>Salvar rascunho</strong>.</p>
+            <a class="btn btn--secundario" href="pesquisa-nova.html">Criar uma pesquisa</a>
+          </details>
+
+          <details class="ajuda-item" id="link-qr" data-precisa="pesquisas">
+            <summary>Como pegar o link e o QR Code de cada unidade</summary>
+            <ol>
+              <li>Em <strong>Pesquisas</strong>, encontre a pesquisa publicada e clique em <strong>Links</strong> (ou no nome de uma unidade).</li>
+              <li>Escolha a unidade. Cada unidade tem o próprio link, e as respostas ficam separadas.</li>
+              <li>Use <strong>Copiar link</strong> para mandar por mensagem ou <strong>Baixar QR Code</strong> para imprimir.</li>
+            </ol>
+            <p class="ajuda-item__dica">Teste o QR Code com a câmera do celular antes de imprimir e imprima com pelo menos 3 cm.</p>
+            <a class="btn btn--secundario" href="pesquisas.html">Ir para Pesquisas</a>
+          </details>
+
+          <details class="ajuda-item" id="atendentes" data-precisa="atendentes">
+            <summary>Como cadastrar os atendentes</summary>
+            <ol>
+              <li>Abra <strong>Configurações › Atendentes</strong>.</li>
+              <li>Clique em <strong>Novo atendente</strong>, informe nome, unidade e cargo, e salve.</li>
+              <li>Para cadastrar vários de uma vez, use <strong>Importar planilha</strong> (CSV com Nome, Código e Cargo).</li>
+            </ol>
+            <p class="ajuda-item__dica">Os atendentes aparecem em "Quem te atendeu?" na pesquisa e entram no Ranking de atendentes.</p>
+            <a class="btn btn--secundario" href="configuracoes.html?aba=atendentes">Ir para Atendentes</a>
+          </details>
+        </section>
+
+        <section class="ajuda-grupo" aria-labelledby="ag-atendimento" data-ajuda-grupo>
+          <h2 class="ajuda-grupo__titulo" id="ag-atendimento">Atendimento</h2>
+
+          <details class="ajuda-item" id="tratar" data-precisa="ocorrencias">
+            <summary>Como tratar um feedback que pede ação</summary>
+            <ol>
+              <li>Em <strong>Feedbacks</strong>, escolha <strong>Precisa de ação</strong> no filtro Tratamento.</li>
+              <li>Clique em <strong>Tratar</strong> no feedback.</li>
+              <li>Defina a <strong>etapa</strong>, o <strong>responsável</strong> e, se quiser, uma anotação interna. Salve.</li>
+            </ol>
+            <p class="ajuda-item__dica">Feedbacks vencidos aparecem em vermelho e somam no número ao lado de Feedbacks, no menu.</p>
+            <a class="btn btn--secundario" href="feedbacks.html?acao=abertas">Ver o que precisa de ação</a>
+          </details>
+
+          <details class="ajuda-item" id="kanban" data-precisa="ocorrencias">
+            <summary>Como ver os casos em colunas (Kanban)</summary>
+            <ol>
+              <li>Em <strong>Feedbacks</strong>, clique em <strong>Kanban</strong> no topo.</li>
+              <li>Cada coluna é uma etapa: Nova, Visualizada, Em andamento, Aguardando cliente e Resolvida.</li>
+              <li>Clique num cartão para abrir o tratamento e mudar a etapa.</li>
+            </ol>
+            <a class="btn btn--secundario" href="feedbacks.html?visao=kanban">Abrir o Kanban</a>
+          </details>
+
+          <details class="ajuda-item" id="divulgar-canal" data-precisa="denuncias">
+            <summary>Como divulgar o canal de denúncias para a equipe</summary>
+            <ol>
+              <li>Abra <strong>Denúncias</strong> e clique em <strong>Divulgar o canal</strong>.</li>
+              <li>Copie o link ou baixe o QR Code.</li>
+              <li>Coloque nos murais, no vestiário ou no grupo da equipe.</li>
+            </ol>
+            <p class="ajuda-item__dica">Quem denuncia escolhe se quer se identificar, e cada relato recebe um protocolo.</p>
+            <a class="btn btn--secundario" href="denuncias.html">Ir para Denúncias</a>
+          </details>
+        </section>
+
+        <section class="ajuda-grupo" aria-labelledby="ag-avaliacoes" data-ajuda-grupo>
+          <h2 class="ajuda-grupo__titulo" id="ag-avaliacoes">Avaliações (Google, iFood, Tripadvisor)</h2>
+
+          <details class="ajuda-item" id="conectar-google" data-precisa="configuracoes">
+            <summary>Como conectar o Google</summary>
+            <ol>
+              <li>Abra <strong>Configurações › Integrações</strong> e, em Google, clique em <strong>Adicionar conta</strong>.</li>
+              <li>Clique em <strong>Entrar com o Google</strong>, use a conta que administra o Perfil da Empresa e clique em <strong>Permitir</strong>.</li>
+              <li>Marque as unidades dessa conta e salve.</li>
+            </ol>
+            <p class="ajuda-item__dica">Você só autoriza uma vez: depois disso, a conexão fica ativa sozinha.</p>
+            <a class="btn btn--secundario" href="configuracoes.html?aba=integracoes">Ir para Integrações</a>
+          </details>
+
+          <details class="ajuda-item" id="conectar-ifood" data-precisa="configuracoes">
+            <summary>Como conectar o iFood</summary>
+            <ol>
+              <li>Em <strong>Configurações › Integrações</strong>, no iFood, clique em <strong>Adicionar conta</strong>.</li>
+              <li>Copie o código que aparece.</li>
+              <li>No <strong>Portal do Parceiro iFood</strong> da loja, cole o código e clique em <strong>Autorizar</strong>.</li>
+              <li>Volte ao Opiina, clique em <strong>Já autorizei</strong>, marque as unidades e salve.</li>
+            </ol>
+            <a class="btn btn--secundario" href="configuracoes.html?aba=integracoes">Ir para Integrações</a>
+          </details>
+
+          <details class="ajuda-item" id="franquia" data-precisa="configuracoes">
+            <summary>Tenho franquias: como ligar a conta de cada franqueado?</summary>
+            <ol>
+              <li>Em <strong>Configurações › Integrações</strong>, clique em <strong>Adicionar conta</strong> uma vez para cada conta (Google ou iFood).</li>
+              <li>Em cada conta, marque só as unidades daquele franqueado.</li>
+            </ol>
+            <p class="ajuda-item__dica">Uma unidade fica em uma conta só por plataforma. Se ela já estiver em outra conta, aparece com "já em [conta]".</p>
+            <a class="btn btn--secundario" href="configuracoes.html?aba=integracoes">Ir para Integrações</a>
+          </details>
+
+          <details class="ajuda-item" id="atualizacao" data-precisa="avaliacoes">
+            <summary>Por que uma avaliação nova ainda não apareceu?</summary>
+            <p>As avaliações ficam guardadas e se atualizam sozinhas: <strong>Google e iFood a cada 6 horas</strong>, <strong>Tripadvisor uma vez por dia</strong>. Para buscar antes, use <strong>Atualizar agora</strong> no topo da aba Avaliações (libera de novo a cada 15 minutos).</p>
+            <a class="btn btn--secundario" href="avaliacoes.html">Ir para Avaliações</a>
+          </details>
+        </section>
+
+        <section class="ajuda-grupo" aria-labelledby="ag-conta" data-ajuda-grupo>
+          <h2 class="ajuda-grupo__titulo" id="ag-conta">Equipe, conta e plano</h2>
+
+          <details class="ajuda-item" id="convidar" data-precisa="configuracoes">
+            <summary>Como convidar alguém da equipe e escolher o perfil</summary>
+            <ol>
+              <li>Abra <strong>Configurações › Usuários e perfis</strong> e clique em <strong>Convidar usuário</strong>.</li>
+              <li>Informe nome e e-mail, escolha o perfil (Administrador, Marketing ou Gestor) e as unidades.</li>
+              <li>A pessoa recebe um e-mail e cria a própria senha.</li>
+            </ol>
+            <p class="ajuda-item__dica">A tabela "O que cada perfil vê", na mesma tela, mostra o que cada perfil acessa.</p>
+            <a class="btn btn--secundario" href="configuracoes.html?aba=usuarios">Ir para Usuários</a>
+          </details>
+
+          <details class="ajuda-item" id="minha-conta">
+            <summary>Como trocar meu nome, e-mail, celular ou senha</summary>
+            <ol>
+              <li>Abra <strong>Configurações › Minha conta</strong> (ou clique no seu nome, no rodapé do menu).</li>
+              <li>Altere os dados e salve. Para trocar a senha, use <strong>Trocar senha</strong>.</li>
+            </ol>
+            <p class="ajuda-item__dica">Trocar o e-mail pede a senha atual e só vale depois de confirmar pelo link enviado ao novo endereço.</p>
+            <a class="btn btn--secundario" href="configuracoes.html?aba=conta">Ir para Minha conta</a>
+          </details>
+
+          <details class="ajuda-item" id="teste-gratis">
+            <summary>Como funciona o teste grátis de 7 dias</summary>
+            <ul>
+              <li>O teste começa no dia do cadastro. A faixa no topo do painel mostra quantos dias faltam.</li>
+              <li>Na véspera do fim, aparece um aviso. No último dia, o painel só continua com um plano escolhido.</li>
+              <li>O pagamento é feito na página da Stripe. Sem plano, a conta fica inativa.</li>
+            </ul>
+          </details>
+
+          <details class="ajuda-item" id="exportar-clientes" data-precisa="clientes">
+            <summary>Como exportar a lista de clientes</summary>
+            <ol>
+              <li>Em <strong>Clientes</strong>, clique em <strong>Exportar</strong>.</li>
+              <li>Escolha quem entra (a lista filtrada, só quem aceita ofertas ou todos) e o formato.</li>
+            </ol>
+            <p class="ajuda-item__dica">O arquivo tem dados pessoais: use só para o que o cliente autorizou.</p>
+            <a class="btn btn--secundario" href="clientes.html">Ir para Clientes</a>
+          </details>
+        </section>
+
+        <p class="vazio cartao" data-ajuda-vazio hidden><strong>Nenhum tutorial com essa busca</strong>Tente outra palavra ou fale com o suporte.</p>
+
+        <section class="cartao ajuda-fim" aria-labelledby="ajuda-fim-titulo">
+          <div>
+            <h2 class="cartao__titulo" id="ajuda-fim-titulo">Não achou o que procurava?</h2>
+            <p class="cartao__sub">Abra um chamado e acompanhe a resposta pelo número da ordem de serviço.</p>
+          </div>
+          <a class="btn btn--primario" href="suporte.html?de=painel">Falar com o suporte</a>
+        </section>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>

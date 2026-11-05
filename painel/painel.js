@@ -222,7 +222,7 @@ $$('[data-nav]').forEach((item) => {
 // quem não configura a empresa entra direto nos próprios dados (nome, e-mail, celular e senha).
 // Suporte também é de todos: abre a página pública de chamados já com os dados da conta.
 $$('[data-nav]').forEach((item) => {
-  if (item.dataset.nav === 'suporte') return;
+  if (item.dataset.nav === 'suporte' || item.dataset.nav === 'ajuda') return;   // Ajuda e Suporte: todos os perfis
   if (item.dataset.nav === 'configuracoes' && !pode('configuracoes')) item.href = `configuracoes.html?aba=${pode('atendentes') ? 'atendentes' : 'conta'}`;
   else if (!pode(item.dataset.nav)) item.remove();
 });
@@ -827,7 +827,8 @@ const PASSOS_TOUR = [
   { nav: 'denuncias', titulo: 'Denúncias', texto: 'O canal de ética da equipe. Confidencial: só quem tem acesso vê.' },
   { nav: 'clientes', titulo: 'Clientes', texto: 'Quem deixou o contato na pesquisa, com aniversário e aceite de ofertas.' },
   { nav: 'configuracoes', titulo: 'Configurações', texto: pode('configuracoes') ? 'Empresa, unidades, atendentes, usuários e integrações (Google, iFood, Tripadvisor).' : 'Seus dados: nome, e-mail, celular e senha.' },
-  { nav: 'suporte', titulo: 'Suporte', texto: 'Precisa de ajuda? Abra um chamado e acompanhe por aqui.' },
+  { nav: 'ajuda', titulo: 'Central de ajuda', texto: 'Tutoriais curtos das dúvidas mais comuns, com o caminho para cada tela.' },
+  { nav: 'suporte', titulo: 'Suporte', texto: 'Não achou na ajuda? Abra um chamado e acompanhe por aqui.' },
 ];
 
 function iniciarTour({ automatico }) {
