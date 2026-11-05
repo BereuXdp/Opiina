@@ -666,35 +666,8 @@ document.addEventListener('click', async (e) => {
 // =====================================================================
 // Integrações
 // =====================================================================
+// A Muito Mais saiu daqui (cliente, 2026-11-05: "vamos integrar ele depois pela API").
 function desenharIntegracoes() {
-  const caixa = $('[data-muitomais]');
-  if (!caixa) return;
-  const mm = cfg.muitoMais;
-  caixa.innerHTML = `
-    <div class="cfg__topo">
-      <div><h3 class="cartao__titulo">Muito Mais ${mm.conectado ? situacao('Conectado', 'publicada') : situacao('Desconectado', 'arquivada')}</h3>
-      <p class="cartao__sub">Liga a conta Muito Mais ao Opiina para gerar vouchers por unidade. Os vouchers são usados em Prêmios, que ainda está em desenvolvimento.</p></div>
-      ${mm.conectado ? '<button class="btn btn--perigo" type="button" data-mm-desconectar>Desconectar</button>' : ''}
-    </div>
-    ${mm.conectado ? `
-      <form class="cfg__linha" data-mm-voucher novalidate>
-        ${htmlSelect({ id: 'mm-unidade', rotulo: 'Unidade', opcoes: cfg.unidades.map((u) => [u.nome, u.nome]), valor: cfg.unidades[0].nome })}
-        <button class="btn btn--primario" type="submit">Gerar voucher</button>
-      </form>
-      <p class="campo__erro" id="mm-unidade-erro" role="alert" hidden></p>
-      <p class="campo__dica">O voucher é ligado à unidade pelo CNPJ dela.</p>
-      ${mm.vouchers.length ? `<ul class="cfg-vouchers">${mm.vouchers.map((v) => `<li>${icone('premios')}<span><strong>${esc(v.unidade)}</strong> · voucher ativo</span></li>`).join('')}</ul>` : '<p class="mudo">Nenhum voucher ativo.</p>'}`
-    : `
-      <form class="cfg__linha" data-mm-conectar novalidate>
-        <div class="campo">
-          <label for="mm-chave">Chave de API da Muito Mais</label>
-          <input id="mm-chave" type="password" autocomplete="off" aria-describedby="mm-chave-dica mm-chave-erro">
-          <p class="campo__dica" id="mm-chave-dica">Copie a chave na sua conta Muito Mais. Depois de salva, ela não aparece mais aqui.</p>
-          <p class="campo__erro" id="mm-chave-erro" hidden>Cole a chave de API.</p>
-        </div>
-        <button class="btn btn--primario" type="submit">Conectar</button>
-      </form>`}`;
-
   desenharIntegAvaliacoes();
   desenharChavesApi();
 }
@@ -1016,49 +989,6 @@ document.addEventListener('submit', (e) => {
   gravarAvaliacoesEstado(estado);
   fecharInteg();
   avisar(`${p.nome}: ${modo === 'nova' ? (plat === 'tripadvisor' ? 'página adicionada' : 'conta adicionada') : 'conta atualizada'} · ${unidades.join(', ')}${importadas ? ` · ${importadas} avaliações importadas` : ''}`);
-});
-document.addEventListener('submit', (e) => {
-  if (e.target.matches('[data-mm-conectar]')) {
-    e.preventDefault();
-    const chave = document.getElementById('mm-chave');
-    if (!validar([[chave, !chave.value.trim()]])) return;
-    cfg.muitoMais.conectado = true;   // a chave não é guardada no protótipo
-    salvarCfg();
-    desenharIntegracoes();
-    $('[data-muitomais] h3').setAttribute('tabindex', '-1');
-    $('[data-muitomais] h3').focus();
-    avisar('Muito Mais conectada (protótipo)');
-  }
-  if (e.target.matches('[data-mm-voucher]')) {
-    e.preventDefault();
-    const nome = document.getElementById('mm-unidade').value;
-    const unidade = cfg.unidades.find((u) => u.nome === nome);
-    const erro = document.getElementById('mm-unidade-erro');
-    if (!unidade.cnpj) {
-      erro.innerHTML = `A unidade ${esc(nome)} não tem CNPJ. Cadastre em <a class="link-texto" href="?aba=unidades" data-aba-link="unidades">Unidades</a> e volte aqui.`;
-      erro.hidden = false;
-      return;
-    }
-    if (!cfg.muitoMais.vouchers.some((v) => v.unidade === nome)) cfg.muitoMais.vouchers.push({ unidade: nome });
-    salvarCfg();
-    desenharIntegracoes();
-    avisar(`Voucher gerado para ${nome} (protótipo)`);
-  }
-});
-document.addEventListener('click', async (e) => {
-  if (!e.target.closest('[data-mm-desconectar]')) return;
-  const sim = await confirmar({
-    titulo: 'Desconectar a Muito Mais?',
-    texto: 'Os vouchers deixam de funcionar até a conta ser conectada de novo.',
-    botao: 'Desconectar', perigo: true, icone: 'plug',
-  });
-  $('[data-confirmar]').close();
-  if (!sim) return;
-  cfg.muitoMais = { conectado: false, vouchers: [] };
-  salvarCfg();
-  desenharIntegracoes();
-  document.getElementById('mm-chave')?.focus();
-  avisar('Muito Mais desconectada');
 });
 
 // =====================================================================
