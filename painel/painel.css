@@ -1731,3 +1731,36 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 .cfg-integ__passos > p:first-child { font-size: 14px; }
 .cfg-integ__passos .campo { max-width: 520px; }
 .cfg-integ__botoes { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Plataformas de avaliação com várias contas (Integrações, 2026-11-05) */
+.cfg-plats { display: grid; border: 1px solid var(--linha); border-radius: var(--raio-cartao); overflow: hidden; }
+.cfg-plat { padding: 12px 14px; }
+.cfg-plat + .cfg-plat { border-top: 1px solid var(--linha); }
+.cfg-plat--aberta { background: var(--bg-suave); }
+.cfg-plat__topo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.cfg-plat__topo h4 { font-size: 15px; font-weight: 600; }
+.cfg-plat__resumo { color: var(--mudo); font-size: 13px; }
+.cfg-plat__add { margin-left: auto; min-height: 36px; padding: 0 10px; font-size: 13px; }
+.cfg-plat__nota { margin: 4px 0 0 40px; color: var(--mudo); font-size: 13px; }
+.cfg-plat__contas { display: grid; gap: 4px; margin: 8px 0 0 40px; padding: 0; list-style: none; }
+.cfg-plat__contas > li { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 4px 0; border-top: 1px dashed var(--linha); font-size: 14px; }
+.cfg-plat__conta { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cfg-plat__unids { color: var(--mudo); font-size: 13px; }
+.cfg-plat__acoes { display: flex; gap: 2px; }
+.cfg-plat__acoes .btn { min-height: 34px; padding: 0 8px; font-size: 13px; }
+.cfg-plat__contas .cfg-integ__painel, .cfg-plat > .cfg-integ__painel { grid-column: 1 / -1; margin-top: 6px; }
+.cfg-plat > .cfg-integ__painel { margin-left: 40px; }
+.cfg-integ__unidades { display: flex; flex-wrap: wrap; gap: 8px; border: 0; min-width: 0; }
+.cfg-integ__unidades legend { width: 100%; margin-bottom: 6px; }
+.cfg-integ__unidade { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border: 1px solid var(--linha-forte); border-radius: 999px; background: var(--superficie); font-size: 14px; cursor: pointer; }
+.cfg-integ__unidade input { width: 16px; height: 16px; margin: 0; accent-color: var(--primario); }
+.cfg-integ__unidade:has(input:checked) { border-color: var(--primario); background: var(--selecionado); }
+.cfg-integ__unidade:has(input:focus-visible) { outline: 3px solid var(--acento); outline-offset: 2px; }
+.cfg-integ__unidade--ocupada { opacity: .6; cursor: not-allowed; }
+.cfg-integ__unidade small { color: var(--mudo); font-size: 12px; }
+.cfg-integ__unidades .campo__erro { width: 100%; }
+@media (max-width: 639px) {
+  .cfg-plat__contas, .cfg-plat__nota, .cfg-plat > .cfg-integ__painel { margin-left: 0; }
+  .cfg-plat__contas > li { grid-template-columns: 1fr auto; }
+  .cfg-plat__unids { grid-column: 1; }
+  .cfg-plat__acoes { grid-column: 2; grid-row: 1 / span 2; }
+}

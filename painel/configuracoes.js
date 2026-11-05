@@ -797,155 +797,225 @@ document.addEventListener('click', async (e) => {
   avisar('Chave removida');
 });
 
-// Plataformas de avaliação: a conexão acontece aqui, na própria linha da plataforma, sem gaveta
-// (cliente, 2026-11-05: "adiciona esses meios de conexão aqui; não quero ir para a aba Avaliações").
-// O estado é o mesmo da aba Avaliações (localStorage "opiina-demo-avaliacoes"): o que conecta aqui aparece lá.
-// Google e iFood: o restaurante só AUTORIZA (as chaves de desenvolvedor são da Dev+, no servidor).
-// Tripadvisor: endereço da página de cada unidade. Reclame Aqui: sem API pública (em análise).
+// Plataformas de avaliação: a conexão acontece aqui (cliente, 2026-11-05), com VÁRIAS CONTAS por plataforma
+// (franquias: cada franqueado tem a própria conta Google e a própria loja no iFood). Compacto: cada plataforma
+// lista as contas ligadas, uma por linha, e "+ Adicionar conta" autoriza e pede só as unidades (caixinhas).
+// Uma unidade fica em uma conta só por plataforma. O estado é o mesmo da aba Avaliações (localStorage
+// "opiina-demo-avaliacoes"): "contas" é a lista por plataforma e "conexoes" (unidade → conta), que a aba lê, é
+// recalculado a cada mudança. Google e iFood: o restaurante só AUTORIZA (as credenciais são da Dev+, no servidor).
 const CHAVE_AV = 'opiina-demo-avaliacoes';
 const CODIGO_IFOOD_DEMO = 'QWER-7K2D';   // exemplo: no app, o código vem do iFood e vale por pouco tempo
-let integAberta = null;                  // plataforma com os passos abertos
-let integAutorizou = new Set();          // Google/iFood já autorizados nesta abertura (simulação)
+// Painel aberto: { plat, modo: 'nova' | 'editar', contaId, etapa: 'autorizar' | 'unidades', nome }
+let integPainel = null;
 
 function lerAvaliacoesEstado() {
-  try { const s = JSON.parse(localStorage.getItem(CHAVE_AV)); if (s?.atualizadoEm) return s; } catch { /* usa o inicial */ }
-  const inicio = Date.now() - 47 * 60e3;   // igual ao começo da aba Avaliações
-  return { atualizadoEm: inicio, porPlataforma: { google: inicio, ifood: inicio }, conexoes: structuredClone(D.conexoes), extras: [] };
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(CHAVE_AV)); } catch { /* usa o inicial */ }
+  if (!s?.atualizadoEm) {
+    const inicio = Date.now() - 47 * 60e3;   // igual ao começo da aba Avaliações
+    s = { atualizadoEm: inicio, porPlataforma: { google: inicio, ifood: inicio }, conexoes: structuredClone(D.conexoes), extras: [] };
+  }
+  // Estados antigos (sem contas): cada plataforma vira uma conta com as unidades que já estavam ligadas
+  if (!s.contas) {
+    const nomeInicial = { google: 'ana@casaexemplo.com.br', ifood: 'Casa Exemplo (iFood)' };
+    s.contas = {};
+    D.plataformas.forEach((p) => {
+      const ligadas = Object.entries(s.conexoes[p.id] || {});
+      if (p.id === 'tripadvisor') s.contas[p.id] = ligadas.map(([u, link], i) => ({ id: `t-${i}`, nome: link, unidades: [u] }));
+      else s.contas[p.id] = ligadas.length ? [{ id: `${p.id}-1`, nome: nomeInicial[p.id] || p.nome, unidades: ligadas.map(([u]) => u) }] : [];
+    });
+  }
+  return s;
 }
-const gravarAvaliacoesEstado = (s) => { try { localStorage.setItem(CHAVE_AV, JSON.stringify(s)); } catch { /* ignora */ } };
+function gravarAvaliacoesEstado(s) {
+  // "conexoes" (unidade → conta) é o que a aba Avaliações usa para saber o que está ligado
+  D.plataformas.forEach((p) => {
+    s.conexoes[p.id] = Object.fromEntries((s.contas[p.id] || []).flatMap((c) => c.unidades.map((u) => [u, c.nome])));
+  });
+  try { localStorage.setItem(CHAVE_AV, JSON.stringify(s)); } catch { /* ignora */ }
+}
 
-function passosConexao(p, ligadas) {
-  const nomes = cfg.unidades.map((u) => u.nome);
-  const autorizada = ligadas.length > 0 || integAutorizou.has(p.id);
-  const opcoes = (u) => ['', ...nomes.map((x) => (p.id === 'google' ? `Casa Exemplo – ${x}` : `Casa Exemplo ${x}`))]
-    .map((o) => `<option value="${esc(o)}"${o === (lerAvaliacoesEstado().conexoes[p.id]?.[u] || '') ? ' selected' : ''}>${o || 'Não ligar'}</option>`).join('');
-  // 1º passo: autorizar (Google e iFood). Já conectada, vai direto para a escolha das unidades.
-  if (p.id === 'google' && !autorizada) {
+// Caixinhas das unidades: as que já estão em outra conta desta plataforma ficam marcadas com o nome dela
+function caixasUnidades(p, contas, contaId, marcadas) {
+  return `<fieldset class="cfg-integ__unidades">
+    <legend class="campo__rotulo">${p.id === 'tripadvisor' ? 'Unidade desta página' : 'Unidades desta conta'}</legend>
+    ${cfg.unidades.map(({ nome: u }, i) => {
+      const outra = contas.find((c) => c.id !== contaId && c.unidades.includes(u));
+      return `<label class="cfg-integ__unidade${outra ? ' cfg-integ__unidade--ocupada' : ''}">
+        <input type="${p.id === 'tripadvisor' ? 'radio' : 'checkbox'}" name="unidade" value="${esc(u)}"${marcadas.includes(u) ? ' checked' : ''}${outra ? ' disabled' : ''}${i === 0 ? ' data-primeira' : ''}>
+        <span>${esc(u)}${outra ? ` <small>· já em ${esc(outra.nome)}</small>` : ''}</span>
+      </label>`;
+    }).join('')}
+    <p class="campo__erro" id="ig-unidades-erro" hidden>Marque pelo menos uma unidade.</p>
+  </fieldset>`;
+}
+
+function painelConta(p, contas) {
+  const pn = integPainel;
+  const conta = contas.find((c) => c.id === pn.contaId);
+  const botoes = (ok) => `<div class="cfg-integ__botoes">${ok}<button class="btn btn--secundario" type="button" data-integ-fechar>Cancelar</button></div>`;
+  if (pn.etapa === 'autorizar' && p.id === 'google') {
     return `<div class="cfg-integ__passos">
-      <p>Entre com a conta Google que administra o Perfil da Empresa dos restaurantes e clique em <strong>Permitir</strong>.</p>
-      <div class="cfg-integ__botoes"><button class="btn btn--primario" type="button" data-integ-autorizar="google">Entrar com o Google</button>
-      <button class="btn btn--secundario" type="button" data-integ-fechar>Cancelar</button></div>
-      <p class="campo__dica">Protótipo: a entrada é simulada. No app, abre a tela de permissão do Google.</p>
+      <p>Entre com a conta Google que administra o Perfil da Empresa (do restaurante ou do franqueado) e clique em <strong>Permitir</strong>.</p>
+      ${botoes('<button class="btn btn--primario" type="button" data-integ-autorizar>Entrar com o Google</button>')}
+      <p class="campo__dica">Protótipo: a entrada é simulada.</p>
     </div>`;
   }
-  if (p.id === 'ifood' && !autorizada) {
+  if (pn.etapa === 'autorizar' && p.id === 'ifood') {
     return `<div class="cfg-integ__passos">
-      <ol class="av-passos">
-        <li>Entre no <strong>Portal do Parceiro iFood</strong> com a conta da loja.</li>
-        <li>Cole este código e clique em <strong>Autorizar</strong>:
-          <span class="av-codigo"><strong data-integ-codigo>${CODIGO_IFOOD_DEMO}</strong><button class="btn btn--fantasma" type="button" data-integ-copiar>${icone('link')}Copiar código</button></span></li>
-        <li>Volte aqui e clique em "Já autorizei".</li>
-      </ol>
-      <div class="cfg-integ__botoes"><button class="btn btn--primario" type="button" data-integ-autorizar="ifood">Já autorizei</button>
-      <button class="btn btn--secundario" type="button" data-integ-fechar>Cancelar</button></div>
+      <p>No <strong>Portal do Parceiro iFood</strong> da loja, cole o código abaixo e clique em <strong>Autorizar</strong>.</p>
+      <span class="av-codigo"><strong data-integ-codigo>${CODIGO_IFOOD_DEMO}</strong><button class="btn btn--fantasma" type="button" data-integ-copiar>${icone('link')}Copiar código</button></span>
+      ${botoes('<button class="btn btn--primario" type="button" data-integ-autorizar>Já autorizei</button>')}
       <p class="campo__dica">Protótipo: o código é de exemplo e a autorização é simulada.</p>
     </div>`;
   }
-  // 2º passo: qual perfil/loja/página é de cada unidade
-  const atual = lerAvaliacoesEstado().conexoes[p.id] || {};
-  const campo = (u, i) => (p.id === 'tripadvisor'
-    ? `<input id="ig-${i}" name="${esc(u)}" value="${esc(atual[u] || '')}" placeholder="https://www.tripadvisor.com.br/Restaurant_Review-…" autocomplete="off" spellcheck="false" aria-describedby="ig-${i}-erro">`
-    : `<select id="ig-${i}" name="${esc(u)}">${opcoes(u)}</select>`);
-  const rotulo = { google: 'Perfil no Google', ifood: 'Loja no iFood', tripadvisor: 'Página no Tripadvisor' }[p.id];
-  return `<form class="cfg-integ__passos" data-integ-form="${p.id}" novalidate>
-    ${p.id === 'tripadvisor' ? '<p>Cole o endereço da página de cada unidade no Tripadvisor. O Tripadvisor cobra por consulta; por isso a atualização é diária.</p>'
-      : `<p>${p.id === 'google' ? 'Conta Google autorizada.' : 'Loja autorizada no iFood.'} Escolha ${p.id === 'google' ? 'o perfil' : 'a loja'} de cada unidade.</p>`}
-    ${nomes.map((u, i) => `<div class="campo">
-      <label for="ig-${i}">${esc(u)} <span class="opcional">· ${rotulo}</span></label>
-      ${campo(u, i)}
-      <p class="campo__erro" id="ig-${i}-erro" hidden>Este endereço não parece ser do Tripadvisor.</p>
-    </div>`).join('')}
-    <p class="campo__dica">Deixe em branco (ou "Não ligar") a unidade que não está nesta plataforma.</p>
-    <div class="cfg-integ__botoes"><button class="btn btn--primario" type="submit">Salvar conexões</button>
-    <button class="btn btn--secundario" type="button" data-integ-fechar>Cancelar</button></div>
+  // Etapa "unidades" (ou Tripadvisor, que não tem autorização: endereço da página + unidade)
+  const marcadas = conta ? conta.unidades : [];
+  return `<form class="cfg-integ__passos" data-integ-form novalidate>
+    ${p.id === 'tripadvisor' ? `<div class="campo">
+        <label for="ig-link">Endereço da página no Tripadvisor</label>
+        <input id="ig-link" value="${esc(conta?.nome || '')}" placeholder="https://www.tripadvisor.com.br/Restaurant_Review-…" autocomplete="off" spellcheck="false" aria-describedby="ig-link-erro">
+        <p class="campo__erro" id="ig-link-erro" hidden>Cole o endereço de uma página do Tripadvisor.</p>
+      </div>`
+      : `<p><strong>${esc(pn.nome)}</strong> ${pn.modo === 'nova' ? 'autorizada.' : ''} Marque as unidades desta conta.</p>`}
+    ${caixasUnidades(p, contas, pn.contaId, marcadas)}
+    ${botoes('<button class="btn btn--primario" type="submit">Salvar</button>')}
   </form>`;
 }
 
 function desenharIntegAvaliacoes() {
   const caixa = $('[data-integ-avaliacoes]');
   if (!caixa) return;
-  const conexoes = lerAvaliacoesEstado().conexoes;
+  const estado = lerAvaliacoesEstado();
   caixa.innerHTML = `
     <div class="cfg__topo">
       <div><h3 class="cartao__titulo">Plataformas de avaliação</h3>
-      <p class="cartao__sub">Conecte cada plataforma aqui. As avaliações aparecem na aba <a class="link-texto" href="avaliacoes.html">Avaliações</a> e se atualizam sozinhas.</p></div>
+      <p class="cartao__sub">Dá para ligar várias contas em cada plataforma (uma por franqueado, por exemplo). As avaliações aparecem na aba <a class="link-texto" href="avaliacoes.html">Avaliações</a>.</p></div>
     </div>
-    <ul class="cfg-integ">
+    <div class="cfg-plats">
       ${D.plataformas.map((p) => {
-        const unidades = Object.keys(conexoes[p.id] || {});
-        const estado = p.emAnalise ? '<span class="selo-dev">Em análise</span>'
-          : unidades.length ? situacao('Conectada', 'publicada') : situacao('Não conectada', 'arquivada');
-        const detalhe = p.emAnalise ? 'Sem API pública por enquanto'
-          : unidades.length ? (unidades.length === cfg.unidades.length ? 'Todas as unidades' : unidades.map(esc).join(', ')) : 'Nenhuma unidade';
-        const aberta = integAberta === p.id;
-        const botao = p.emAnalise || aberta ? ''
-          : `<button class="btn btn--${unidades.length ? 'fantasma' : 'secundario'}" type="button" data-integ-abrir="${p.id}" aria-expanded="false">${unidades.length ? 'Gerenciar' : 'Conectar'}</button>`;
-        return `<li${aberta ? ' class="cfg-integ--aberta"' : ''}><span class="av-sigla" style="--cor:${p.cor}" aria-hidden="true">${p.sigla}</span>
-          <span class="cfg-integ__nome"><strong id="ig-nome-${p.id}">${p.nome}</strong><span>${detalhe}</span></span>${estado}${botao}
-          ${aberta ? `<div class="cfg-integ__painel" role="region" aria-labelledby="ig-nome-${p.id}">${passosConexao(p, unidades)}</div>` : ''}</li>`;
+        const contas = estado.contas[p.id] || [];
+        const ligadas = contas.reduce((n, c) => n + c.unidades.length, 0);
+        const aberto = integPainel?.plat === p.id;
+        const resumo = p.emAnalise ? '<span class="selo-dev">Em análise</span>'
+          : `<span class="cfg-plat__resumo">${ligadas ? `${ligadas} de ${cfg.unidades.length} unidades` : 'Nenhuma unidade'}</span>`;
+        return `<section class="cfg-plat${aberto ? ' cfg-plat--aberta' : ''}" aria-labelledby="ig-${p.id}">
+          <div class="cfg-plat__topo">
+            <span class="av-sigla" style="--cor:${p.cor}" aria-hidden="true">${p.sigla}</span>
+            <h4 id="ig-${p.id}">${p.nome}</h4>${resumo}
+            ${p.emAnalise || (aberto && integPainel.modo === 'nova') ? '' : `<button class="btn btn--fantasma cfg-plat__add" type="button" data-integ-nova="${p.id}">${icone('mais')}${p.id === 'tripadvisor' ? 'Adicionar página' : 'Adicionar conta'}</button>`}
+          </div>
+          ${p.emAnalise ? '<p class="cfg-plat__nota">Sem API pública por enquanto.</p>' : ''}
+          ${contas.length ? `<ul class="cfg-plat__contas">${contas.map((c) => `<li>
+              <span class="cfg-plat__conta" title="${esc(c.nome)}">${esc(c.nome)}</span>
+              <span class="cfg-plat__unids">${c.unidades.map(esc).join(', ')}</span>
+              <span class="cfg-plat__acoes">
+                <button class="btn btn--fantasma" type="button" data-integ-editar="${p.id}|${c.id}">Editar</button>
+                <button class="btn btn--fantasma cfg-chave__remover" type="button" data-integ-remover="${p.id}|${c.id}">Remover</button>
+              </span>
+              ${aberto && integPainel.contaId === c.id ? `<div class="cfg-integ__painel">${painelConta(p, contas)}</div>` : ''}
+            </li>`).join('')}</ul>` : ''}
+          ${aberto && integPainel.modo === 'nova' ? `<div class="cfg-integ__painel">${painelConta(p, contas)}</div>` : ''}
+        </section>`;
       }).join('')}
-    </ul>`;
+    </div>`;
   const painel = $('.cfg-integ__painel', caixa);
-  if (painel) ($('select, input', painel) || $('button', painel)).focus();
+  if (painel) ($('input:not([disabled])', painel) || $('button', painel)).focus();
 }
 
-function fecharInteg(id) {
-  integAberta = null;
-  integAutorizou = new Set();
+function fecharInteg(foco) {
+  const plat = integPainel?.plat;
+  integPainel = null;
   desenharIntegAvaliacoes();
-  $(`[data-integ-abrir="${id}"]`)?.focus();
+  $(foco || `[data-integ-nova="${plat}"]`)?.focus();
 }
 
 document.addEventListener('click', async (e) => {
-  const abrir = e.target.closest('[data-integ-abrir]');
-  if (abrir) { integAberta = abrir.dataset.integAbrir; integAutorizou = new Set(); desenharIntegAvaliacoes(); return; }
-  if (e.target.closest('[data-integ-fechar]')) { fecharInteg(integAberta); return; }
-  const autorizar = e.target.closest('[data-integ-autorizar]');
-  if (autorizar) {
-    integAutorizou.add(autorizar.dataset.integAutorizar);
+  const nova = e.target.closest('[data-integ-nova]');
+  if (nova) {
+    const plat = nova.dataset.integNova;
+    integPainel = { plat, modo: 'nova', contaId: null, etapa: plat === 'tripadvisor' ? 'unidades' : 'autorizar', nome: '' };
     desenharIntegAvaliacoes();
-    avisar(autorizar.dataset.integAutorizar === 'google' ? 'Conta Google autorizada (simulação). Escolha o perfil de cada unidade.' : 'Autorização do iFood recebida (simulação). Escolha a loja de cada unidade.');
+    return;
+  }
+  const editar = e.target.closest('[data-integ-editar]');
+  if (editar) {
+    const [plat, contaId] = editar.dataset.integEditar.split('|');
+    const conta = lerAvaliacoesEstado().contas[plat].find((c) => c.id === contaId);
+    integPainel = { plat, modo: 'editar', contaId, etapa: 'unidades', nome: conta.nome };
+    desenharIntegAvaliacoes();
+    return;
+  }
+  if (e.target.closest('[data-integ-fechar]')) { fecharInteg(); return; }
+  if (e.target.closest('[data-integ-autorizar]')) {
+    // Simulação: a plataforma devolve a conta autorizada (no app: o e-mail da conta Google / o nome da loja no iFood)
+    const n = (lerAvaliacoesEstado().contas[integPainel.plat] || []).length + 1;
+    integPainel.nome = integPainel.plat === 'google' ? `conta${n}@exemplo.com.br` : `Loja iFood ${n}`;
+    integPainel.etapa = 'unidades';
+    desenharIntegAvaliacoes();
     return;
   }
   if (e.target.closest('[data-integ-copiar]')) {
     try { await navigator.clipboard.writeText(CODIGO_IFOOD_DEMO); avisar('Código copiado'); }
     catch { getSelection().selectAllChildren($('[data-integ-codigo]')); avisar('Código selecionado: copie com Ctrl+C'); }
+    return;
+  }
+  const remover = e.target.closest('[data-integ-remover]');
+  if (remover) {
+    const [plat, contaId] = remover.dataset.integRemover.split('|');
+    const estado = lerAvaliacoesEstado();
+    const conta = estado.contas[plat].find((c) => c.id === contaId);
+    if (!conta) { desenharIntegAvaliacoes(); return; }
+    const p = D.plataformas.find((x) => x.id === plat);
+    const sim = await confirmar({
+      titulo: `Remover ${p.id === 'tripadvisor' ? 'esta página' : 'esta conta'} do ${p.nome}?`,
+      texto: `As avaliações de <strong>${conta.unidades.map(esc).join(', ')}</strong> no ${p.nome} deixam de ser atualizadas.`,
+      botao: 'Remover', perigo: true, icone: 'plug',
+    });
+    $('[data-confirmar]').close();
+    if (!sim) return;
+    estado.contas[plat] = estado.contas[plat].filter((c) => c.id !== contaId);
+    gravarAvaliacoesEstado(estado);
+    integPainel = null;
+    desenharIntegAvaliacoes();
+    avisar(`${p.nome}: ${p.id === 'tripadvisor' ? 'página removida' : 'conta removida'}`);
   }
 });
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && e.target.closest?.('.cfg-integ__painel')) fecharInteg(integAberta);
+  if (e.key === 'Escape' && e.target.closest?.('.cfg-integ__painel')) fecharInteg();
 });
 document.addEventListener('submit', (e) => {
   const form = e.target.closest('[data-integ-form]');
   if (!form) return;
   e.preventDefault();
-  const id = form.dataset.integForm;
-  const p = D.plataformas.find((x) => x.id === id);
-  const campos = $$('input, select', form);
-  if (id === 'tripadvisor') {
-    const regras = campos.map((c) => [c, Boolean(c.value.trim()) && !c.value.toLowerCase().includes('tripadvisor')]);
-    if (!validar(regras)) return;
-  }
+  const { plat, modo, contaId } = integPainel;
+  const p = D.plataformas.find((x) => x.id === plat);
+  const unidades = $$('input[name="unidade"]:checked', form).map((i) => i.value);
+  const erroUnid = document.getElementById('ig-unidades-erro');
+  erroUnid.hidden = unidades.length > 0;
+  const link = document.getElementById('ig-link');
+  if (link && !validar([[link, !link.value.toLowerCase().includes('tripadvisor')]])) return;
+  if (!unidades.length) { $('input[name="unidade"]:not([disabled])', form)?.focus(); return; }
   const estado = lerAvaliacoesEstado();
-  const antes = new Set(Object.keys(estado.conexoes[id] || {}));
-  const novo = {};
-  campos.forEach((c) => { if (c.value.trim()) novo[c.name] = c.value.trim(); });
-  estado.conexoes[id] = novo;
-  // Demonstração: quem acabou de conectar o Tripadvisor já vê avaliações chegando na aba Avaliações
+  const lista = estado.contas[plat] || (estado.contas[plat] = []);
+  const antes = new Set(lista.flatMap((c) => c.unidades));
+  const nome = link ? link.value.trim() : integPainel.nome;
+  if (modo === 'nova') lista.push({ id: `${plat}-${Date.now()}`, nome, unidades });
+  else Object.assign(lista.find((c) => c.id === contaId), { nome, unidades });
+  // Demonstração: unidade recém-ligada ao Tripadvisor já traz avaliações para a aba Avaliações
   let importadas = 0;
-  Object.keys(novo).filter((u) => !antes.has(u)).forEach((u) => {
-    (D.avaliacoesAoConectar[id] || []).forEach((modelo, i) => {
-      const idNovo = `${id}-${slug(u)}-${i}`;
+  unidades.filter((u) => !antes.has(u)).forEach((u) => {
+    (D.avaliacoesAoConectar[plat] || []).forEach((modelo, i) => {
+      const idNovo = `${plat}-${slug(u)}-${i}`;
       if (estado.extras.some((x) => x.id === idNovo)) return;
       estado.extras.push({ ...modelo, id: idNovo, unidade: u, ts: Date.now() - (i * 3 + 1) * 864e5 });
       importadas += 1;
     });
   });
-  estado.porPlataforma[id] = Date.now();
+  estado.porPlataforma[plat] = Date.now();
   gravarAvaliacoesEstado(estado);
-  const n = Object.keys(novo).length;
-  fecharInteg(id);
-  avisar(n ? `${p.nome}: ${n} ${n === 1 ? 'unidade conectada' : 'unidades conectadas'}${importadas ? ` · ${importadas} avaliações importadas` : ''}` : `${p.nome} desconectado`);
+  fecharInteg();
+  avisar(`${p.nome}: ${modo === 'nova' ? (plat === 'tripadvisor' ? 'página adicionada' : 'conta adicionada') : 'conta atualizada'} · ${unidades.join(', ')}${importadas ? ` · ${importadas} avaliações importadas` : ''}`);
 });
 document.addEventListener('submit', (e) => {
   if (e.target.matches('[data-mm-conectar]')) {
