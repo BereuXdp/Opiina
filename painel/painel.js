@@ -812,3 +812,134 @@ if ($('.principal')) {
   else if (diaTeste === 7) abrirAvisoTeste('ultimo');   // em toda tela: o painel fica travado até assinar
   else if (diaTeste === 6 && lembrarAviso('opiina-demo-aviso-vespera')) abrirAvisoTeste('vespera');
 }
+
+// ---------- Tour da primeira entrada (pedido do cliente, 2026-11-05) ----------
+// Aparece sozinho na primeira entrada (guardado no navegador) e pode ser revisto pelo botão "Ver o tour" no menu.
+// Cada passo destaca um item do menu com uma explicação curta. Só entram as telas que o perfil enxerga.
+// No celular (menu em gaveta), os passos aparecem centralizados, sem destaque.
+const CHAVE_TOUR = 'opiina-demo-tour-visto';
+const PASSOS_TOUR = [
+  { nav: 'dashboard', titulo: 'Dashboard', texto: 'O resumo do NPS, das respostas e do que precisa de atenção hoje.' },
+  { nav: 'feedbacks', titulo: 'Feedbacks', texto: 'Todas as respostas das pesquisas. O que pede ação ganha responsável e prazo, em lista ou Kanban.' },
+  { nav: 'avaliacoes', titulo: 'Avaliações', texto: 'O que os clientes dizem no Google, iFood e Tripadvisor, num lugar só.' },
+  { nav: 'pesquisas', titulo: 'Pesquisas', texto: 'Monte a pesquisa e pegue o link e o QR Code de cada unidade.' },
+  { nav: 'ranking', titulo: 'Ranking', texto: 'Compare as unidades e os atendentes pelo NPS.' },
+  { nav: 'denuncias', titulo: 'Denúncias', texto: 'O canal de ética da equipe. Confidencial: só quem tem acesso vê.' },
+  { nav: 'clientes', titulo: 'Clientes', texto: 'Quem deixou o contato na pesquisa, com aniversário e aceite de ofertas.' },
+  { nav: 'configuracoes', titulo: 'Configurações', texto: pode('configuracoes') ? 'Empresa, unidades, atendentes, usuários e integrações (Google, iFood, Tripadvisor).' : 'Seus dados: nome, e-mail, celular e senha.' },
+  { nav: 'suporte', titulo: 'Suporte', texto: 'Precisa de ajuda? Abra um chamado e acompanhe por aqui.' },
+];
+
+function iniciarTour({ automatico }) {
+  const passos = PASSOS_TOUR.filter((p) => $(`.nav [data-nav="${p.nav}"]`));
+  let atual = -1;   // -1 = boas-vindas; passos.length = fim
+  const focoAntes = document.activeElement;
+  document.body.insertAdjacentHTML('beforeend', `
+    <div class="tour" data-tour>
+      <div class="tour__luz" data-tour-luz aria-hidden="true"></div>
+      <div class="tour__cartao" role="dialog" aria-modal="true" aria-labelledby="tour-titulo" aria-describedby="tour-texto" data-tour-cartao></div>
+    </div>`);
+  const tela = $('[data-tour]');
+  const luz = $('[data-tour-luz]');
+  const cartao = $('[data-tour-cartao]');
+  // O resto da página fica fora do alcance do teclado enquanto o tour está aberto
+  const fora = $$('body > *:not([data-tour])').filter((el) => !el.hasAttribute('inert'));
+  fora.forEach((el) => el.setAttribute('inert', ''));
+
+  function posicionar() {
+    const passo = passos[atual];
+    const alvo = passo && $(`.nav [data-nav="${passo.nav}"]`);
+    const r = alvo?.getBoundingClientRect();
+    const visivel = r && r.width > 0 && r.height > 0 && !telaMovel.matches;
+    tela.classList.toggle('tour--centro', !visivel);
+    if (!visivel) { luz.hidden = true; cartao.style.cssText = ''; return; }
+    luz.hidden = false;
+    alvo.scrollIntoView({ block: 'nearest' });
+    const rr = alvo.getBoundingClientRect();
+    Object.assign(luz.style, { top: `${rr.top - 4}px`, left: `${rr.left - 4}px`, width: `${rr.width + 8}px`, height: `${rr.height + 8}px` });
+    const alto = cartao.offsetHeight;
+    const topo = Math.min(Math.max(rr.top + rr.height / 2 - alto / 2, 12), innerHeight - alto - 12);
+    cartao.style.cssText = `top:${topo}px; left:${rr.right + 18}px;`;
+  }
+
+  function desenhar() {
+    const total = passos.length;
+    let corpo;
+    if (atual === -1) {
+      corpo = `
+        <span class="tour__selo">${icone('ok')}</span>
+        <h2 id="tour-titulo" tabindex="-1">Boas-vindas ao Opiina${D.usuario.primeiroNome ? `, ${esc(D.usuario.primeiroNome)}` : ''}!</h2>
+        <p id="tour-texto">Em 1 minuto, mostramos onde fica cada coisa no painel.</p>
+        <div class="tour__acoes"><button class="btn btn--secundario" type="button" data-tour-sair>Agora não</button><button class="btn btn--primario" type="button" data-tour-prox>Começar o tour</button></div>`;
+    } else if (atual === total) {
+      const podeCriar = pode('pesquisas');
+      corpo = `
+        <span class="tour__selo tour__selo--fim">${icone('ok')}</span>
+        <h2 id="tour-titulo" tabindex="-1">Pronto!</h2>
+        <p id="tour-texto">${podeCriar ? 'Um bom começo é criar a primeira pesquisa da unidade.' : 'Agora é só explorar.'} Para ver o tour de novo, use "Ver o tour" no fim do menu.</p>
+        <div class="tour__acoes">${podeCriar ? '<button class="btn btn--secundario" type="button" data-tour-sair>Fechar</button><a class="btn btn--primario" href="pesquisa-nova.html" data-tour-sair>Criar a primeira pesquisa</a>' : '<button class="btn btn--primario" type="button" data-tour-sair>Fechar</button>'}</div>`;
+    } else {
+      const p = passos[atual];
+      corpo = `
+        <p class="tour__conta">${atual + 1} de ${total}</p>
+        <h2 id="tour-titulo" tabindex="-1">${p.titulo}</h2>
+        <p id="tour-texto">${p.texto}</p>
+        <div class="tour__acoes">
+          <button class="btn btn--fantasma tour__pular" type="button" data-tour-sair>Pular o tour</button>
+          ${atual > 0 ? '<button class="btn btn--secundario" type="button" data-tour-volta>Voltar</button>' : ''}
+          <button class="btn btn--primario" type="button" data-tour-prox>${atual === total - 1 ? 'Concluir' : 'Próximo'}</button>
+        </div>`;
+    }
+    cartao.innerHTML = corpo;
+    posicionar();
+    $('#tour-titulo', cartao).focus();
+  }
+
+  function sair() {
+    try { localStorage.setItem(CHAVE_TOUR, '1'); } catch { /* ignora */ }
+    removeEventListener('resize', posicionar);
+    fora.forEach((el) => el.removeAttribute('inert'));
+    tela.remove();
+    if (!automatico && focoAntes?.isConnected) focoAntes.focus();
+  }
+
+  cartao.addEventListener('click', (e) => {
+    if (e.target.closest('[data-tour-prox]')) { atual += 1; desenhar(); }
+    else if (e.target.closest('[data-tour-volta]')) { atual -= 1; desenhar(); }
+    else if (e.target.closest('[data-tour-sair]')) sair();
+  });
+  tela.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { e.preventDefault(); sair(); }
+    if (e.key === 'ArrowRight' && atual < passos.length) { atual += 1; desenhar(); }
+    if (e.key === 'ArrowLeft' && atual > -1) { atual -= 1; desenhar(); }
+    // Mantém o Tab dentro do cartão
+    if (e.key === 'Tab') {
+      const focaveis = $$('button, a[href]', cartao);
+      const [primeiro, ultimo] = [focaveis[0], focaveis[focaveis.length - 1]];
+      if (e.shiftKey && document.activeElement === primeiro) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primeiro.focus(); }
+    }
+  });
+  addEventListener('resize', posicionar);
+  desenhar();
+}
+
+// Botão "Ver o tour" no rodapé do menu (logo acima do Modo escuro)
+$('[data-tema-botao]')?.insertAdjacentHTML('beforebegin', `
+  <button class="tema" type="button" data-tour-abrir><span class="tema__icone" aria-hidden="true">${icone('ok')}</span>Ver o tour</button>`);
+$('[data-tour-abrir]')?.addEventListener('click', () => {
+  if (telaMovel.matches) $('[data-menu-fechar]')?.click();   // no celular, fecha a gaveta do menu antes
+  iniciarTour({ automatico: false });
+});
+
+// Primeira entrada: abre sozinho. Espera o aviso do teste grátis (véspera) ser fechado; com o painel travado
+// (último dia do teste ou conta inativa), não abre.
+(function tourNaPrimeiraEntrada() {
+  if (!$('.principal') || !$('.nav')) return;
+  let visto = false;
+  try { visto = Boolean(localStorage.getItem(CHAVE_TOUR)); } catch { /* sem armazenamento: não abre */ visto = true; }
+  if (visto || estadoTeste === 'inativa' || diaTeste === 7) return;
+  const aviso = $('[data-teste-janela]');
+  if (aviso?.open) aviso.addEventListener('close', () => iniciarTour({ automatico: true }), { once: true });
+  else iniciarTour({ automatico: true });
+}());
