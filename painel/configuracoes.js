@@ -707,16 +707,32 @@ const CHAVE_APIS = 'opiina-demo-chaves';
 const lerChaves = () => { try { return JSON.parse(localStorage.getItem(CHAVE_APIS)) || []; } catch { return []; } };
 const gravarChaves = (lista) => { try { localStorage.setItem(CHAVE_APIS, JSON.stringify(lista)); } catch { /* ignora */ } };
 
+// O campo abre dentro do próprio cartão (cliente, 2026-11-05: "ao clicar em adicionar, não quero que puxe o modal").
+// emEdicao: null = fechado · 'nova' = adicionando · número = trocando a chave daquela posição
+let emEdicao = null;
+
 function desenharChavesApi() {
   const caixa = $('[data-integ-chaves]');
   if (!caixa) return;
   const chaves = lerChaves();
+  const trocando = typeof emEdicao === 'number' ? chaves[emEdicao] : null;
   caixa.innerHTML = `
     <div class="cfg__topo">
       <div><h3 class="cartao__titulo">Chaves de API</h3>
       <p class="cartao__sub">Por segurança, depois de salva a chave não aparece mais: fica só o final.</p></div>
-      <button class="btn btn--primario" type="button" data-chave-nova>${icone('mais')}Adicionar chave de API</button>
+      ${emEdicao === null ? `<button class="btn btn--primario" type="button" data-chave-nova>${icone('mais')}Adicionar chave de API</button>` : ''}
     </div>
+    ${emEdicao !== null ? `
+      <form class="cfg__linha cfg-chave__form" data-chave-form novalidate>
+        <div class="campo">
+          <label for="ch-chave">${trocando ? `Nova chave de API <span class="opcional">(substitui a •••• ${esc(trocando.final)})</span>` : 'Chave de API'}</label>
+          <input id="ch-chave" type="password" autocomplete="off" spellcheck="false" aria-describedby="ch-chave-dica ch-chave-erro">
+          <p class="campo__dica" id="ch-chave-dica">Cole a chave inteira. Ela não aparece de novo depois de salva.</p>
+          <p class="campo__erro" id="ch-chave-erro" hidden>Cole a chave de API (pelo menos 8 caracteres, sem espaços).</p>
+        </div>
+        <button class="btn btn--primario" type="submit">Salvar chave</button>
+        <button class="btn btn--secundario" type="button" data-chave-cancelar>Cancelar</button>
+      </form>` : ''}
     ${chaves.length ? `<ul class="cfg-integ">${chaves.map((c, i) => `<li>
         <span class="cfg-chave__icone" aria-hidden="true">${icone('cadeado')}</span>
         <span class="cfg-integ__nome"><strong class="cfg-chave__final" aria-label="Chave de API terminada em ${esc(c.final)}">•••• ${esc(c.final)}</strong>
@@ -725,35 +741,42 @@ function desenharChavesApi() {
           <button class="btn btn--fantasma" type="button" data-chave-trocar="${i}">Trocar</button>
           <button class="btn btn--fantasma cfg-chave__remover" type="button" data-chave-remover="${i}">Remover</button>
         </span>
-      </li>`).join('')}</ul>` : '<p class="mudo">Nenhuma chave cadastrada.</p>'}`;
+      </li>`).join('')}</ul>` : (emEdicao === null ? '<p class="mudo">Nenhuma chave cadastrada.</p>' : '')}`;
+  if (emEdicao !== null) document.getElementById('ch-chave').focus();
 }
 
 function abrirChave(indice) {
-  const chaves = lerChaves();
-  const atual = indice != null ? chaves[indice] : null;
-  abrirGaveta({
-    titulo: atual ? 'Trocar a chave de API' : 'Adicionar chave de API',
-    botao: 'Salvar chave',
-    campos: `
-      ${atual ? `<p class="cartao__sub">A chave atual (•••• ${esc(atual.final)}) deixa de valer quando você salvar a nova.</p>` : ''}
-      ${htmlCampo({ id: 'ch-chave', rotulo: 'Chave de API', tipo: 'password', obrigatorio: true, dica: 'Cole a chave inteira. Ela não aparece de novo depois de salva.', erro: 'Cole a chave de API (pelo menos 8 caracteres, sem espaços).', extra: 'autocomplete="off" spellcheck="false"' })}`,
-    salvar: () => {
-      const chave = document.getElementById('ch-chave');
-      const valor = chave.value.trim();
-      if (!validar([[chave, valor.length < 8 || /\s/.test(valor)]])) return false;
-      const registro = { final: valor.slice(-4), criadaEm: Date.now(), por: cfg.usuarios[INDICE_EU].nome };   // só o final
-      chave.value = '';
-      if (atual) chaves[indice] = registro; else chaves.push(registro);
-      gravarChaves(chaves);
-      desenharChavesApi();
-      avisar(`${atual ? 'Chave trocada' : 'Chave salva'} (protótipo: nada foi enviado)`);
-      return true;
-    },
-  });
+  emEdicao = indice == null ? 'nova' : indice;
+  desenharChavesApi();
 }
+function fecharChave(focarEm) {
+  emEdicao = null;
+  desenharChavesApi();
+  $(focarEm || '[data-chave-nova]')?.focus();
+}
+
+document.addEventListener('submit', (e) => {
+  if (!e.target.matches('[data-chave-form]')) return;
+  e.preventDefault();
+  const campo = document.getElementById('ch-chave');
+  const valor = campo.value.trim();
+  if (!validar([[campo, valor.length < 8 || /\s/.test(valor)]])) return;
+  const chaves = lerChaves();
+  const registro = { final: valor.slice(-4), criadaEm: Date.now(), por: cfg.usuarios[INDICE_EU].nome };   // só o final
+  const trocou = typeof emEdicao === 'number';
+  campo.value = '';
+  if (trocou) chaves[emEdicao] = registro; else chaves.push(registro);
+  gravarChaves(chaves);
+  fecharChave();
+  avisar(`${trocou ? 'Chave trocada' : 'Chave salva'} (protótipo: nada foi enviado)`);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && e.target.closest?.('[data-chave-form]')) fecharChave();
+});
 
 document.addEventListener('click', async (e) => {
   if (e.target.closest('[data-chave-nova]')) { abrirChave(null); return; }
+  if (e.target.closest('[data-chave-cancelar]')) { fecharChave(); return; }
   const trocar = e.target.closest('[data-chave-trocar]');
   if (trocar) { abrirChave(Number(trocar.dataset.chaveTrocar)); return; }
   const remover = e.target.closest('[data-chave-remover]');
