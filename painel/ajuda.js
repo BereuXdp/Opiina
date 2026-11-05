@@ -20,8 +20,8 @@ function iniciarAjuda() {
       const ok = termos.every((t) => textos.get(d).includes(t));
       d.hidden = !ok;
       if (ok) visiveis += 1;
-      // Com busca, abre o que achou (se for pouco); sem busca, volta tudo fechado
-      if (termos.length) d.open = ok && visiveis <= 3;
+      // Com busca, abre o primeiro que achou (um aberto por vez); sem busca, volta tudo fechado
+      if (termos.length) d.open = ok && visiveis === 1;
     });
     grupos.forEach((g) => { g.hidden = !$$('.ajuda-item', g).some((d) => !d.hidden); });
     vazio.hidden = visiveis > 0;
@@ -43,6 +43,16 @@ function iniciarAjuda() {
     alvo.scrollIntoView({ block: 'start' });
     $('summary', alvo).focus({ preventScroll: true });
   }
+  // Um tutorial aberto por vez (pedido do cliente, 2026-11-05): abrir um fecha o anterior.
+  // Fecha no clique, antes de abrir, e compensa a rolagem: se o anterior estava acima, o clicado não "pula".
+  itens.forEach((d) => $('summary', d).addEventListener('click', () => {
+    if (d.open) return;   // este clique vai fechar o próprio tutorial
+    const antes = d.getBoundingClientRect().top;
+    itens.forEach((outro) => { if (outro !== d) outro.open = false; });
+    const desvio = d.getBoundingClientRect().top - antes;
+    if (desvio) scrollBy({ top: desvio, behavior: 'instant' });
+  }));
+
   // Ao abrir um tutorial, o endereço guarda qual é (dá para mandar o link para alguém da equipe)
   itens.forEach((d) => d.addEventListener('toggle', () => {
     if (!d.open || campo.value.trim()) return;
