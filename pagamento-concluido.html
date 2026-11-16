@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pagamento confirmado — Opiina</title>
+  <meta name="description" content="Pagamento do plano Opiina confirmado.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#1c7bff">
+  <link rel="icon" href="assets/icons/logo-opiina-64.png" type="image/png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/login.css">
+  <link rel="stylesheet" href="assets/css/onboarding.css">
+  <script src="assets/js/planos.js" defer></script>
+  <script src="assets/js/pagamento-concluido.js" defer></script>
+</head>
+<!--
+  Protótipo da página para onde a Stripe devolve o cliente depois do pagamento aprovado
+  (success_url do Checkout). Fluxo (cliente, 2026-11-16): cadastro → "Ir para o pagamento" → Stripe → esta página.
+  No protótipo, o plano vem de ?plan=start|pro|redes. No app, os dados devem vir da sessão
+  da Stripe (?session_id={CHECKOUT_SESSION_ID}), conferida no servidor antes de mostrar "confirmado".
+-->
+<body class="pagina-login pagina-onboarding">
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="brilho" viewBox="0 0 24 24">
+        <path d="M12 2.6c.55 0 .88.55 1.08 2.1.62 4.7 1.52 5.6 6.22 6.22 1.55.2 2.1.53 2.1 1.08s-.55.88-2.1 1.08c-4.7.62-5.6 1.52-6.22 6.22-.2 1.55-.53 2.1-1.08 2.1s-.88-.55-1.08-2.1c-.62-4.7-1.52-5.6-6.22-6.22C3.15 12.88 2.6 12.55 2.6 12s.55-.88 2.1-1.08c4.7-.62 5.6-1.52 6.22-6.22.2-1.55.53-2.1 1.08-2.1Z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="login">
+    <!-- Painel da marca + plano pago (desktop) -->
+    <aside class="login__marca onb__marca" aria-label="Plano contratado">
+      <a class="marca marca--clara" href="index.html" aria-label="Opiina — início">
+        <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+        <span class="marca__nome">Opiina</span>
+      </a>
+
+      <div class="login__marca-texto">
+        <p class="selo selo--claro">
+          <svg aria-hidden="true"><use href="#brilho"/></svg>Ouça · Entenda · Fidelize
+        </p>
+        <!-- Preenchido pelo pagamento-concluido.js a partir de ?plan= -->
+        <div class="plano-resumo plano-resumo--claro" data-plano-resumo></div>
+      </div>
+
+      <p class="login__credito">Desenvolvido por <a href="https://devmais.com">Dev+</a></p>
+    </aside>
+
+    <main class="login__principal onb__principal" id="conteudo">
+      <div class="onb__topo">
+        <a class="marca login__marca-mobile" href="index.html" aria-label="Opiina — início">
+          <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+          <span class="marca__nome">Opiina</span>
+        </a>
+      </div>
+
+      <div class="login__cartao onb__cartao">
+        <div class="onb__sucesso">
+          <span class="modal__icone modal__icone--ok onb__sucesso-icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </span>
+          <h1 class="login__titulo" tabindex="-1" data-sucesso-titulo>Pagamento confirmado!</h1>
+          <p class="login__sub" data-texto>Seu plano está ativo. O painel do Opiina já está liberado para você.</p>
+
+          <dl class="onb__resumo">
+            <div data-linha-plano hidden><dt>Plano</dt><dd data-s="plano"></dd></div>
+            <div><dt>Pagamento</dt><dd>Aprovado pela Stripe</dd></div>
+            <div><dt>Data</dt><dd data-s="data"></dd></div>
+          </dl>
+
+          <h2 class="onb__passos-titulo">Próximos passos</h2>
+          <ol class="onb__passos">
+            <li>Entre no painel com o e-mail e a senha do cadastro.</li>
+            <li>Monte a primeira pesquisa NPS da unidade.</li>
+            <li>Imprima o QR Code da pesquisa e deixe à vista na unidade.</li>
+          </ol>
+
+          <div class="onb__pagar">
+            <a class="btn btn--solido btn--grande btn--largo" href="login.html">Entrar no painel</a>
+          </div>
+          <p class="onb__prototipo">Protótipo: nenhum pagamento foi feito de verdade.</p>
+        </div>
+      </div>
+
+      <p class="login__credito login__credito--mobile">Desenvolvido por <a href="https://devmais.com">Dev+</a></p>
+    </main>
+  </div>
+</body>
+</html>

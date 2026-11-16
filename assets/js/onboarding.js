@@ -1,29 +1,7 @@
 // Opiina — onboarding (protótipo). Sem dependências.
 // Escolha do plano (pré-marcada por ?plan=start|pro|redes), resumo do plano no painel,
 // sugestão do endereço do painel e validação acessível. NÃO envia dados.
-
-// Planos exatamente como estão no site (preço, descrição e itens).
-const PLANOS = {
-  start: {
-    nome: 'Start', preco: 'R$ 147,00', desc: 'NPS e ocorrências para a sua unidade.',
-    itens: ['Pesquisa NPS', 'Ocorrências', '1 unidade'],
-  },
-  pro: {
-    nome: 'Pro', preco: 'R$ 297,00', desc: 'NPS, dashboard e Kanban para a sua unidade.',
-    itens: ['Pesquisa NPS', 'Ocorrências', 'Dashboard', 'Kanban de atendimento', '5 usuários', '1 unidade'],
-  },
-  redes: {
-    nome: 'Redes', preco: 'R$ 697,00', desc: 'NPS e atendimento em todas as suas unidades.',
-    itens: ['Pesquisa NPS', 'Ocorrências', 'Dashboard', 'Kanban de atendimento', 'Métricas por unidade', 'Unidades ilimitadas', '20 usuários'],
-  },
-};
-
-function el(tag, classe, texto) {
-  const no = document.createElement(tag);
-  if (classe) no.className = classe;
-  if (texto) no.textContent = texto;
-  return no;
-}
+// PLANOS e el() vêm de planos.js (carregado antes).
 
 // ---------- Escolha do plano ----------
 const opcoesPlano = [...document.querySelectorAll('[data-plano-opcao]')];
@@ -62,7 +40,6 @@ function montarResumo() {
   preco.append(el('small', '', '/mês'));
   resumo.append(preco);
   resumo.append(el('p', 'plano-resumo__desc', plano.desc));
-  resumo.append(el('p', 'plano-resumo__teste', 'Começa com 7 dias grátis. Você só paga se continuar.'));
   const lista = el('ul', 'login__lista');
   plano.itens.forEach((item) => lista.append(el('li', '', item)));
   resumo.append(lista);
@@ -183,13 +160,12 @@ function mostrarSucesso() {
   const preencher = (chave, texto) => { sucesso.querySelector(`[data-s="${chave}"]`).textContent = texto; };
 
   const texto = sucesso.querySelector('[data-sucesso-texto]');
-  // Teste grátis de 7 dias: hoje é o dia 1, o último é daqui a 6 dias; a cobrança começa no dia seguinte
-  const dia = (deslocamento) => { const d = new Date(); d.setDate(d.getDate() + deslocamento); return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }); };
-  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Seu teste grátis de 7 dias começou hoje.`;
-  preencher('teste', `Hoje até ${dia(6)}`);
-  preencher('plano', `${plano.nome} · ${plano.preco} por mês, a partir de ${dia(7)}`);
-  preencher('fim', dia(6));
+  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Agora falta o pagamento do plano.`;
+  preencher('plano', `${plano.nome} · ${plano.preco} por mês`);
   preencher('endereco', endereco.textContent);
+  // Protótipo: o botão simula a volta da Stripe com o pagamento aprovado.
+  // No app, ele abre o Checkout da Stripe, e o success_url aponta para pagamento-concluido.
+  sucesso.querySelector('[data-pagar]').href = `pagamento-concluido.html?plan=${opcoesPlano.find((o) => o.checked).value}`;
   preencher('email', valor('admin-email'));
   preencher('unidade', valor('unidade-nome') || 'Unidade 1');
 
