@@ -57,7 +57,7 @@ body.dev {
   box-shadow: 0 24px 80px rgba(2, 8, 23, .45);
 }
 .dev .pub__prototipo { background: rgba(245, 158, 11, .12); color: var(--alerta); }
-.dev .pub__rodape { color: var(--mudo); }
+.dev .pub__rodape { color: var(--mudo); flex-wrap: wrap; justify-content: center; }
 .dev .pub__rodape a { color: var(--link); font-weight: 600; }
 .dev .pub__noscript { background: var(--superficie); }
 

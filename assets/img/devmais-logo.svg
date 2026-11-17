@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="203 453 674 173" fill="none">
+  <defs>
+    <linearGradient id="devmais-plus" x1="0" y1="470" x2="0" y2="608" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0ae087"/>
+      <stop offset=".55" stop-color="#14935c"/>
+      <stop offset="1" stop-color="#112a22"/>
+    </linearGradient>
+  </defs>
+  <g fill="#dbe3e5" stroke="#dbe3e5" stroke-width="6" stroke-linejoin="round">
+    <path d="M210 460H275A79.5 79.5 0 0 1 275 619H210Z"/>
+    <path d="M376 460H496V495H415V521H487V558H415V583H496V619H376Z"/>
+    <path d="M519 460H560L606 562L652 460H695L627 619H588Z"/>
+  </g>
+  <g fill="url(#devmais-plus)">
+    <path d="M786 470H821C819 500 812 525 795 537C780 550 760 556 722 552L729 518C750 525 770 525 778 518C787 510 788 490 786 470Z"/>
+    <path d="M809 608H774C776 578 783 553 800 541C815 528 835 522 873 526L866 560C845 553 825 553 817 560C808 568 807 588 809 608Z"/>
+  </g>
+</svg>

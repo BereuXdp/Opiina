@@ -342,6 +342,22 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 .denuncia__item h3 { margin-bottom: 4px; font-size: 18px; }
 .denuncia__item p { color: var(--mudo); font-size: 15px; line-height: 1.55; }
 
+/* Clientes (logos de perfil, 150×150, recortados em círculo) */
+.clientes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.cliente {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 28px 18px 24px;
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+  transition: border-color .35s, transform .35s var(--suave), box-shadow .35s;
+}
+.cliente:hover { border-color: rgba(28, 123, 255, .5); transform: translateY(-4px); box-shadow: 0 18px 40px -22px rgba(28, 123, 255, .5); }
+.cliente img { width: 96px; height: 96px; margin-bottom: 12px; border-radius: 50%; box-shadow: 0 0 0 1px var(--linha); }
+.cliente__nome { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.cliente__unidade { color: var(--mudo); font-size: 14px; }
+
 /* Benefícios */
 .grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .card {
@@ -374,6 +390,102 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
   font-size: 13px; font-weight: 600;
 }
 .selo-ia svg { width: 12px; height: 12px; fill: currentColor; }
+
+/* Benefícios: etapas com imagem (2026-11-17).
+   Celular e sem JS: tudo aberto, um embaixo do outro.
+   Computador (.vitrine--rolagem): lista e palco presos no meio da tela; a rolagem passa por 1, 2, 3… */
+.vitrine { display: grid; gap: 12px; }
+.vitrine__item {
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color .35s, box-shadow .35s, background-color .35s;
+}
+.vitrine__titulo {
+  display: flex; align-items: center; gap: 14px;
+  padding: 18px 20px 12px;
+  font-size: 18px; font-weight: 600; letter-spacing: -.02em;
+}
+.vitrine__titulo i {
+  flex: none; display: grid; place-items: center;
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: var(--grad);
+  color: #fff; font-size: 15px; font-style: normal;
+  transition: background .35s, color .35s;
+}
+.vitrine__item--ia .vitrine__titulo i { background: var(--grad-ia); }
+.vitrine__titulo .selo-ia { margin: 0 0 0 auto; flex: none; }
+.vitrine__painel { padding: 0 20px 20px 68px; }
+.vitrine__texto { max-width: 52ch; color: var(--mudo); font-size: 15px; line-height: 1.55; }
+.vitrine__tela {
+  overflow: hidden;
+  margin-top: 16px;
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  background: #F4F7FC;   /* mesmo fundo do painel: a captura se encaixa sem emenda */
+}
+.vitrine__tela img { width: 100%; height: auto; }
+.vitrine__nota { margin-top: 16px; color: var(--mudo); font-size: 14px; }
+.vitrine__palco { display: none; }
+
+@media (max-width: 560px) {
+  .vitrine__titulo { padding: 16px 16px 10px; font-size: 17px; }
+  .vitrine__painel { padding: 0 16px 16px; }
+}
+
+/* Computador: a seção fica alta (uma "parada" por etapa) e o conteúdo fica preso enquanto se rola */
+@media (min-width: 901px) {
+  .vitrine--rolagem { display: block; height: calc(var(--fixo-altura, 600px) + 6 * 42vh); }
+  .vitrine--rolagem .vitrine__fixo {
+    position: sticky; top: var(--fixo-topo, 96px);
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px 40px; align-items: center; align-content: center;
+  }
+  .vitrine--rolagem .vitrine__lista { display: grid; gap: 4px; }
+  .vitrine--rolagem .vitrine__item { border-color: transparent; background: transparent; }
+  .vitrine--rolagem .vitrine__titulo { padding: 0; }
+  .vitrine--rolagem .vitrine__titulo button {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; min-height: 56px;
+    padding: 10px 20px;
+    border: 0; border-radius: 14px;
+    background: none;
+    color: var(--mudo);
+    font: inherit; text-align: left;
+    cursor: pointer;
+    transition: color .3s;
+  }
+  .vitrine--rolagem .vitrine__titulo button:hover { color: var(--texto); }
+  .vitrine--rolagem .vitrine__item:not(.vitrine__item--aberto) .vitrine__titulo i { background: #EAF2FF; color: var(--link); }
+  .vitrine--rolagem .vitrine__painel { display: none; padding: 0 20px 18px 68px; }
+  .vitrine--rolagem .vitrine__item--aberto { border-color: rgba(28, 123, 255, .35); background: #fff; box-shadow: 0 18px 40px -26px rgba(28, 123, 255, .55); }
+  .vitrine--rolagem .vitrine__item--ia.vitrine__item--aberto { border-color: rgba(112, 56, 248, .35); box-shadow: 0 18px 40px -26px rgba(112, 56, 248, .5); }
+  .vitrine--rolagem .vitrine__item--aberto .vitrine__titulo button { color: var(--texto); }
+  .vitrine--rolagem .vitrine__item--aberto .vitrine__painel { display: block; }
+  .vitrine--rolagem .vitrine__palco {
+    display: block; position: relative;
+    aspect-ratio: 1476 / 1020;   /* as telas mais altas são cortadas embaixo; as largas ficam inteiras */
+    overflow: hidden;
+    border: 1px solid var(--linha);
+    border-radius: 22px;
+    background: #F4F7FC;
+    box-shadow: 0 30px 60px -40px rgba(20, 60, 140, .45);
+  }
+  .vitrine__palco .vitrine__tela {
+    position: absolute; inset: 0;
+    margin: 0; border: 0; border-radius: 0; background: none;
+    opacity: 0; visibility: hidden;
+    transition: opacity .45s ease, visibility 0s linear .45s;
+  }
+  .vitrine__palco .vitrine__tela--ativa { opacity: 1; visibility: visible; transition: opacity .45s ease, visibility 0s; }
+  .vitrine__palco .vitrine__tela img { width: 100%; height: 100%; object-fit: cover; object-position: top center; }
+  .vitrine__palco .vitrine__tela--larga img { object-fit: contain; object-position: center; }
+  /* Andamento: 6 tracinhos embaixo do palco */
+  .vitrine__andamento { grid-column: 2; display: flex; gap: 6px; justify-content: center; margin-top: -4px; }
+  .vitrine__andamento span { width: 22px; height: 4px; border-radius: 2px; background: rgba(28, 123, 255, .18); transition: background .3s, width .3s; }
+  .vitrine__andamento .ativo { width: 36px; background: var(--acento); }
+  .vitrine--rolagem .vitrine__nota { grid-column: 1 / -1; margin-top: 0; }
+}
 
 /* Como funciona */
 .passos { margin-top: 44px; border-top: 1px solid var(--linha); }
@@ -530,6 +642,14 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 
 @media (max-width: 1099px) {
   .demo, .denuncia { grid-template-columns: 1fr; gap: 40px; }
+  .clientes { gap: 10px; }
+  .cliente { padding: 24px 10px 20px; }
+  .cliente img { width: 84px; height: 84px; }
+}
+
+@media (max-width: 1099px) and (min-width: 901px) {
+  .nav { gap: 6px; }
+  .nav a { padding: 0 11px; font-size: 13px; }   /* 6 links + logo + "Já tenho conta" cabem a partir de 901px */
 }
 
 @media (max-width: 900px) {
@@ -569,6 +689,9 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 @media (max-width: 560px) {
   .acoes { flex-direction: column; width: 100%; }
   .acoes .btn { width: 100%; }
+  .clientes { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cliente { padding: 22px 10px 18px; }
+  .cliente img { width: 80px; height: 80px; }
 }
 
 @media (max-width: 359px) {
@@ -616,3 +739,8 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
   .hero__copy { transform: none; opacity: 1; }
   .progresso { display: none; }
 }
+
+/* Crédito Dev+ no rodapé */
+.rodape__credito { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 13px; }
+.rodape__credito img { height: 20px; width: auto; }
+.rodape__credito a { text-decoration: underline; text-underline-offset: 3px; }

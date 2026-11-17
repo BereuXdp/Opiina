@@ -48,6 +48,7 @@
       <a href="#beneficios">Benefícios</a>
       <a href="#como-funciona">Como funciona</a>
       <a href="#denuncias">Denúncias</a>
+      <a href="#clientes">Clientes</a>
       <a href="#planos">Planos</a>
       <a href="#duvidas">Dúvidas</a>
       <a class="nav__entrar" href="login.html">Já tenho conta</a>
@@ -129,39 +130,54 @@
       <span class="tag revelar">Benefícios</span>
       <h2 id="beneficios-titulo" data-palavras>Mais do que ouvir: entender, comparar e <em>cuidar</em></h2>
       <p class="sub revelar">Nota, comentário e ocorrência no mesmo lugar — sem planilha, sem conversa perdida.</p>
-      <div class="grade">
-        <article class="card revelar">
-          <i aria-hidden="true">1</i>
-          <h3>Pesquisa rápida, em mais de um canal</h3>
-          <p>Rápido de montar, fácil de responder. A resposta volta direto pro painel.</p>
-        </article>
-        <article class="card revelar" style="--d:.08s">
-          <i aria-hidden="true">2</i>
-          <h3>NPS e comentário no mesmo recorte</h3>
-          <p>A nota e o comentário chegam juntos. Você enxerga onde a casa está ganhando ou perdendo.</p>
-        </article>
-        <article class="card revelar" style="--d:.16s">
-          <i aria-hidden="true">3</i>
-          <h3>Ocorrências no Kanban</h3>
-          <p>Cada ocorrência vira um card. A equipe trata, você acompanha.</p>
-        </article>
-        <article class="card card--ia revelar">
-          <i aria-hidden="true">4</i>
-          <span class="selo-ia"><svg aria-hidden="true"><use href="#brilho"/></svg>IA</span>
-          <h3>A IA organiza o que veio nas respostas</h3>
-          <p>Comentários abertos viram temas — demora, atendimento, comida, elogio. Você vê o que mais aparece e onde agir primeiro.</p>
-        </article>
-        <article class="card revelar" style="--d:.08s">
-          <i aria-hidden="true">5</i>
-          <h3>Unidades lado a lado, com ranking</h3>
-          <p>Compare nota, volume de respostas e desempenho entre casas — sem montar planilha no fim do mês.</p>
-        </article>
-        <article class="card revelar" style="--d:.16s">
-          <i aria-hidden="true">6</i>
-          <h3>Denúncia em canal próprio</h3>
-          <p>Cada unidade tem um link só pra isso, fora do NPS. Canal alinhado às obrigações trabalhistas.</p>
-        </article>
+      <!-- Etapas com imagem (pedido do cliente, 2026-11-17). Computador: lista e tela presas no meio da tela, e a rolagem
+           passa por 1, 2, 3… (cada título vira botão que leva à etapa). Celular e sem JS: tudo aberto, um embaixo do outro.
+           Imagens: telas do painel (protótipo) com dados de exemplo, geradas por tools/capturas-site.mjs. -->
+      <div class="vitrine" data-vitrine>
+        <div class="vitrine__item">
+          <h3 class="vitrine__titulo" id="vh-1"><i aria-hidden="true">1</i>Pesquisa rápida, em mais de um canal</h3>
+          <div class="vitrine__painel" id="vp-1">
+            <p class="vitrine__texto">Rápido de montar, fácil de responder. A resposta volta direto pro painel.</p>
+            <figure class="vitrine__tela"><img src="assets/img/painel/beneficio-pesquisa.webp" width="1476" height="1140" loading="lazy" alt="Editor de pesquisa do painel: nome, unidades e, ao lado, a prévia no celular com a pergunta de 0 a 5."></figure>
+          </div>
+        </div>
+        <div class="vitrine__item">
+          <h3 class="vitrine__titulo" id="vh-2"><i aria-hidden="true">2</i>NPS e comentário no mesmo recorte</h3>
+          <div class="vitrine__painel" id="vp-2">
+            <p class="vitrine__texto">A nota e o comentário chegam juntos. Você enxerga onde a casa está ganhando ou perdendo.</p>
+            <figure class="vitrine__tela"><img src="assets/img/painel/beneficio-feedbacks.webp" width="1476" height="1007" loading="lazy" alt="Lista de feedbacks do painel: cada resposta com a nota, o comentário do cliente, a unidade e etiquetas como elogio ou reclamação."></figure>
+          </div>
+        </div>
+        <div class="vitrine__item">
+          <h3 class="vitrine__titulo" id="vh-3"><i aria-hidden="true">3</i>Ocorrências no Kanban</h3>
+          <div class="vitrine__painel" id="vp-3">
+            <p class="vitrine__texto">Cada ocorrência vira um card. A equipe trata, você acompanha.</p>
+            <figure class="vitrine__tela"><img src="assets/img/painel/beneficio-kanban.webp" width="1476" height="1020" loading="lazy" alt="Kanban do painel com colunas por etapa (nova, visualizada, em andamento), cada card com a reclamação, a unidade, o prazo e o responsável."></figure>
+          </div>
+        </div>
+        <div class="vitrine__item vitrine__item--ia">
+          <h3 class="vitrine__titulo" id="vh-4"><i aria-hidden="true">4</i>A IA organiza o que veio nas respostas <span class="selo-ia"><svg aria-hidden="true"><use href="#brilho"/></svg>IA</span></h3>
+          <div class="vitrine__painel" id="vp-4">
+            <p class="vitrine__texto">Comentários abertos viram temas — demora, atendimento, comida, elogio. Você vê o que mais aparece e onde agir primeiro.</p>
+            <figure class="vitrine__tela vitrine__tela--larga"><img src="assets/img/painel/beneficio-ia.webp" width="1476" height="707" loading="lazy" alt="Dashboard do painel: lista do que precisa de atenção e, ao lado, os temas mais citados nos comentários, agrupados pela IA."></figure>
+          </div>
+        </div>
+        <div class="vitrine__item">
+          <h3 class="vitrine__titulo" id="vh-5"><i aria-hidden="true">5</i>Unidades lado a lado, com ranking</h3>
+          <div class="vitrine__painel" id="vp-5">
+            <p class="vitrine__texto">Compare nota, volume de respostas e desempenho entre casas — sem montar planilha no fim do mês.</p>
+            <figure class="vitrine__tela vitrine__tela--larga"><img src="assets/img/painel/beneficio-ranking.webp" width="1476" height="734" loading="lazy" alt="Ranking de unidades do painel: cada unidade com posição, número de respostas, barra de promotores, passivos e detratores, e o NPS."></figure>
+          </div>
+        </div>
+        <div class="vitrine__item">
+          <h3 class="vitrine__titulo" id="vh-6"><i aria-hidden="true">6</i>Denúncia em canal próprio</h3>
+          <div class="vitrine__painel" id="vp-6">
+            <p class="vitrine__texto">Cada unidade tem um link só pra isso, fora do NPS. Canal alinhado às obrigações trabalhistas.</p>
+            <figure class="vitrine__tela"><img src="assets/img/painel/beneficio-denuncias.webp" width="1476" height="1140" loading="lazy" alt="Tela de denúncias do painel: totais por situação e a lista de relatos com prioridade, categoria, unidade, situação e identificação."></figure>
+          </div>
+        </div>
       </div>
+      <p class="vitrine__nota revelar">Telas do painel do Opiina com dados de exemplo.</p>
     </div>
   </section>
 
@@ -257,6 +273,25 @@
     </div>
   </section>
 
+  <!-- Clientes (pedido do cliente, 2026-11-17): logos enviados pelo próprio Opiina. Só nome e unidade, sem números nem depoimentos. -->
+  <section class="sec sec--suave" id="clientes" aria-labelledby="clientes-titulo">
+    <div class="sec__in">
+      <span class="tag revelar">Clientes</span>
+      <h2 class="revelar" id="clientes-titulo">Quem já <em>ouve o cliente</em> com o Opiina</h2>
+      <p class="sub revelar">Restaurantes, redes e um open mall que usam o Opiina.</p>
+      <ul class="clientes">
+        <li class="cliente revelar"><img src="assets/img/clientes/ordos-burger.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Ordo's Burger</span></li>
+        <li class="cliente revelar" style="--d:.05s"><img src="assets/img/clientes/cabana-del-primo.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Cabaña del Primo</span></li>
+        <li class="cliente revelar" style="--d:.1s"><img src="assets/img/clientes/geppos-italiano.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Geppos Italiano</span></li>
+        <li class="cliente revelar" style="--d:.15s"><img src="assets/img/clientes/geppos-praia.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Geppos Praia</span></li>
+        <li class="cliente revelar"><img src="assets/img/clientes/jardins-open-mall.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Jardins Open Mall</span></li>
+        <li class="cliente revelar" style="--d:.05s"><img src="assets/img/clientes/carneiro-do-ordones-joquei.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Carneiro do Ordones</span><span class="cliente__unidade">Jóquei</span></li>
+        <li class="cliente revelar" style="--d:.1s"><img src="assets/img/clientes/carneiro-do-ordones-jovita.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Carneiro do Ordones</span><span class="cliente__unidade">Jovita</span></li>
+        <li class="cliente revelar" style="--d:.15s"><img src="assets/img/clientes/carneiro-do-ordones-varjota.jpg" width="150" height="150" loading="lazy" alt=""><span class="cliente__nome">Carneiro do Ordones</span><span class="cliente__unidade">Varjota</span></li>
+      </ul>
+    </div>
+  </section>
+
   <!-- Planos -->
   <section class="sec" id="planos" aria-labelledby="planos-titulo">
     <div class="sec__in">
@@ -332,11 +367,13 @@
       <a href="#beneficios">Benefícios</a>
       <a href="#como-funciona">Como funciona</a>
       <a href="#denuncias">Denúncias</a>
+      <a href="#clientes">Clientes</a>
       <a href="#planos">Planos</a>
       <a href="#duvidas">Dúvidas</a>
       <a href="painel/suporte.html">Suporte</a>
       <a href="login.html">Entrar</a>
     </nav>
+    <p class="rodape__credito"><a href="https://devmais.com" target="_blank" rel="noopener" aria-label="Dev+" style="display:inline-flex"><img src="assets/img/devmais-logo-dark.svg" alt="Dev+" height="20"></a> Desenvolvido por <a href="https://devmais.com">Dev+</a> · <a href="mailto:atendimento@devmais.com">atendimento@devmais.com</a></p>
   </footer>
 
   <!-- Voltar ao início: sem JS é um link comum para o hero; com JS aparece só depois que o hero sai da tela -->

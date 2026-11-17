@@ -242,3 +242,7 @@
   .modal[open] { animation-name: modal-sobe; }
   @keyframes modal-sobe { from { transform: translateY(100%); } }
 }
+
+/* Crédito Dev+ (logo + e-mail) */
+.login__credito .devmais-logo { height: 20px; width: auto; vertical-align: middle; margin-right: 4px; }
+
