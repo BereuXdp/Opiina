@@ -20,7 +20,11 @@ const temPainel = !LOCAL
     .then((r) => r.ok)
     .catch(() => false);
 
-temPainel.then((ok) => {
+// Login do parceiro (parceiro-entrar.html, 2026-11-19): a mesma tela e o mesmo modal de senha,
+// mas a entrada é feita por parceiro-entrar.js. Aqui ficam só a validação e o modal.
+const LOGIN_PARCEIRO = formulario.dataset.login === 'parceiro';
+
+if (!LOGIN_PARCEIRO) temPainel.then((ok) => {
   const aviso = document.querySelector('[data-demo]');
   if (ok && aviso) aviso.hidden = false;
 });
@@ -43,6 +47,10 @@ formulario.addEventListener('submit', (evento) => {
   const invalidos = regras.filter((regra) => !validar(regra));
   if (invalidos.length) {
     invalidos[0].campo.focus();
+    return;
+  }
+  if (LOGIN_PARCEIRO) {
+    formulario.dispatchEvent(new CustomEvent('login-valido'));
     return;
   }
   temPainel.then((ok) => {

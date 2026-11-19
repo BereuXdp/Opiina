@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Opiina para contadores — indique e ganhe por cliente</title>
+  <meta name="description" content="Indique o Opiina às empresas que você atende, do nicho que for, e receba uma comissão por cada cliente que assinar.">
+  <meta name="theme-color" content="#1c7bff">
+  <meta property="og:title" content="Opiina para contadores — indique e ganhe por cliente">
+  <meta property="og:description" content="Indique o Opiina às empresas que você atende, do nicho que for, e receba uma comissão por cada cliente que assinar.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Opiina">
+  <meta property="og:image" content="https://opiina.com/logo-opiina.png">
+  <link rel="icon" href="assets/icons/logo-opiina-64.png" type="image/png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/contadores.css">
+  <script src="https://cdn.jsdelivr.net/npm/motion@11.13.5/dist/motion.js" integrity="sha384-BG8qTQ2lHxZvmqmFjpdCovyBi1i7jBhaPXWloglhSI67vEAcYXTxhQWvCjvdYrnU" crossorigin="anonymous" defer></script>
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/parceiros.js" defer></script>
+  <script src="assets/js/contadores.js" defer></script>
+</head>
+<body>
+  <!-- Landing page para contadores (pedido do cliente, 2026-11-19).
+       Estrutura e tom inspirados no AbacatePay (hero com exemplo, faixa de logos, passos, FAQ, CTA final bem-humorado);
+       cores, fonte e componentes do Opiina (specs/design.md). Só fatos confirmados: comissão única por cliente que assinar,
+       sem valor publicado; as condições são passadas no contato. -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="brilho" viewBox="0 0 24 24">
+        <path d="M12 2.6c.55 0 .88.55 1.08 2.1.62 4.7 1.52 5.6 6.22 6.22 1.55.2 2.1.53 2.1 1.08s-.55.88-2.1 1.08c-4.7.62-5.6 1.52-6.22 6.22-.2 1.55-.53 2.1-1.08 2.1s-.88-.55-1.08-2.1c-.62-4.7-1.52-5.6-6.22-6.22C3.15 12.88 2.6 12.55 2.6 12s.55-.88 2.1-1.08c4.7-.62 5.6-1.52 6.22-6.22.2-1.55.53-2.1 1.08-2.1Z"/>
+      </symbol>
+      <symbol id="c-nps" viewBox="0 0 24 24"><path d="M4 5.5h16v10H9l-5 4v-14Z"/><path d="M8 10.5h8"/></symbol>
+      <symbol id="c-kanban" viewBox="0 0 24 24"><rect x="3.5" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="10" rx="1.5"/><rect x="15.5" y="4" width="5" height="13" rx="1.5"/></symbol>
+      <symbol id="c-rede" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="M10.8 7.2 6.2 15.8M13.2 7.2l4.6 8.6M7.5 18h9"/></symbol>
+      <symbol id="c-denuncia" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5M12 14.5v2"/></symbol>
+      <symbol id="n-alimentacao" viewBox="0 0 24 24"><path d="M7 3v8M4.5 3v5a2.5 2.5 0 0 0 5 0V3M7 11v10M17 21V3c-2.5 1.5-3.5 4-3.5 7.5V13H17"/></symbol>
+      <symbol id="n-varejo" viewBox="0 0 24 24"><path d="M5 8h14l-1 12.5H6L5 8Z"/><path d="M9 10.5V6.5a3 3 0 0 1 6 0v4"/></symbol>
+      <symbol id="n-saude" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 7.6 4.2 4.2 0 0 1 19.5 10c0 5.6-7.5 10-7.5 10Z"/><path d="M12 10.5v5M9.5 13h5"/></symbol>
+      <symbol id="n-servicos" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M8.5 7.5V6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5M3.5 12.5h17"/></symbol>
+      <symbol id="c-escritorio" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2"/><path d="M8 7.5h3M8 11h3M8 14.5h3M13.5 7.5h2.5M13.5 11h2.5M10 20.5v-3h4v3"/></symbol>
+      <symbol id="c-loja" viewBox="0 0 24 24"><path d="M4 9.5 5.5 4h13L20 9.5M4 9.5h16M4 9.5c0 1.4 1.1 2.5 2.7 2.5S9.3 10.9 9.3 9.5c0 1.4 1.1 2.5 2.7 2.5s2.7-1.1 2.7-2.5c0 1.4 1.1 2.5 2.6 2.5S20 10.9 20 9.5M5 12v8.5h14V12M10 20.5V16h4v4.5"/></symbol>
+      <symbol id="c-moeda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.2c-.5-.8-1.5-1.3-2.6-1.3-1.5 0-2.6.8-2.6 2s1.1 1.7 2.6 2.1 2.7.9 2.7 2.1-1.2 2-2.7 2c-1.2 0-2.2-.5-2.7-1.3M12 6.5v1.4M12 16.1v1.4"/></symbol>
+      <symbol id="c-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></symbol>
+    </defs>
+  </svg>
+
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <div class="progresso" aria-hidden="true" data-progresso></div>
+
+  <header class="cabecalho">
+    <a class="marca" href="index.html" aria-label="Opiina — página inicial">
+      <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+      <span class="marca__nome">Opiina</span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Seções" data-nav>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#nichos">Nichos</a>
+      <a href="#seu-cliente">Vantagens</a>
+      <a href="#planos">Planos</a>
+      <a href="#duvidas">Dúvidas</a>
+      <a class="nav__entrar" href="#parceria">Quero ser parceiro</a>
+      <a class="nav__entrar" href="parceiro-entrar.html">Entrar como parceiro</a>
+      <a class="nav__voltar" href="index.html">← Voltar ao site do Opiina</a>
+    </nav>
+
+    <div class="cabecalho__acoes">
+      <a class="voltar-site" href="index.html" title="Voltar ao site do Opiina"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 5.5 4.5 12l6.5 6.5"/></svg>Voltar ao site</a>
+      <a class="btn btn--contorno cabecalho__login" href="parceiro-entrar.html">Entrar</a>
+      <a class="btn btn--solido cabecalho__entrar" href="#parceria">Quero ser parceiro</a>
+    </div>
+    <button class="menu-botao" type="button" aria-controls="nav" aria-expanded="false" aria-label="Abrir menu" data-menu-botao>
+      <i></i><i></i><i></i>
+    </button>
+    <div class="menu-fundo" data-menu-fundo></div>
+  </header>
+
+  <main id="conteudo">
+    <div class="topo" data-topo>
+      <div class="topo__fixo">
+        <div class="topo__fundo" aria-hidden="true"><div class="topo__brilho" data-topo-fundo></div></div>
+        <section class="hero hero--parceria" id="inicio" aria-labelledby="hero-titulo">
+          <div class="hero__copy" data-hero-copy>
+            <div class="parceria-hero__texto">
+              <p class="selo surgir s-pop" style="--d:.15s">
+                <svg aria-hidden="true"><use href="#brilho"/></svg>Programa de parceria para contadores
+              </p>
+              <!-- A palavra que troca é só visual (aria-hidden); o leitor de tela lê a frase completa escondida. -->
+              <h1 id="hero-titulo" tabindex="-1">
+                <span class="visualmente-oculto">Seu cliente tem restaurante, loja, clínica ou salão? Indique o Opiina e ganhe por cada cliente.</span>
+                <span class="linha surgir s-mascara" style="--d:.3s" aria-hidden="true">Seu cliente tem</span>
+                <span class="linha surgir s-mascara" style="--d:.4s" aria-hidden="true"><span class="giro" data-giro><em class="giro__palavra giro__palavra--ativa">restaurante?</em><em class="giro__palavra">loja?</em><em class="giro__palavra">clínica?</em><em class="giro__palavra">salão?</em><em class="giro__palavra">academia?</em><em class="giro__palavra">hotel?</em></span></span>
+                <span class="linha linha--menor surgir s-mascara" style="--d:.5s" aria-hidden="true">Indique o Opiina e ganhe por isso.</span>
+              </h1>
+              <p class="lede surgir s-suave" style="--d:.6s">Se o seu cliente atende o público, o Opiina ajuda ele a ouvir quem compra. E cada cliente indicado que assinar gera uma comissão pra você.</p>
+              <div class="acoes">
+                <a class="btn btn--solido btn--grande surgir s-botao" style="--d:.72s" href="#parceria">Quero ser parceiro</a>
+                <a class="btn btn--contorno btn--grande surgir s-lado" style="--d:.82s" href="#como-funciona">Ver como funciona</a>
+              </div>
+              <p class="fino surgir s-suave" style="--d:.9s">Cadastro na hora, com cupom e painel próprio. · <a href="parceiro-entrar.html">Já sou parceiro? Entrar</a></p>
+            </div>
+
+            <!-- Ilustração do caminho da indicação (não é tela do produto) -->
+            <ol class="caminho surgir s-suave" style="--d:.7s" aria-label="Caminho da indicação">
+              <li class="caminho__etapa">
+                <span class="caminho__icone"><svg aria-hidden="true"><use href="#c-escritorio"/></svg></span>
+                <div><small>Você</small><b>Indica o Opiina</b></div>
+              </li>
+              <li class="caminho__etapa">
+                <span class="caminho__icone"><svg aria-hidden="true"><use href="#c-loja"/></svg></span>
+                <div><small>Seu cliente</small><b>Assina um plano</b>
+                  <span class="caminho__nichos" aria-label="De qualquer nicho"><i>Alimentação</i><i>Varejo</i><i>Saúde e beleza</i><i>Serviços</i></span>
+                </div>
+              </li>
+              <li class="caminho__etapa caminho__etapa--fim">
+                <span class="caminho__icone"><svg aria-hidden="true"><use href="#c-moeda"/></svg></span>
+                <div><small>Você</small><b>Recebe a comissão</b></div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <ul class="fatos" aria-label="Destaques da parceria">
+          <li class="fato surgir s-fato" style="--d:.95s">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.2c-.5-.8-1.5-1.3-2.6-1.3-1.5 0-2.6.8-2.6 2s1.1 1.7 2.6 2.1 2.7.9 2.7 2.1-1.2 2-2.7 2c-1.2 0-2.2-.5-2.7-1.3M12 6.5v1.4M12 16.1v1.4"/></svg>
+            Comissão por cliente que assinar
+          </li>
+          <li class="fato surgir s-fato" style="--d:1.05s">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12.6V4.5A1.5 1.5 0 0 1 4.5 3h8.1a1.5 1.5 0 0 1 1.06.44l7.4 7.4a1.5 1.5 0 0 1 0 2.12l-8.1 8.1a1.5 1.5 0 0 1-2.12 0l-7.4-7.4A1.5 1.5 0 0 1 3 12.6Z"/><circle cx="8" cy="8" r="1.6"/></svg>
+            Planos a partir de R$ 147/mês
+          </li>
+          <li class="fato surgir s-fato" style="--d:1.15s">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 5.5 4h13L20 10.5M4 10.5h16M4 10.5V20h16v-9.5M9.5 20v-5h5v5"/></svg>
+            Uma unidade ou a rede toda
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Faixa de logos (no molde do AbacatePay): só os clientes confirmados do Opiina (os mesmos da home) -->
+    <section class="sec sec--faixa" id="clientes" aria-labelledby="clientes-titulo">
+      <div class="sec__in">
+        <h2 class="faixa__titulo revelar" id="clientes-titulo">Quem já <em>ouve o cliente</em> com o Opiina</h2>
+      </div>
+      <div class="faixa revelar">
+        <ul class="faixa__trilho" data-faixa>
+          <li><img src="assets/img/clientes/ordos-burger.jpg" width="150" height="150" loading="lazy" alt="">Ordo's Burger</li>
+          <li><img src="assets/img/clientes/cabana-del-primo.jpg" width="150" height="150" loading="lazy" alt="">Cabaña del Primo</li>
+          <li><img src="assets/img/clientes/geppos-italiano.jpg" width="150" height="150" loading="lazy" alt="">Geppos Italiano</li>
+          <li><img src="assets/img/clientes/geppos-praia.jpg" width="150" height="150" loading="lazy" alt="">Geppos Praia</li>
+          <li><img src="assets/img/clientes/jardins-open-mall.jpg" width="150" height="150" loading="lazy" alt="">Jardins Open Mall</li>
+          <li><img src="assets/img/clientes/carneiro-do-ordones-joquei.jpg" width="150" height="150" loading="lazy" alt="">Carneiro do Ordones · Jóquei</li>
+          <li><img src="assets/img/clientes/carneiro-do-ordones-jovita.jpg" width="150" height="150" loading="lazy" alt="">Carneiro do Ordones · Jovita</li>
+          <li><img src="assets/img/clientes/carneiro-do-ordones-varjota.jpg" width="150" height="150" loading="lazy" alt="">Carneiro do Ordones · Varjota</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Como funciona a parceria -->
+    <section class="sec sec--azul" id="como-funciona" aria-labelledby="como-titulo">
+      <div class="sec__in">
+        <div class="bloco-azul revelar">
+          <span class="tag tag--clara">Como funciona</span>
+          <h2 id="como-titulo">Três passos. <em>Sem letrinha miúda.</em></h2>
+          <ol class="trilha">
+            <li class="trilha__passo"><b aria-hidden="true">1</b><h3>Cadastre-se</h3><p>Crie sua conta de parceiro nesta página. Seu cupom sai na hora, junto com o acesso ao seu painel.</p></li>
+            <li class="trilha__passo"><b aria-hidden="true">2</b><h3>Indique</h3><p>Mande seu cupom ou seu link pras empresas que você atende. Quem usa o cupom ganha desconto na assinatura.</p></li>
+            <li class="trilha__passo"><b aria-hidden="true">3</b><h3>Receba</h3><p>Acompanhe no painel quem usou seu cupom. Quando o cliente paga o plano, a comissão entra no seu saldo e você pede o saque.</p></li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- Frase de destaque (tom do AbacatePay) -->
+    <section class="sec sec--frase" aria-label="Por que indicar">
+      <div class="sec__in">
+        <p class="frase" data-palavras>Você já é quem o cliente procura pra entender os números. <em>Agora também indica como ele ouve quem compra.</em></p>
+      </div>
+    </section>
+
+    <!-- Nichos (pedido do cliente, 2026-11-19): o contador atende vários nichos. Exemplos de uso só com recursos confirmados. -->
+    <section class="sec" id="nichos" aria-labelledby="nichos-titulo">
+      <div class="sec__in">
+        <span class="tag revelar">Nichos</span>
+        <h2 class="revelar" id="nichos-titulo">Seu escritório atende de tudo. <em>O Opiina também.</em></h2>
+        <p class="sub revelar">Se o seu cliente atende o público, ele precisa ouvir quem compra. Veja como o Opiina entra em cada nicho.</p>
+        <ul class="nichos">
+          <li class="nicho revelar">
+            <svg aria-hidden="true"><use href="#n-alimentacao"/></svg>
+            <h3>Alimentação</h3>
+            <p class="nicho__quem">Restaurantes, bares, cafeterias, padarias, redes e franquias.</p>
+            <p class="nicho__uso">O cliente dá a nota depois da refeição. A reclamação vira ocorrência pro gerente tratar.</p>
+          </li>
+          <li class="nicho revelar" style="--d:.08s">
+            <svg aria-hidden="true"><use href="#n-varejo"/></svg>
+            <h3>Varejo e shoppings</h3>
+            <p class="nicho__quem">Lojas, redes de varejo, shoppings e open malls.</p>
+            <p class="nicho__uso">Um link e QR Code por loja. O ranking compara as unidades sem planilha.</p>
+          </li>
+          <li class="nicho revelar" style="--d:.16s">
+            <svg aria-hidden="true"><use href="#n-saude"/></svg>
+            <h3>Saúde e beleza</h3>
+            <p class="nicho__quem">Clínicas, consultórios, salões, estéticas e academias.</p>
+            <p class="nicho__uso">Pesquisa depois do atendimento. Cada reclamação ganha responsável e prazo.</p>
+          </li>
+          <li class="nicho revelar" style="--d:.24s">
+            <svg aria-hidden="true"><use href="#n-servicos"/></svg>
+            <h3>Serviços em geral</h3>
+            <p class="nicho__quem">Hotéis, escolas, oficinas e outros negócios que atendem o público.</p>
+            <p class="nicho__uso">NPS pro cliente e canal de denúncias pra equipe, cada um no seu link.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- O que o cliente do contador ganha (só recursos confirmados do produto) -->
+    <section class="sec" id="seu-cliente" aria-labelledby="seu-cliente-titulo">
+      <div class="sec__in">
+        <span class="tag revelar">O que o seu cliente ganha</span>
+        <h2 class="revelar" id="seu-cliente-titulo">Uma indicação que <em>ajuda de verdade</em></h2>
+        <p class="sub revelar">Você já conhece a operação do seu cliente. O Opiina mostra o outro lado: o que o cliente dele sente e o que o negócio precisa fazer.</p>
+        <ul class="ganhos">
+          <li class="ganho revelar">
+            <svg aria-hidden="true"><use href="#c-nps"/></svg>
+            <h3>NPS e comentário juntos</h3>
+            <p>Pesquisa rápida de montar e fácil de responder. A nota e o comentário voltam direto pro painel.</p>
+          </li>
+          <li class="ganho revelar" style="--d:.08s">
+            <svg aria-hidden="true"><use href="#c-kanban"/></svg>
+            <h3>Ocorrências no Kanban</h3>
+            <p>Cada reclamação vira um card. A equipe trata, o dono acompanha. Sem planilha, sem conversa perdida.</p>
+          </li>
+          <li class="ganho revelar" style="--d:.16s">
+            <svg aria-hidden="true"><use href="#c-rede"/></svg>
+            <h3>Unidades lado a lado</h3>
+            <p>Pra quem tem mais de uma unidade: ranking e métricas por unidade, sem esperar o fechamento do mês.</p>
+          </li>
+          <li class="ganho revelar" style="--d:.24s">
+            <svg aria-hidden="true"><use href="#c-denuncia"/></svg>
+            <h3>Canal de denúncias</h3>
+            <p>Um link por unidade pra equipe relatar o que vê, anônimo ou com nome. Canal alinhado às obrigações trabalhistas.</p>
+          </li>
+        </ul>
+        <a class="link-seta revelar" href="index.html#beneficios">Ver o Opiina em detalhe</a>
+      </div>
+    </section>
+
+    <!-- Planos que o contador indica (mesmos preços da home) -->
+    <section class="sec sec--suave" id="planos" aria-labelledby="planos-titulo">
+      <div class="sec__in">
+        <span class="tag revelar">Planos</span>
+        <h2 class="revelar" id="planos-titulo">O que você vai <em>indicar</em></h2>
+        <p class="sub revelar">Preços claros, do negócio com uma unidade só à rede com várias.</p>
+        <ul class="planos-mini">
+          <li class="plano-mini revelar">
+            <span class="ptag">Ideal para começar</span>
+            <h3>Start</h3>
+            <p class="plano__desc">NPS e ocorrências para uma unidade.</p>
+            <p class="plano-mini__preco">R$ 147,00<small>/mês</small></p>
+          </li>
+          <li class="plano-mini plano-mini--destaque revelar" style="--d:.1s">
+            <span class="ptag ptag--pop">Mais popular</span>
+            <h3>Pro</h3>
+            <p class="plano__desc">NPS, dashboard e Kanban para uma unidade.</p>
+            <p class="plano-mini__preco">R$ 297,00<small>/mês</small></p>
+          </li>
+          <li class="plano-mini revelar" style="--d:.2s">
+            <span class="ptag ptag--rede">Para redes e franquias</span>
+            <h3>Redes</h3>
+            <p class="plano__desc">NPS e atendimento em unidades ilimitadas.</p>
+            <p class="plano-mini__preco">R$ 697,00<small>/mês</small></p>
+          </li>
+        </ul>
+        <a class="link-seta revelar" href="index.html#planos">Ver tudo o que cada plano inclui</a>
+      </div>
+    </section>
+
+    <!-- Cadastro do parceiro (2026-11-19): cria a conta e entrega o cupom na hora.
+         PROTÓTIPO: a conta fica guardada no navegador (assets/js/parceiros.js). No app, o envio cria a conta no servidor. -->
+    <section class="sec" id="parceria" aria-labelledby="parceria-titulo">
+      <div class="sec__in parceria">
+        <div class="parceria__texto">
+          <span class="tag revelar">Seja parceiro</span>
+          <h2 class="revelar" id="parceria-titulo">Crie sua conta e <em>pegue seu cupom</em></h2>
+          <p class="sub revelar">Leva um minuto. No fim, você já sai com o cupom e o acesso ao seu painel de parceiro.</p>
+          <ul class="parceria__lista revelar">
+            <li><svg aria-hidden="true"><use href="#c-check"/></svg>Cupom próprio, que dá desconto pro seu cliente</li>
+            <li><svg aria-hidden="true"><use href="#c-check"/></svg>Painel com quem usou o cupom e quanto você tem a receber</li>
+            <li><svg aria-hidden="true"><use href="#c-check"/></svg>Saque da comissão por PIX, pedido no próprio painel</li>
+          </ul>
+        </div>
+
+        <div class="cartao revelar">
+          <form class="form" id="form-parceria" novalidate data-form-parceria>
+            <div class="campo">
+              <label for="p-nome">Seu nome</label>
+              <input id="p-nome" name="nome" type="text" autocomplete="name" placeholder="Ex.: Ana Souza" required aria-describedby="p-nome-erro">
+              <p class="campo__erro" id="p-nome-erro" hidden></p>
+            </div>
+            <div class="campo">
+              <label for="p-escritorio">Escritório de contabilidade</label>
+              <input id="p-escritorio" name="escritorio" type="text" autocomplete="organization" placeholder="Ex.: Souza Contabilidade" required aria-describedby="p-escritorio-erro">
+              <p class="campo__erro" id="p-escritorio-erro" hidden></p>
+            </div>
+            <div class="form__dupla">
+              <div class="campo">
+                <label for="p-email">E-mail</label>
+                <input id="p-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="voce@escritorio.com.br" required aria-describedby="p-email-erro">
+                <p class="campo__erro" id="p-email-erro" hidden></p>
+              </div>
+              <div class="campo">
+                <label for="p-telefone">WhatsApp</label>
+                <input id="p-telefone" name="telefone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(00) 00000-0000" required aria-describedby="p-telefone-erro">
+                <p class="campo__erro" id="p-telefone-erro" hidden></p>
+              </div>
+            </div>
+            <div class="campo">
+              <label for="p-senha">Crie uma senha</label>
+              <input id="p-senha" name="senha" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo de 8 caracteres" required aria-describedby="p-senha-erro">
+              <p class="campo__erro" id="p-senha-erro" hidden></p>
+            </div>
+            <div class="campo">
+              <label for="p-clientes">Quantos clientes o escritório atende? <span class="campo__opcional">(opcional)</span></label>
+              <select id="p-clientes" name="clientes">
+                <option value="">Prefiro não dizer</option>
+                <option value="1-5">De 1 a 5</option>
+                <option value="6-20">De 6 a 20</option>
+                <option value="21-50">De 21 a 50</option>
+                <option value="51-200">De 51 a 200</option>
+                <option value="200+">Mais de 200</option>
+              </select>
+            </div>
+            <fieldset class="campo campo--grupo">
+              <legend>Nichos dos seus clientes <span class="campo__opcional">(opcional)</span></legend>
+              <div class="opcoes">
+                <label class="opcao"><input type="checkbox" name="nichos" value="alimentacao">Alimentação</label>
+                <label class="opcao"><input type="checkbox" name="nichos" value="varejo">Varejo e shoppings</label>
+                <label class="opcao"><input type="checkbox" name="nichos" value="saude-beleza">Saúde e beleza</label>
+                <label class="opcao"><input type="checkbox" name="nichos" value="servicos">Serviços em geral</label>
+              </div>
+            </fieldset>
+            <button class="btn btn--solido btn--grande form__enviar" type="submit">Criar conta e pegar meu cupom</button>
+            <p class="form__nota">Já é parceiro? <a href="parceiro-entrar.html">Entrar no seu painel</a></p>
+          </form>
+
+          <div class="sucesso" data-sucesso hidden>
+            <svg class="sucesso__icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5 10 17.5 19 7"/></svg>
+            <h3 tabindex="-1" data-sucesso-titulo>Conta criada!</h3>
+            <p><span data-sucesso-nome></span>, este é o seu cupom de parceiro:</p>
+            <div class="cupom">
+              <strong class="cupom__codigo" data-sucesso-cupom></strong>
+              <button class="btn btn--contorno cupom__copiar" type="button" data-copiar-cupom>Copiar</button>
+            </div>
+            <p class="sucesso__dica">Quem usar o cupom no cadastro do Opiina ganha desconto, e a indicação aparece no seu painel.</p>
+            <a class="btn btn--solido btn--grande sucesso__painel" href="painel/parceiro.html?novo=1">Abrir meu painel</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dúvidas -->
+    <section class="sec sec--suave" id="duvidas" aria-labelledby="duvidas-titulo">
+      <div class="sec__in sec__in--estreito">
+        <span class="tag revelar">Dúvidas</span>
+        <h2 class="revelar" id="duvidas-titulo">Perguntas <em>frequentes</em></h2>
+        <div class="faq revelar">
+          <details><summary>Quem pode ser parceiro?</summary><p>Contadores e escritórios de contabilidade, de qualquer nicho. O que importa é ter clientes que atendem o público.</p></details>
+          <details><summary>Serve pra que tipo de negócio?</summary><p>Pra quem atende o público: alimentação, varejo e shoppings, saúde e beleza e serviços em geral. Funciona numa unidade só ou na rede toda.</p></details>
+          <details><summary>Quanto eu ganho por indicação?</summary><p>Uma comissão única por cliente indicado que assinar: um percentual da primeira mensalidade do plano escolhido. O percentual aparece no seu painel de parceiro.</p></details>
+          <details><summary>Como funciona o cupom?</summary><p>Ao criar a conta, você recebe um cupom próprio. O cliente digita o cupom (ou abre o seu link de indicação) no cadastro do Opiina e ganha desconto na assinatura. A indicação aparece no seu painel na hora.</p></details>
+          <details><summary>Como recebo a comissão?</summary><p>Quando o cliente indicado paga o plano, a comissão entra no seu saldo. Você cadastra a chave PIX e pede o saque pelo próprio painel.</p></details>
+          <details><summary>Como meu cliente começa a usar?</summary><p>Ele escolhe o plano, cria a conta e paga pela Stripe, numa página segura de pagamento. Depois de pago, é só entrar no painel.</p></details>
+          <details><summary>O que o Opiina faz, em uma frase?</summary><p>Captura o NPS, mostra o que o cliente falou e organiza o atendimento num Kanban simples — numa unidade ou na rede toda.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA final (tom do AbacatePay: "você leu até aqui") -->
+    <section class="sec" id="comecar" aria-labelledby="cta-titulo">
+      <div class="sec__in">
+        <div class="cta revelar">
+          <h2 id="cta-titulo">Leu até aqui? <em>Já tem cliente em mente.</em></h2>
+          <p class="sub">Crie sua conta, pegue seu cupom e indique o Opiina pras empresas que você atende.</p>
+          <div class="acoes">
+            <a class="btn btn--solido btn--grande" href="#parceria">Quero ser parceiro</a>
+            <a class="btn btn--contorno btn--grande" href="index.html">Conhecer o Opiina</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <a class="marca marca--pequena" href="index.html" aria-label="Opiina — página inicial">
+      <img class="marca__icone" src="assets/icons/logo-opiina-256.png" alt="" width="256" height="256">
+      <span>© <span data-ano>2026</span> Opiina</span>
+    </a>
+    <nav class="rodape__nav" aria-label="Rodapé">
+      <a href="index.html">Início</a>
+      <a href="#como-funciona">Como funciona</a>
+      <a href="#nichos">Nichos</a>
+      <a href="#seu-cliente">O que o cliente ganha</a>
+      <a href="#planos">Planos</a>
+      <a href="#parceria">Seja parceiro</a>
+      <a href="#duvidas">Dúvidas</a>
+      <a href="parceiro-entrar.html">Entrar (parceiro)</a>
+      <a href="painel/suporte.html">Suporte</a>
+    </nav>
+    <p class="rodape__credito"><a href="https://devmais.com" target="_blank" rel="noopener" aria-label="Dev+" style="display:inline-flex"><img src="assets/img/devmais-logo-dark.svg" alt="Dev+" height="20"></a> Desenvolvido por <a href="https://devmais.com">Dev+</a> · <a href="mailto:atendimento@devmais.com">atendimento@devmais.com</a></p>
+  </footer>
+
+  <a class="voltar-topo" href="#inicio" aria-label="Voltar ao início" data-voltar-topo>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>
+  </a>
+</body>
+</html>

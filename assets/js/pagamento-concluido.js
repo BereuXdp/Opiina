@@ -30,5 +30,10 @@ if (plano) {
   resumo.append(el('p', 'plano-resumo__desc', 'Seu pagamento foi confirmado.'));
 }
 
+// Indicação de parceiro (2026-11-19): com o pagamento aprovado, a comissão do contador é liberada.
+// No app, isso acontece no servidor, pelo aviso (webhook) da Stripe, não por esta página.
+const indicacaoPaga = new URLSearchParams(location.search).get('ind');
+if (indicacaoPaga && window.OpiinaParceiros) window.OpiinaParceiros.marcarPaga(indicacaoPaga);
+
 // O título recebe o foco para o leitor de tela anunciar a confirmação.
 document.querySelector('[data-sucesso-titulo]').focus();

@@ -189,3 +189,11 @@
 
 /* Erro do grupo: destaca os cartões */
 .planos-escolha[data-invalido="true"] .plano-opcao { border-color: #DC2626; }
+
+/* Cupom de parceiro (2026-11-19) */
+.onb__resumo div[hidden] { display: none; }
+.onb__cupom { margin-top: 18px; }
+.onb__cupom input { text-transform: uppercase; letter-spacing: .04em; }
+.onb__cupom input::placeholder { text-transform: none; letter-spacing: 0; }
+.campo__opcional { color: var(--mudo); font-weight: 500; }
+.campo__dica--ok { color: #15803D; font-weight: 600; }

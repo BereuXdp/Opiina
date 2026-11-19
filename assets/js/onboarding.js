@@ -118,6 +118,36 @@ subdominio.addEventListener('blur', () => {
 });
 atualizarEndereco();
 
+// ---------- Cupom de parceiro (2026-11-19) ----------
+// Vem do link de indicação do contador (?cupom=). No protótipo, qualquer código de 4 a 20 letras/números vale;
+// no app, o servidor confere se o cupom existe e aplica o desconto no Checkout da Stripe.
+const campoCupom = document.querySelector('[data-cupom]');
+const dicaCupom = document.querySelector('[data-cupom-dica]');
+const erroCupom = document.getElementById('cupom-erro');
+const textoDicaCupom = dicaCupom.textContent;
+const parceiros = window.OpiinaParceiros;
+
+function mostrarCupom() {
+  const codigo = parceiros.normalizarCupom(campoCupom.value);
+  const aplicado = parceiros.cupomValido(codigo);
+  dicaCupom.textContent = aplicado ? `Cupom ${codigo} aplicado. O desconto aparece no pagamento.` : textoDicaCupom;
+  dicaCupom.classList.toggle('campo__dica--ok', aplicado);
+}
+function validarCupom() {
+  const valido = !campoCupom.value.trim() || parceiros.cupomValido(campoCupom.value);
+  campoCupom.setAttribute('aria-invalid', String(!valido));
+  erroCupom.hidden = valido;
+  return valido;
+}
+const cupomDoLink = new URLSearchParams(location.search).get('cupom');
+if (cupomDoLink) campoCupom.value = parceiros.normalizarCupom(cupomDoLink);
+mostrarCupom();
+campoCupom.addEventListener('input', () => {
+  mostrarCupom();
+  if (campoCupom.getAttribute('aria-invalid') === 'true') validarCupom();
+});
+campoCupom.addEventListener('blur', () => { if (campoCupom.value) validarCupom(); });
+
 // ---------- Validação acessível (sem envio) ----------
 const formulario = document.querySelector('[data-onboarding]');
 const status = formulario.querySelector('[data-status]');
@@ -143,6 +173,10 @@ formulario.addEventListener('submit', (evento) => {
     opcoesPlano[0].focus({ preventScroll: true });
     return;
   }
+  if (!validarCupom()) {
+    campoCupom.focus();
+    return;
+  }
   if (invalidos.length) {
     invalidos[0].campo.focus();
     return;
@@ -165,7 +199,18 @@ function mostrarSucesso() {
   preencher('endereco', endereco.textContent);
   // Protótipo: o botão simula a volta da Stripe com o pagamento aprovado.
   // No app, ele abre o Checkout da Stripe, e o success_url aponta para pagamento-concluido.
-  sucesso.querySelector('[data-pagar]').href = `pagamento-concluido.html?plan=${opcoesPlano.find((o) => o.checked).value}`;
+  const chavePlano = opcoesPlano.find((o) => o.checked).value;
+  const pagar = new URL('pagamento-concluido.html', location.href);
+  pagar.searchParams.set('plan', chavePlano);
+  // Com cupom: a indicação vai para o painel do parceiro como "Cadastrou"; o pagamento a marca como paga.
+  const cupom = parceiros.normalizarCupom(campoCupom.value);
+  sucesso.querySelector('[data-linha-cupom]').hidden = !cupom;
+  if (cupom) {
+    preencher('cupom', `${cupom} · desconto no pagamento`);
+    const indicacao = parceiros.registrarIndicacao({ cupom, empresa: empresa || 'Empresa sem nome', plano: chavePlano });
+    pagar.searchParams.set('ind', indicacao.id);
+  }
+  sucesso.querySelector('[data-pagar]').href = pagar.pathname.split('/').pop() + pagar.search;
   preencher('email', valor('admin-email'));
   preencher('unidade', valor('unidade-nome') || 'Unidade 1');
 

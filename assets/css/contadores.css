@@ -1,0 +1,329 @@
+/* ==========================================================================
+   Opiina — landing page para contadores (2026-11-19)
+   Complementa styles.css (tokens, cabeçalho, hero, seções, FAQ, CTA, rodapé).
+   ========================================================================== */
+
+/* ---------- Voltar ao site principal (cabeçalho) ---------- */
+.voltar-site {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 0 12px;
+  border-radius: 8px;
+  color: var(--link);
+  font-size: 14px; font-weight: 600;
+  white-space: nowrap;
+}
+.voltar-site svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform var(--rapido); }
+.voltar-site:hover { text-decoration: underline; text-underline-offset: 3px; }
+.voltar-site:hover svg { transform: translateX(-3px); }
+.nav__voltar { display: none !important; }
+.cabecalho__login { padding-inline: 18px; }
+@media (max-width: 900px) { .cabecalho__login { display: none; } }
+
+/* Computador médio: só a seta, com o texto para leitor de tela */
+@media (min-width: 901px) and (max-width: 1279px) {
+  .voltar-site { width: 44px; padding: 0; justify-content: center; font-size: 0; border: 1px solid rgba(28, 123, 255, .3); background: #fff; }
+}
+/* Celular: sai do cabeçalho e fica no menu */
+@media (max-width: 900px) {
+  .voltar-site { display: none; }
+  .nav__voltar { display: inline-flex !important; border-color: transparent !important; background: transparent !important; color: var(--link); font-size: 16px !important; }
+}
+
+/* ---------- Topo em duas colunas (2026-11-19, "dar uma diferenciada") ---------- */
+.hero--parceria { padding-inline: var(--sx); }
+.hero--parceria .hero__copy {
+  display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); align-items: center; gap: 56px;
+  max-width: 1200px;
+  text-align: left;
+}
+.parceria-hero__texto { display: flex; flex-direction: column; align-items: flex-start; }
+.hero--parceria h1 { align-items: flex-start; font-size: clamp(36px, 4.8vw, 70px); }
+.hero--parceria .linha { padding-inline: 0; }
+.hero--parceria .linha--menor { margin-top: .2em; font-size: .5em; letter-spacing: -.03em; color: var(--texto); }
+.hero--parceria .lede { max-width: 600px; font-size: clamp(17px, 1.5vw, 20px); }
+.hero--parceria .acoes { justify-content: flex-start; }
+
+/* Palavra que troca no título: todas ocupam a mesma célula; só a ativa aparece */
+.giro { display: inline-grid; vertical-align: bottom; }
+.giro__palavra { grid-area: 1 / 1; opacity: 0; transform: translateY(45%); transition: opacity .45s var(--suave), transform .6s var(--suave); }
+.giro__palavra--ativa { opacity: 1; transform: none; }
+.giro__palavra--saindo { opacity: 0; transform: translateY(-45%); }
+
+/* Ilustração: caminho da indicação */
+.caminho {
+  position: relative;
+  display: grid; gap: 30px;
+  padding: 30px 28px;
+  border: 1px solid var(--linha);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .85);
+  box-shadow: 0 40px 80px -50px rgba(20, 60, 140, .55);
+  text-align: left;
+}
+.caminho__etapa { position: relative; display: grid; grid-template-columns: 52px 1fr; align-items: start; gap: 16px; }
+.caminho__etapa > div { padding-top: 4px; }
+/* Linha tracejada ligando os ícones */
+.caminho__etapa:not(:last-child)::after {
+  content: ""; position: absolute; left: 25px; top: 56px; height: calc(100% - 26px); width: 2px;
+  background: repeating-linear-gradient(to bottom, rgba(28, 123, 255, .45) 0 5px, transparent 5px 10px);
+}
+.caminho__icone { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 14px; background: #EAF2FF; }
+.caminho__icone svg { width: 26px; height: 26px; fill: none; stroke: var(--link); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.caminho__etapa small { display: block; color: var(--mudo); font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
+.caminho__etapa b { display: block; font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+.caminho__nichos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.caminho__nichos i { padding: 4px 10px; border: 1px solid var(--linha); border-radius: 999px; background: var(--bg-suave); color: var(--mudo); font-size: 13px; font-style: normal; font-weight: 500; }
+.caminho__etapa--fim { margin: -10px -12px; padding: 10px 12px; border-radius: 16px; background: var(--bg-suave); }
+.caminho__etapa--fim .caminho__icone { background: var(--grad); box-shadow: 0 10px 24px -10px rgba(28, 123, 255, .8); }
+.caminho__etapa--fim .caminho__icone svg { stroke: #fff; }
+
+@media (max-width: 1099px) {
+  .hero--parceria .hero__copy { grid-template-columns: 1fr; gap: 40px; max-width: 680px; }
+  .com-motion .topo, .com-motion .topo__fixo { height: auto; }
+  .com-motion .topo__fixo { position: relative; }
+}
+@media (max-width: 560px) {
+  .hero--parceria .linha--menor { font-size: .62em; }
+  .caminho { padding: 24px 20px; }
+}
+
+/* ---------- Como funciona em bloco azul ---------- */
+.sec--azul { padding-bottom: 40px; }
+.bloco-azul {
+  padding: 64px 56px;
+  border-radius: 22px;
+  background: radial-gradient(70% 90% at 100% 0%, rgba(255, 255, 255, .16), transparent 60%), var(--grad);
+  color: #fff;
+}
+.bloco-azul h2 { color: #fff; }
+.bloco-azul h2 em { background: none; -webkit-text-fill-color: #fff; color: #fff; text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 8px; text-decoration-color: rgba(255, 255, 255, .5); }
+.tag--clara { border-color: rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .14); color: #fff; }
+.trilha { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-top: 48px; }
+.trilha__passo { position: relative; }
+.trilha__passo b {
+  position: relative; z-index: 1;
+  display: grid; place-items: center;
+  width: 48px; height: 48px; margin-bottom: 20px;
+  border-radius: 50%;
+  background: #fff; color: var(--link);
+  font-size: 18px; font-weight: 700;
+  box-shadow: 0 0 0 6px rgba(255, 255, 255, .18);
+}
+/* Linha ligando um passo ao próximo */
+.trilha__passo:not(:last-child)::after {
+  content: ""; position: absolute; top: 23px; left: 60px; right: -20px; height: 2px;
+  background: repeating-linear-gradient(to right, rgba(255, 255, 255, .6) 0 6px, transparent 6px 12px);
+}
+.trilha__passo h3 { margin-bottom: 8px; font-size: 22px; }
+.trilha__passo p { color: #fff; font-size: 15px; line-height: 1.6; }
+
+@media (max-width: 900px) {
+  .bloco-azul { padding: 44px 24px; }
+  .trilha { grid-template-columns: 1fr; gap: 28px; margin-top: 36px; }
+  .trilha__passo { display: grid; grid-template-columns: 48px 1fr; column-gap: 18px; }
+  .trilha__passo b { grid-row: span 2; margin-bottom: 0; }
+  .trilha__passo:not(:last-child)::after {
+    top: 56px; left: 23px; right: auto; bottom: -24px; width: 2px; height: auto;
+    background: repeating-linear-gradient(to bottom, rgba(255, 255, 255, .6) 0 6px, transparent 6px 12px);
+  }
+}
+
+/* ---------- Frase de destaque ---------- */
+.sec--frase { padding-block: 90px 40px; }
+.frase { max-width: 980px; font-size: clamp(26px, 3.4vw, 44px); font-weight: 500; letter-spacing: -.035em; line-height: 1.22; text-wrap: balance; }
+.frase em {
+  font-style: normal; font-weight: 600;
+  background: var(--grad); -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+
+/* ---------- Faixa de logos (rolando sozinha, no molde do AbacatePay) ---------- */
+.sec--faixa { padding-block: 72px 64px; }
+.faixa__titulo { font-size: clamp(20px, 2.2vw, 26px); text-align: center; letter-spacing: -.03em; }
+.faixa {
+  overflow: hidden;
+  margin-top: 32px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+.faixa__trilho { display: flex; gap: 14px; width: max-content; }
+.faixa__trilho li {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 10px 20px 10px 10px;
+  border: 1px solid var(--linha);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+  white-space: nowrap;
+}
+.faixa__trilho img { width: 44px; height: 44px; border-radius: 50%; box-shadow: 0 0 0 1px var(--linha); }
+/* Com JS, o trilho é duplicado e anda em loop; para no hover e no foco */
+.faixa--anda .faixa__trilho { animation: faixa-anda 45s linear infinite; }
+.faixa--anda:hover .faixa__trilho, .faixa--anda:focus-within .faixa__trilho { animation-play-state: paused; }
+@keyframes faixa-anda { to { transform: translateX(calc(-50% - 7px)); } }
+
+/* Sem JS ou com movimento reduzido: os logos ficam parados, centralizados e quebrando linha */
+.faixa:not(.faixa--anda) { -webkit-mask-image: none; mask-image: none; padding-inline: var(--sx); }
+.faixa:not(.faixa--anda) .faixa__trilho { flex-wrap: wrap; justify-content: center; width: auto; max-width: 1120px; margin: 0 auto; }
+
+/* ---------- Nichos ---------- */
+.nichos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.nicho {
+  display: flex; flex-direction: column;
+  padding: 28px 26px;
+  border: 1px solid var(--linha);
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--bg-suave), #fff 55%);
+  transition: border-color .35s, transform .35s var(--suave), box-shadow .35s;
+}
+.nicho:hover { border-color: rgba(28, 123, 255, .5); transform: translateY(-4px); box-shadow: 0 18px 40px -22px rgba(28, 123, 255, .5); }
+.nicho svg {
+  width: 52px; height: 52px; padding: 12px; margin-bottom: 20px;
+  border-radius: 14px; background: var(--grad);
+  fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+.nicho h3 { margin-bottom: 8px; font-size: 20px; }
+.nicho__quem { min-height: 4.5em; color: var(--texto); font-size: 15px; font-weight: 500; line-height: 1.5; }
+.nicho__uso { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--linha); color: var(--mudo); font-size: 15px; line-height: 1.55; }
+/* ---------- O que o cliente ganha ---------- */
+.ganhos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+.ganho {
+  padding: 26px;
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  background: #fff;
+  transition: border-color .35s, transform .35s var(--suave), box-shadow .35s;
+}
+.ganho:hover { border-color: rgba(28, 123, 255, .5); transform: translateY(-4px); box-shadow: 0 18px 40px -22px rgba(28, 123, 255, .5); }
+.ganho svg {
+  display: block; width: 44px; height: 44px; padding: 10px; margin-bottom: 18px;
+  border-radius: 10px; background: var(--grad);
+  fill: none; stroke: #fff; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+.ganho h3 { margin-bottom: 8px; font-size: 18px; }
+.ganho p { color: var(--mudo); font-size: 15px; line-height: 1.55; }
+
+/* ---------- Planos (versão resumida) ---------- */
+.planos-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+.plano-mini {
+  display: flex; flex-direction: column;
+  padding: 28px;
+  border: 1px solid var(--linha);
+  border-radius: 22px;
+  background: #fff;
+}
+.plano-mini--destaque {
+  border-color: transparent;
+  background: linear-gradient(#fff, #fff) padding-box, var(--grad) border-box;
+  box-shadow: 0 24px 60px -28px rgba(28, 123, 255, .6);
+}
+.plano-mini h3 { font-size: 24px; }
+.plano-mini__preco { margin-top: 18px; font-size: clamp(28px, 3vw, 34px); font-weight: 600; letter-spacing: -.04em; white-space: nowrap; }
+.plano-mini__preco small { margin-left: 4px; color: var(--mudo); font-size: 14px; font-weight: 500; letter-spacing: 0; }
+
+/* ---------- Parceria (texto + formulário) ---------- */
+.parceria { display: grid; grid-template-columns: 5fr 6fr; align-items: start; gap: 56px; }
+.parceria__texto .sub { margin-bottom: 28px; }
+.parceria__lista { display: grid; gap: 12px; }
+.parceria__lista li { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+.parceria__lista svg {
+  flex: none; width: 28px; height: 28px; padding: 6px;
+  border-radius: 50%; background: #EAF2FF;
+  fill: none; stroke: var(--link); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.cartao {
+  padding: 32px;
+  border: 1px solid var(--linha);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 30px 60px -40px rgba(20, 60, 140, .45);
+}
+.form { display: grid; gap: 18px; }
+.form[hidden] { display: none; }
+.form__dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+.campo { display: grid; gap: 8px; align-content: start; }
+.campo label { color: var(--texto); font-size: 14px; font-weight: 600; }
+.campo__opcional { color: var(--mudo); font-weight: 500; }
+.campo input, .campo select {
+  width: 100%; min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid rgba(20, 60, 140, .22);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--texto);
+  font: inherit; font-size: 16px;   /* 16px: o iPhone não dá zoom ao focar */
+  transition: border-color .2s, box-shadow .2s;
+}
+.campo select { appearance: none; padding-right: 40px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%2351627F' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E") no-repeat right 16px center; cursor: pointer; }
+.campo input::placeholder { color: #8391AB; }
+.campo input:hover, .campo select:hover { border-color: rgba(28, 123, 255, .5); }
+.campo input:focus, .campo select:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 4px rgba(28, 123, 255, .18); }
+.campo input[aria-invalid="true"] { border-color: #DC2626; }
+.campo input[aria-invalid="true"]:focus { box-shadow: 0 0 0 4px rgba(220, 38, 38, .15); }
+.campo__erro { color: #B91C1C; font-size: 14px; font-weight: 500; }
+.campo__erro[hidden] { display: none; }
+
+.campo--grupo { border: 0; }
+.campo--grupo legend { margin-bottom: 8px; color: var(--texto); font-size: 14px; font-weight: 600; }
+.opcoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.opcao {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 14px;
+  border: 1px solid rgba(20, 60, 140, .22);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 14px; font-weight: 500;
+  cursor: pointer;
+  transition: border-color .2s, background-color .2s;
+}
+.opcao:hover { border-color: rgba(28, 123, 255, .5); }
+.opcao input { width: 18px; height: 18px; accent-color: var(--primario); }
+.opcao:has(input:checked) { border-color: var(--acento); background: #EAF2FF; color: var(--link); }
+.opcao:has(input:focus-visible) { outline: 3px solid var(--acento); outline-offset: 3px; }
+
+.form__enviar { width: 100%; margin-top: 4px; }
+.form__nota { color: var(--mudo); font-size: 14px; text-align: center; }
+
+.sucesso { display: grid; justify-items: center; gap: 12px; padding: 24px 8px; text-align: center; }
+.sucesso[hidden] { display: none; }
+.sucesso__icone {
+  width: 56px; height: 56px; padding: 14px; margin-bottom: 4px;
+  border-radius: 50%; background: #DCFCE7;
+  fill: none; stroke: #15803D; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round;
+}
+.sucesso h3 { font-size: 24px; }
+.sucesso h3:focus { outline: none; }
+.sucesso p { max-width: 42ch; color: var(--mudo); }
+.form__nota a { color: var(--link); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Cupom entregue no cadastro */
+.cupom {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; max-width: 380px; margin: 4px 0;
+  padding: 10px 10px 10px 22px;
+  border: 2px dashed rgba(28, 123, 255, .5);
+  border-radius: 16px;
+  background: var(--bg-suave);
+}
+.cupom__codigo { font-size: clamp(24px, 3vw, 30px); font-weight: 700; letter-spacing: .06em; color: var(--link); }
+.cupom__copiar { flex: none; }
+.sucesso .sucesso__dica { font-size: 14px; }
+.sucesso__painel { width: 100%; max-width: 380px; margin-top: 8px; }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 1099px) {
+  .ganhos, .nichos { grid-template-columns: repeat(2, 1fr); }
+  .parceria { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 900px) {
+  .planos-mini { grid-template-columns: 1fr; }
+  .plano-mini--destaque { order: -1; }
+  .sec--faixa { padding-block: 56px 48px; }
+}
+@media (max-width: 560px) {
+  .ganhos, .nichos, .form__dupla { grid-template-columns: 1fr; }
+  .cartao { padding: 24px 18px; }
+  .faixa__trilho li { font-size: 14px; }
+}

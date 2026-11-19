@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="assets/css/login.css">
   <link rel="stylesheet" href="assets/css/onboarding.css">
   <script src="assets/js/planos.js" defer></script>
+  <script src="assets/js/parceiros.js" defer></script>
   <script src="assets/js/onboarding.js" defer></script>
 </head>
 <!--
@@ -92,7 +93,17 @@
                 <span class="plano-opcao__desc">NPS e atendimento em todas as suas unidades.</span>
               </label>
             </div>
-            <p class="campo__erro" id="plano-erro" hidden>Escolha um plano para continuar.</p>          </fieldset>
+            <p class="campo__erro" id="plano-erro" hidden>Escolha um plano para continuar.</p>
+
+            <!-- Cupom de parceiro (2026-11-19): vem preenchido pelo link de indicação (?cupom=). Dá desconto no pagamento. -->
+            <div class="campo onb__cupom">
+              <label for="cupom">Cupom de parceiro <span class="campo__opcional">(opcional)</span></label>
+              <input id="cupom" name="cupom" type="text" autocapitalize="characters" autocomplete="off" spellcheck="false"
+                     placeholder="Ex.: SOUZA27" aria-describedby="cupom-dica cupom-erro" data-cupom>
+              <p class="campo__dica" id="cupom-dica" data-cupom-dica>Recebeu um cupom do seu contador? Digite aqui. O desconto aparece no pagamento.</p>
+              <p class="campo__erro" id="cupom-erro" hidden>Confira o cupom: use só letras e números, de 4 a 20.</p>
+            </div>
+          </fieldset>
 
           <!-- 2. Empresa -->
           <fieldset class="grupo">
@@ -208,6 +219,7 @@
             <div><dt>Endereço do painel</dt><dd data-s="endereco"></dd></div>
             <div><dt>E-mail de acesso</dt><dd data-s="email"></dd></div>
             <div><dt>Primeira unidade</dt><dd data-s="unidade"></dd></div>
+            <div data-linha-cupom hidden><dt>Cupom de parceiro</dt><dd data-s="cupom"></dd></div>
           </dl>
 
           <h2 class="onb__passos-titulo">Próximos passos</h2>

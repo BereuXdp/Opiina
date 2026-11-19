@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Painel do parceiro — Opiina</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="../assets/icons/logo-opiina-64.png" type="image/png">
+  <!-- Sem login (parceiro-entrar.html) nem cadastro nesta aba, volta para o login do parceiro (protótipo) -->
+  <script>try { if (!sessionStorage.getItem('opiina-parceiro-sessao')) location.replace('../parceiro-entrar.html'); } catch (e) {}</script>
+  <!-- Modo escuro: mesma escolha do painel do Opiina. Antes do CSS, para não piscar. -->
+  <script>try { var t = localStorage.getItem('opiina-tema'); if (t === 'escuro' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.dataset.tema = 'escuro'; } catch (e) {}</script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="painel.css">
+  <link rel="stylesheet" href="parceiro.css">
+  <script src="../assets/js/parceiros.js" defer></script>
+  <script src="qrcode.js" defer></script>
+  <script src="parceiro.js" defer></script>
+</head>
+<!--
+  Painel do parceiro (contador), protótipo — 2026-11-19. Visual do painel do Opiina (painel.css).
+  Sem conta criada em contadores.html, abre com uma conta e indicações DE EXEMPLO.
+  Com conta: mostra o cupom dela e as indicações feitas no cadastro (onboarding.html?cupom=…), guardadas no navegador.
+-->
+<body>
+  <svg class="sprite-local" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="p-moeda" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.2c-.5-.8-1.5-1.3-2.6-1.3-1.5 0-2.6.8-2.6 2s1.1 1.7 2.6 2.1 2.7.9 2.7 2.1-1.2 2-2.7 2c-1.2 0-2.2-.5-2.7-1.3M12 6.5v1.4M12 16.1v1.4"/></symbol>
+      <symbol id="p-cupom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5V6A1.5 1.5 0 0 1 5 4.5h14A1.5 1.5 0 0 1 20.5 6v2.5a2.5 2.5 0 0 0 0 5V18a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 18v-4.5a2.5 2.5 0 0 0 0-5Z"/><path d="M14.5 4.5v15" stroke-dasharray="2 2.5"/></symbol>
+      <symbol id="p-compartilhar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8 15.8 6.7M8.2 13.2l7.6 4.1"/></symbol>
+      <symbol id="p-copiar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></symbol>
+      <symbol id="p-whats" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.2-4A8 8 0 1 1 8 18.8L4 20Z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 .8c-.8-.4-1.5-1.1-1.8-1.8l.8-1-1-2-1.5 1Z"/></symbol>
+      <symbol id="p-saque" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="12" rx="2"/><path d="M3 10.5h18M7 15h3"/></symbol>
+    </defs>
+  </svg>
+
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+  <div class="app">
+    <header class="barra-movel">
+      <button class="botao-icone" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-lateral" data-menu-abrir>
+        <svg class="icone" aria-hidden="true"><use href="icones.svg#menu"/></svg>
+      </button>
+      <a class="marca" href="parceiro.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+      <span class="selo-parceiro selo-parceiro--barra">Parceiro</span>
+    </header>
+
+    <aside class="lateral" id="menu-lateral" aria-label="Menu do parceiro" data-lateral>
+      <div class="lateral__topo">
+        <a class="marca" href="parceiro.html"><img src="../assets/icons/logo-opiina-256.png" alt="" width="256" height="256">Opiina</a>
+        <button class="botao-icone lateral__fechar" type="button" aria-label="Fechar menu" data-menu-fechar>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#fechar"/></svg>
+        </button>
+      </div>
+      <span class="marca__empresa"><span class="selo-parceiro">Parceiro</span></span>
+
+      <nav class="nav" aria-label="Principal">
+        <div class="nav__grupo">
+          <a class="nav__item" href="?aba=inicio" data-aba-link="inicio"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Início</a>
+          <a class="nav__item" href="?aba=indicacoes" data-aba-link="indicacoes"><svg class="icone" aria-hidden="true"><use href="icones.svg#lista"/></svg>Indicações</a>
+          <a class="nav__item" href="?aba=divulgar" data-aba-link="divulgar"><svg class="icone" aria-hidden="true"><use href="#p-compartilhar"/></svg>Divulgar</a>
+          <a class="nav__item" href="?aba=saques" data-aba-link="saques"><svg class="icone" aria-hidden="true"><use href="#p-saque"/></svg>Saques</a>
+        </div>
+        <div class="nav__grupo">
+          <a class="nav__item" href="?aba=afiliado" data-aba-link="afiliado"><svg class="icone" aria-hidden="true"><use href="icones.svg#pessoa"/></svg>Área do afiliado</a>
+        </div>
+      </nav>
+
+      <button class="tema" type="button" aria-pressed="false" data-tema-botao>
+        <span class="tema__icone"><svg class="icone" aria-hidden="true"><use href="icones.svg#lua"/></svg></span>
+        Modo escuro
+        <span class="tema__chave" aria-hidden="true"></span>
+      </button>
+
+      <div class="conta">
+        <span class="avatar" aria-hidden="true" data-conta-iniciais></span>
+        <span class="conta__texto"><span class="conta__nome" data-conta-nome></span><span class="conta__perfil" data-conta-escritorio></span></span>
+        <button class="conta__sair" type="button" aria-label="Sair" title="Sair" data-sair>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#sair"/></svg>
+        </button>
+      </div>
+    </aside>
+    <div class="lateral-fundo" data-menu-fundo></div>
+
+    <main class="principal" id="conteudo" tabindex="-1">
+      <div class="principal__conteudo">
+        <p class="aviso-prototipo" data-aviso>
+          <svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>
+          <span data-aviso-texto></span>
+        </p>
+
+        <!-- ===== Início ===== -->
+        <section data-aba="inicio" aria-labelledby="t-inicio">
+          <div class="cabeca">
+            <div>
+              <h1 class="cabeca__titulo" id="t-inicio" tabindex="-1" data-ola>Olá!</h1>
+              <p class="cabeca__desc">Acompanhe quem usou seu cupom e quanto você tem a receber.</p>
+            </div>
+          </div>
+
+          <div class="boas-vindas" data-boas-vindas hidden>
+            <svg class="icone" aria-hidden="true"><use href="icones.svg#ok"/></svg>
+            <p><strong>Conta criada!</strong> Seu cupom já está ativo. Mande pros seus clientes pelo link abaixo ou pela aba <a href="?aba=divulgar" data-ir="divulgar">Divulgar</a>.</p>
+          </div>
+
+          <div class="cupom-destaque">
+            <div class="cupom-destaque__texto">
+              <p class="cupom-destaque__rotulo">Seu cupom</p>
+              <p class="cupom-destaque__codigo" data-cupom></p>
+              <p class="cupom-destaque__desc">Dá desconto pro cliente que você indicar<span data-desconto-texto></span>. Cada uso aparece aqui.</p>
+            </div>
+            <div class="cupom-destaque__acoes">
+              <button class="btn btn--branco" type="button" data-copiar="cupom"><svg class="icone" aria-hidden="true"><use href="#p-copiar"/></svg>Copiar cupom</button>
+              <button class="btn btn--branco-contorno" type="button" data-copiar="link"><svg class="icone" aria-hidden="true"><use href="icones.svg#link"/></svg>Copiar link</button>
+              <a class="btn btn--branco-contorno" href="#" target="_blank" rel="noopener" data-whats-link><svg class="icone" aria-hidden="true"><use href="#p-whats"/></svg>WhatsApp</a>
+            </div>
+          </div>
+
+          <div class="kpis" data-kpis></div>
+
+          <div class="grade-parceiro">
+            <section class="cartao" aria-labelledby="t-ultimas">
+              <div class="cartao__topo">
+                <div>
+                  <h2 class="cartao__titulo" id="t-ultimas">Últimas indicações</h2>
+                  <p class="cartao__sub">Empresas que usaram seu cupom no cadastro.</p>
+                </div>
+                <a class="cartao__link" href="?aba=indicacoes" data-ir="indicacoes">Ver todas<svg class="icone" aria-hidden="true"><use href="icones.svg#seta"/></svg></a>
+              </div>
+              <ul class="lista-ind" data-ultimas></ul>
+            </section>
+
+            <section class="cartao" aria-labelledby="t-como">
+              <h2 class="cartao__titulo" id="t-como">Como você ganha</h2>
+              <ol class="passos-mini">
+                <li><b>1</b><span><strong>O cliente usa seu cupom</strong> no cadastro do Opiina e ganha desconto.</span></li>
+                <li><b>2</b><span><strong>Ele paga o plano.</strong> A comissão entra no seu saldo: <span data-regra-comissao></span>.</span></li>
+                <li><b>3</b><span><strong>Você pede o saque</strong> por PIX, na aba <a href="?aba=saques" data-ir="saques">Saques</a>.</span></li>
+              </ol>
+            </section>
+          </div>
+        </section>
+
+        <!-- ===== Indicações ===== -->
+        <section data-aba="indicacoes" aria-labelledby="t-indicacoes" hidden>
+          <div class="cabeca">
+            <div>
+              <h1 class="cabeca__titulo" id="t-indicacoes" tabindex="-1">Indicações</h1>
+              <p class="cabeca__desc">Todas as empresas que usaram o cupom <strong data-cupom></strong>.</p>
+            </div>
+          </div>
+          <div class="cartao">
+            <div class="filtro-chips" role="group" aria-label="Filtrar por situação" data-filtros>
+              <button type="button" aria-pressed="true" data-filtro="todas">Todas <span data-qtd="todas"></span></button>
+              <button type="button" aria-pressed="false" data-filtro="cadastrou">Aguardando pagamento <span data-qtd="cadastrou"></span></button>
+              <button type="button" aria-pressed="false" data-filtro="pagou">Pagaram <span data-qtd="pagou"></span></button>
+              <button type="button" aria-pressed="false" data-filtro="cancelou">Cancelaram <span data-qtd="cancelou"></span></button>
+            </div>
+            <div class="tabela-rolagem">
+              <table class="tabela">
+                <caption class="visualmente-oculto">Indicações feitas com o seu cupom</caption>
+                <thead><tr><th scope="col">Empresa</th><th scope="col">Plano</th><th scope="col">Cadastro</th><th scope="col">Situação</th><th scope="col" class="num">Sua comissão</th></tr></thead>
+                <tbody data-tabela-ind></tbody>
+              </table>
+            </div>
+            <p class="vazio" data-vazio-ind hidden>Nenhuma indicação aqui ainda. Mande seu cupom pelos clientes na aba <a href="?aba=divulgar" data-ir="divulgar">Divulgar</a>.</p>
+          </div>
+        </section>
+
+        <!-- ===== Divulgar ===== -->
+        <section data-aba="divulgar" aria-labelledby="t-divulgar" hidden>
+          <div class="cabeca">
+            <div>
+              <h1 class="cabeca__titulo" id="t-divulgar" tabindex="-1">Divulgar</h1>
+              <p class="cabeca__desc">Seu cupom, seu link, o QR Code e mensagens prontas pra mandar.</p>
+            </div>
+          </div>
+
+          <div class="grade-divulgar">
+            <section class="cartao" aria-labelledby="t-link">
+              <h2 class="cartao__titulo" id="t-link">Link de indicação</h2>
+              <p class="cartao__sub">Abre o cadastro do Opiina com o seu cupom já preenchido.</p>
+              <div class="campo campo-copiar">
+                <label for="link-indicacao" class="visualmente-oculto">Link de indicação</label>
+                <input id="link-indicacao" type="text" readonly data-link-campo>
+                <button class="btn btn--primario" type="button" data-copiar="link"><svg class="icone" aria-hidden="true"><use href="#p-copiar"/></svg>Copiar</button>
+              </div>
+              <div class="linha-botoes">
+                <a class="btn btn--secundario" href="#" target="_blank" rel="noopener" data-whats-link><svg class="icone" aria-hidden="true"><use href="#p-whats"/></svg>Mandar no WhatsApp</a>
+                <button class="btn btn--secundario" type="button" data-copiar="cupom"><svg class="icone" aria-hidden="true"><use href="#p-cupom"/></svg>Copiar só o cupom</button>
+              </div>
+            </section>
+
+            <section class="cartao qr-cartao" aria-labelledby="t-qr">
+              <h2 class="cartao__titulo" id="t-qr">QR Code</h2>
+              <p class="cartao__sub">Pra imprimir, pôr na apresentação ou no e-mail.</p>
+              <div class="qr-cartao__img" data-qr></div>
+              <button class="btn btn--secundario" type="button" data-baixar-qr><svg class="icone" aria-hidden="true"><use href="icones.svg#qr"/></svg>Baixar imagem</button>
+            </section>
+          </div>
+
+          <section class="cartao" aria-labelledby="t-mensagens">
+            <h2 class="cartao__titulo" id="t-mensagens">Mensagens prontas</h2>
+            <p class="cartao__sub">Já vêm com o seu cupom e o seu link. Copie e ajuste do seu jeito.</p>
+            <ul class="mensagens" data-mensagens></ul>
+          </section>
+        </section>
+
+        <!-- ===== Saques ===== -->
+        <section data-aba="saques" aria-labelledby="t-saques" hidden>
+          <div class="cabeca">
+            <div>
+              <h1 class="cabeca__titulo" id="t-saques" tabindex="-1">Saques</h1>
+              <p class="cabeca__desc">A comissão entra no saldo quando o cliente indicado paga o plano. O saque é por PIX.</p>
+            </div>
+          </div>
+
+          <div class="saldo">
+            <div>
+              <p class="saldo__rotulo">Saldo disponível</p>
+              <p class="saldo__valor" data-saldo></p>
+              <p class="saldo__pix" data-saldo-pix></p>
+            </div>
+            <button class="btn btn--branco" type="button" data-abrir-saque><svg class="icone" aria-hidden="true"><use href="#p-saque"/></svg>Solicitar saque</button>
+          </div>
+
+          <div class="kpis kpis--3" data-kpis-saque></div>
+
+          <section class="cartao" aria-labelledby="t-historico">
+            <h2 class="cartao__titulo" id="t-historico">Histórico de saques</h2>
+            <div class="tabela-rolagem">
+              <table class="tabela">
+                <caption class="visualmente-oculto">Saques pedidos</caption>
+                <thead><tr><th scope="col">Pedido em</th><th scope="col">Chave PIX</th><th scope="col">Situação</th><th scope="col" class="num">Valor</th></tr></thead>
+                <tbody data-tabela-saques></tbody>
+              </table>
+            </div>
+            <p class="vazio" data-vazio-saques hidden>Nenhum saque pedido ainda.</p>
+          </section>
+        </section>
+
+        <!-- ===== Área do afiliado ===== -->
+        <section data-aba="afiliado" aria-labelledby="t-afiliado" hidden>
+          <div class="cabeca">
+            <div>
+              <h1 class="cabeca__titulo" id="t-afiliado" tabindex="-1">Área do afiliado</h1>
+              <p class="cabeca__desc">Seus dados, a chave PIX para receber e as regras do programa.</p>
+            </div>
+          </div>
+
+          <div class="grade-afiliado">
+            <section class="cartao" aria-labelledby="t-dados">
+              <h2 class="cartao__titulo" id="t-dados">Seus dados</h2>
+              <form class="form-painel" data-form-dados novalidate>
+                <div class="campo"><label for="a-nome">Nome</label><input id="a-nome" name="nome" type="text" autocomplete="name" required></div>
+                <div class="campo"><label for="a-escritorio">Escritório</label><input id="a-escritorio" name="escritorio" type="text" autocomplete="organization" required></div>
+                <div class="campo"><label for="a-email">E-mail</label><input id="a-email" name="email" type="email" autocomplete="email" required></div>
+                <div class="campo"><label for="a-telefone">WhatsApp</label><input id="a-telefone" name="telefone" type="tel" autocomplete="tel"></div>
+                <button class="btn btn--primario" type="submit">Salvar dados</button>
+              </form>
+            </section>
+
+            <section class="cartao" aria-labelledby="t-pix" id="pix">
+              <h2 class="cartao__titulo" id="t-pix">Chave PIX para receber</h2>
+              <p class="cartao__sub">O saque cai nesta chave. Use uma chave no seu nome ou no do escritório.</p>
+              <form class="form-painel" data-form-pix novalidate>
+                <div class="campo">
+                  <label for="pix-tipo">Tipo de chave</label>
+                  <select id="pix-tipo" name="tipo">
+                    <option>CPF</option><option>CNPJ</option><option>E-mail</option><option>Telefone</option><option>Chave aleatória</option>
+                  </select>
+                </div>
+                <div class="campo">
+                  <label for="pix-chave">Chave</label>
+                  <input id="pix-chave" name="chave" type="text" autocomplete="off" required aria-describedby="pix-erro">
+                  <p class="campo__erro" id="pix-erro" hidden>Informe a chave PIX.</p>
+                </div>
+                <button class="btn btn--primario" type="submit">Salvar chave PIX</button>
+              </form>
+            </section>
+
+            <section class="cartao grade-afiliado__largo" aria-labelledby="t-regras">
+              <h2 class="cartao__titulo" id="t-regras">Regras do programa</h2>
+              <ul class="regras" data-regras></ul>
+            </section>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Solicitar saque -->
+  <dialog class="confirmar" aria-labelledby="saque-titulo" data-dialogo-saque>
+    <form method="dialog" class="form-saque" data-form-saque novalidate>
+      <span class="confirmar__icone"><svg class="icone" aria-hidden="true"><use href="#p-saque"/></svg></span>
+      <h2 id="saque-titulo">Solicitar saque</h2>
+      <p>Disponível: <strong data-saque-disponivel></strong></p>
+      <div class="campo">
+        <label for="saque-valor">Valor do saque (R$)</label>
+        <input id="saque-valor" name="valor" type="text" inputmode="decimal" autocomplete="off" aria-describedby="saque-erro">
+        <p class="campo__erro" id="saque-erro" hidden></p>
+      </div>
+      <!-- Chave PIX do saque (2026-11-19): vem preenchida com a chave salva; dá para trocar e salvar para os próximos -->
+      <fieldset class="form-saque__grupo">
+        <legend>Chave PIX para receber</legend>
+        <div class="form-saque__pix-campos">
+          <div class="campo">
+            <label for="saque-pix-tipo">Tipo de chave</label>
+            <select id="saque-pix-tipo" name="pixTipo">
+              <option>CPF</option><option>CNPJ</option><option>E-mail</option><option>Telefone</option><option>Chave aleatória</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="saque-pix-chave">Chave</label>
+            <input id="saque-pix-chave" name="pixChave" type="text" autocomplete="off" aria-describedby="saque-pix-erro">
+          </div>
+        </div>
+        <p class="campo__erro" id="saque-pix-erro" hidden>Informe a chave PIX para receber.</p>
+        <label class="form-saque__salvar">
+          <input type="checkbox" name="salvarPix" checked data-salvar-pix>
+          <span>Salvar esta chave para os próximos saques</span>
+        </label>
+      </fieldset>
+      <p class="form-saque__pix">O Opiina confere o pedido antes de pagar.</p>
+      <div class="confirmar__acoes">
+        <button class="btn btn--secundario" type="button" data-fechar-saque>Cancelar</button>
+        <button class="btn btn--primario" type="submit" data-confirmar-saque>Confirmar saque</button>
+      </div>
+    </form>
+  </dialog>
+
+  <p class="toast" role="status" aria-live="polite" data-toast></p>
+</body>
+</html>

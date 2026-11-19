@@ -1,0 +1,167 @@
+/* ==========================================================================
+   Opiina — painel do parceiro (contador), protótipo — 2026-11-19
+   Complementa painel.css (tokens, menu lateral, cartões, KPIs, tabelas, janela de confirmação, modo escuro).
+   ========================================================================== */
+
+.sprite-local { position: absolute; width: 0; height: 0; overflow: hidden; }
+[data-aba] { display: grid; gap: 20px; }
+[data-aba][hidden] { display: none; }
+
+.selo-parceiro {
+  display: inline-flex; align-items: center;
+  padding: 2px 9px; border-radius: 999px;
+  background: var(--selecionado); color: var(--link);
+  font-size: 12px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase;
+}
+.selo-parceiro--barra { margin-left: auto; }
+.lateral .marca__empresa { padding-left: 47px; }
+
+/* Faixa de boas-vindas (logo depois do cadastro) */
+.boas-vindas {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(21, 128, 61, .3);
+  border-radius: var(--raio);
+  background: var(--sucesso-fundo);
+  color: var(--texto);
+  font-size: 15px;
+}
+.boas-vindas .icone { color: var(--sucesso); margin-top: 1px; }
+.boas-vindas a { color: var(--link); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Cupom em destaque (Início) ---------- */
+.cupom-destaque {
+  position: relative; overflow: hidden;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 28px;
+  padding: 26px 28px;
+  border-radius: 18px;
+  background: radial-gradient(60% 120% at 100% 0%, rgba(255, 255, 255, .18), transparent 60%), var(--grad);
+  color: #fff;
+  box-shadow: 0 24px 50px -30px rgba(28, 123, 255, .9);
+}
+.cupom-destaque__rotulo { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.cupom-destaque__codigo {
+  display: inline-block; margin: 6px 0 8px;
+  padding: 6px 18px;
+  border: 2px dashed rgba(255, 255, 255, .7);
+  border-radius: 12px;
+  font-size: clamp(28px, 3.4vw, 38px); font-weight: 700; letter-spacing: .08em; line-height: 1.2;
+}
+.cupom-destaque__desc { max-width: 46ch; font-size: 15px; }
+.cupom-destaque__acoes { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.btn--branco { background: #fff; color: #0B5BD3; }
+.btn--branco:hover { box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .4); }
+.btn--branco-contorno { background: transparent; border-color: rgba(255, 255, 255, .7); color: #fff; }
+.btn--branco-contorno:hover { border-color: #fff; background: rgba(255, 255, 255, .1); }
+.btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+
+/* KPIs: o de saldo ganha destaque */
+.kpi--saldo { border-color: rgba(21, 128, 61, .35); }
+.kpi--saldo .kpi__valor { color: var(--sucesso); }
+.kpis--3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+.grade-parceiro { display: grid; gap: 16px; }
+@media (min-width: 1100px) { .grade-parceiro { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+
+/* Lista curta de indicações */
+.lista-ind li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 12px; padding: 12px 0; }
+.lista-ind li + li { border-top: 1px solid var(--linha); }
+.lista-ind__empresa { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lista-ind__meta { grid-column: 1; color: var(--mudo); font-size: 13px; }
+.lista-ind .etapa { grid-row: 1 / span 2; grid-column: 2; }
+
+.passos-mini { display: grid; gap: 14px; margin-top: 16px; }
+.passos-mini li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; font-size: 14px; color: var(--mudo); }
+.passos-mini b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--selecionado); color: var(--link); font-size: 14px; }
+.passos-mini strong { color: var(--texto); }
+.passos-mini a { color: var(--link); font-weight: 600; }
+
+/* Situação da indicação (reaproveita .etapa do painel) */
+.etapa--cancelou { background: var(--neutro-fundo); color: var(--neutro); }
+
+/* ---------- Indicações ---------- */
+.filtro-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.filtro-chips button {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px; padding: 0 14px;
+  border: 1px solid var(--linha-forte); border-radius: 999px;
+  background: var(--superficie); color: var(--texto);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.filtro-chips button:hover { border-color: var(--acento); }
+.filtro-chips button[aria-pressed="true"] { border-color: var(--primario); background: var(--selecionado); color: var(--link); }
+.filtro-chips span { padding: 0 7px; border-radius: 999px; background: var(--bg-suave); color: var(--mudo); font-size: 12px; }
+.tabela .sem-comissao { color: var(--mudo); font-weight: 500; }
+
+/* ---------- Divulgar ---------- */
+.grade-divulgar { display: grid; gap: 16px; }
+@media (min-width: 1000px) { .grade-divulgar { grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); } }
+.campo-copiar { display: flex; gap: 8px; margin-top: 16px; }
+.campo-copiar input { flex: 1; min-width: 0; font-size: 14px; }
+.linha-botoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.qr-cartao { display: grid; justify-items: start; gap: 12px; }
+.qr-cartao__img { width: 168px; padding: 8px; border: 1px solid var(--linha); border-radius: 12px; background: #fff; }
+.qr-cartao__img svg { width: 100%; height: auto; }
+
+.mensagens { display: grid; gap: 12px; margin-top: 16px; }
+@media (min-width: 1100px) { .mensagens { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.mensagem { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--linha); border-radius: 12px; background: var(--bg-suave); }
+.mensagem h3 { font-size: 15px; font-weight: 600; }
+.mensagem p { flex: 1; color: var(--texto); font-size: 14px; line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
+.mensagem__acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.mensagem__acoes .btn { min-height: 40px; padding-inline: 12px; font-size: 13px; }
+
+/* ---------- Saques ---------- */
+.saldo {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px;
+  padding: 26px 28px;
+  border-radius: 18px;
+  background: radial-gradient(60% 120% at 100% 0%, rgba(255, 255, 255, .18), transparent 60%), var(--grad);
+  color: #fff;
+}
+.saldo__rotulo { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.saldo__valor { margin: 4px 0; font-size: clamp(32px, 4vw, 44px); font-weight: 600; letter-spacing: -.03em; line-height: 1.1; }
+.saldo__pix { font-size: 14px; }
+.saldo__pix a { color: #fff; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.etapa--solicitado { background: var(--alerta-fundo); color: var(--alerta); }
+.etapa--pago { background: var(--sucesso-fundo); color: var(--sucesso); }
+
+.form-saque .campo { margin-top: 18px; }
+.form-saque__pix { font-size: 14px; }
+.form-saque__pix a { color: var(--link); font-weight: 600; }
+
+/* ---------- Área do afiliado ---------- */
+.grade-afiliado { display: grid; gap: 16px; }
+@media (min-width: 1000px) {
+  .grade-afiliado { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grade-afiliado__largo { grid-column: 1 / -1; }
+}
+.form-painel { display: grid; gap: 14px; margin-top: 16px; }
+.form-painel .btn { justify-self: start; }
+.campo input[aria-invalid="true"] { border-color: var(--perigo); }
+.regras { display: grid; gap: 10px; margin-top: 14px; }
+.regras li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; font-size: 15px; }
+.regras li::before { content: ""; width: 8px; height: 8px; margin: 8px 0 0 7px; border-radius: 50%; background: var(--acento); }
+.regras .a-definir { display: inline-block; margin-left: 6px; padding: 0 8px; border-radius: 999px; background: var(--alerta-fundo); color: var(--alerta); font-size: 12px; font-weight: 700; }
+
+@media (max-width: 559px) {
+  .cupom-destaque, .saldo { padding: 22px 20px; }
+  .cupom-destaque__acoes, .cupom-destaque__acoes .btn, .saldo .btn { width: 100%; }
+  .campo-copiar { flex-direction: column; }
+}
+
+/* O "Sair" aqui é botão (limpa a conta do protótipo), não link */
+button.conta__sair { border: 0; background: none; cursor: pointer; }
+
+/* Chave PIX dentro do pedido de saque (2026-11-19) */
+.form-saque__grupo { margin-top: 18px; padding: 16px; border: 1px solid var(--linha); border-radius: 12px; background: var(--bg-suave); }
+.form-saque__grupo legend { padding: 0 6px; margin-left: -6px; font-size: 14px; font-weight: 600; }
+.form-saque__pix-campos { display: grid; grid-template-columns: 150px 1fr; gap: 10px; }
+.form-saque .form-saque__pix-campos .campo { margin-top: 0; }
+.form-saque__grupo .campo__erro { margin-top: 6px; }
+.form-saque__salvar { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.form-saque__salvar input { width: 18px; height: 18px; flex: none; accent-color: var(--primario); cursor: pointer; }
+.form-saque__pix { margin-top: 12px; color: var(--mudo); font-size: 14px; }
+.confirmar:has(.form-saque) { width: min(500px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; }
+@media (max-width: 479px) { .form-saque__pix-campos { grid-template-columns: 1fr; } }
