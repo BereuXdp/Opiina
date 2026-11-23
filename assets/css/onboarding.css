@@ -79,6 +79,32 @@
 /* O <legend> fica fora do grid do fieldset (o gap não vale para ele): o respiro vem daqui */
 .grupo__sub { margin-top: 6px; color: var(--mudo); font-size: 14px; }
 
+/* Mais dados (opcionais): fechado por padrão; abre sozinho se houver erro dentro dele */
+.onb__mais {
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  background: #F6F9FF;
+}
+.onb__mais summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 52px;
+  padding: 12px 18px;
+  color: var(--texto);
+  font-size: 15px; font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.onb__mais summary::-webkit-details-marker { display: none; }
+.onb__mais summary::after {
+  content: '+';
+  flex: none;
+  color: var(--link);
+  font-size: 22px; font-weight: 500; line-height: 1;
+}
+.onb__mais[open] summary::after { content: '−'; }
+.onb__mais summary:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; border-radius: 14px; }
+.onb__mais-corpo { display: grid; gap: 16px; padding: 4px 18px 20px; }
+
 .campos-2 { display: grid; gap: 16px; }
 @media (min-width: 560px) { .campos-2 { grid-template-columns: 1fr 1fr; } }
 

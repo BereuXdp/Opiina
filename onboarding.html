@@ -64,7 +64,7 @@
 
       <div class="login__cartao onb__cartao">
         <h1 class="login__titulo">Crie sua conta</h1>
-        <p class="login__sub">Escolha o plano e cadastre a empresa, quem vai administrar o painel e a primeira unidade. Depois, o pagamento é feito na Stripe.</p>
+        <p class="login__sub">Escolha o plano, crie seu acesso e diga o nome da empresa. Depois, o pagamento é feito na Stripe.</p>
 
         <form class="formulario onb__form" data-onboarding novalidate>
           <!-- 1. Plano (pré-marcado por ?plan=start|pro|redes; obrigatório) -->
@@ -105,55 +105,10 @@
             </div>
           </fieldset>
 
-          <!-- 2. Empresa -->
+          <!-- 2. Seus dados (administrador): o que basta para entrar no painel -->
           <fieldset class="grupo">
-            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">2</span>Empresa</legend>
-            <p class="grupo__sub">Dados principais da empresa.</p>
-
-            <div class="campo">
-              <label for="razao">Razão social</label>
-              <input id="razao" name="razao_social" type="text" autocomplete="organization" placeholder="Minha Empresa LTDA">
-            </div>
-
-            <div class="campo">
-              <label for="fantasia">Nome fantasia</label>
-              <input id="fantasia" name="nome_fantasia" type="text" placeholder="Minha Marca" data-fantasia>
-            </div>
-
-            <div class="campo">
-              <label for="subdominio">Endereço do painel</label>
-              <div class="campo__composto">
-                <input id="subdominio" name="subdominio" type="text" inputmode="url" autocapitalize="none" spellcheck="false"
-                       placeholder="minha-marca" aria-describedby="subdominio-dica" data-subdominio>
-                <span class="campo__sufixo" aria-hidden="true">.opiina.com</span>
-              </div>
-              <p class="campo__dica" id="subdominio-dica">Seu painel ficará em <strong data-endereco>minha-marca.opiina.com</strong></p>
-            </div>
-
-            <div class="campos-2">
-              <div class="campo">
-                <label for="email-empresa">E-mail</label>
-                <input id="email-empresa" name="email_empresa" type="email" inputmode="email" autocomplete="email"
-                       placeholder="contato@empresa.com" aria-describedby="email-empresa-erro">
-                <p class="campo__erro" id="email-empresa-erro" hidden>Informe um e-mail válido.</p>
-              </div>
-              <div class="campo">
-                <label for="telefone">Telefone</label>
-                <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 90000-0000">
-              </div>
-            </div>
-
-            <div class="campo">
-              <label for="segmento">Segmento</label>
-              <input id="segmento" name="segmento" type="text" value="restaurante">
-            </div>
-
-          </fieldset>
-
-          <!-- 3. Administrador -->
-          <fieldset class="grupo">
-            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">3</span>Administrador</legend>
-            <p class="grupo__sub">Quem vai acessar o painel primeiro.</p>
+            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">2</span>Seus dados</legend>
+            <p class="grupo__sub">Com o e-mail e a senha você entra no painel.</p>
 
             <div class="campos-2">
               <div class="campo">
@@ -176,27 +131,72 @@
             </div>
           </fieldset>
 
-          <!-- 4. Primeira unidade -->
+          <!-- 3. Sua empresa: só o nome e o endereço do painel -->
           <fieldset class="grupo">
-            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">4</span>Primeira unidade</legend>
-            <p class="grupo__sub">Base para permissões e relatórios.</p>
+            <legend class="grupo__titulo"><span class="grupo__num" aria-hidden="true">3</span>Sua empresa</legend>
+            <p class="grupo__sub">O nome com que o cliente conhece a casa.</p>
 
-            <div class="campos-2">
-              <div class="campo">
-                <label for="unidade-nome">Nome</label>
-                <input id="unidade-nome" name="unidade_nome" type="text" value="Unidade 1">
+            <div class="campo">
+              <label for="fantasia">Nome fantasia</label>
+              <input id="fantasia" name="nome_fantasia" type="text" placeholder="Minha Marca" data-fantasia>
+            </div>
+
+            <div class="campo">
+              <label for="subdominio">Endereço do painel</label>
+              <div class="campo__composto">
+                <input id="subdominio" name="subdominio" type="text" inputmode="url" autocapitalize="none" spellcheck="false"
+                       placeholder="minha-marca" aria-describedby="subdominio-dica" data-subdominio>
+                <span class="campo__sufixo" aria-hidden="true">.opiina.com</span>
               </div>
-              <div class="campo">
-                <label for="fuso">Fuso horário</label>
-                <select id="fuso" name="fuso_horario">
-                  <option value="America/Sao_Paulo" selected>Brasília (GMT−3)</option>
-                  <option value="America/Manaus">Amazonas (GMT−4)</option>
-                  <option value="America/Rio_Branco">Acre (GMT−5)</option>
-                  <option value="America/Noronha">Fernando de Noronha (GMT−2)</option>
-                </select>
-              </div>
+              <p class="campo__dica" id="subdominio-dica">Seu painel ficará em <strong data-endereco>minha-marca.opiina.com</strong></p>
             </div>
           </fieldset>
+
+          <!-- Mais dados (2026-11-23): os demais campos da tela original, opcionais e fechados por padrão,
+               para o formulário não parecer longo antes de a pessoa pagar. Nenhum campo foi removido. -->
+          <details class="onb__mais" data-mais>
+            <summary>Mais dados da empresa e da unidade <span class="campo__opcional">(opcional)</span></summary>
+            <div class="onb__mais-corpo">
+              <div class="campo">
+                <label for="razao">Razão social</label>
+                <input id="razao" name="razao_social" type="text" autocomplete="organization" placeholder="Minha Empresa LTDA">
+              </div>
+
+              <div class="campos-2">
+                <div class="campo">
+                  <label for="email-empresa">E-mail da empresa</label>
+                  <input id="email-empresa" name="email_empresa" type="email" inputmode="email" autocomplete="email"
+                         placeholder="contato@empresa.com" aria-describedby="email-empresa-erro">
+                  <p class="campo__erro" id="email-empresa-erro" hidden>Informe um e-mail válido.</p>
+                </div>
+                <div class="campo">
+                  <label for="telefone">Telefone</label>
+                  <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 90000-0000">
+                </div>
+              </div>
+
+              <div class="campo">
+                <label for="segmento">Segmento</label>
+                <input id="segmento" name="segmento" type="text" value="restaurante">
+              </div>
+
+              <div class="campos-2">
+                <div class="campo">
+                  <label for="unidade-nome">Nome da primeira unidade</label>
+                  <input id="unidade-nome" name="unidade_nome" type="text" value="Unidade 1">
+                </div>
+                <div class="campo">
+                  <label for="fuso">Fuso horário</label>
+                  <select id="fuso" name="fuso_horario">
+                    <option value="America/Sao_Paulo" selected>Brasília (GMT−3)</option>
+                    <option value="America/Manaus">Amazonas (GMT−4)</option>
+                    <option value="America/Rio_Branco">Acre (GMT−5)</option>
+                    <option value="America/Noronha">Fernando de Noronha (GMT−2)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </details>
 
           <div class="onb__acoes">
             <a class="btn btn--contorno btn--grande" href="index.html">Cancelar</a>

@@ -178,6 +178,8 @@ formulario.addEventListener('submit', (evento) => {
     return;
   }
   if (invalidos.length) {
+    // O e-mail da empresa fica no bloco "Mais dados": abre antes de levar o foco até lá
+    invalidos[0].campo.closest('details')?.setAttribute('open', '');
     invalidos[0].campo.focus();
     return;
   }
