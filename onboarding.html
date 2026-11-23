@@ -64,7 +64,7 @@
 
       <div class="login__cartao onb__cartao">
         <h1 class="login__titulo">Crie sua conta</h1>
-        <p class="login__sub">Escolha o plano, crie seu acesso e diga o nome da empresa. Depois, você cadastra o pagamento na Stripe. Os primeiros 7 dias são grátis.</p>
+        <p class="login__sub">Escolha o plano, crie seu acesso e diga o nome da empresa. Você usa o Opiina por 7 dias grátis e paga depois, pelo painel.</p>
 
         <form class="formulario onb__form" data-onboarding novalidate>
           <!-- 1. Plano (pré-marcado por ?plan=start|pro|redes; obrigatório) -->
@@ -216,7 +216,7 @@
           <p class="login__sub" data-sucesso-texto></p>
 
           <dl class="onb__resumo">
-            <div><dt>Plano a pagar</dt><dd data-s="plano"></dd></div>
+            <div><dt>Plano</dt><dd data-s="plano"></dd></div>
             <div><dt>Endereço do painel</dt><dd data-s="endereco"></dd></div>
             <div><dt>E-mail de acesso</dt><dd data-s="email"></dd></div>
             <div><dt>Primeira unidade</dt><dd data-s="unidade"></dd></div>
@@ -225,19 +225,16 @@
 
           <h2 class="onb__passos-titulo">Próximos passos</h2>
           <ol class="onb__passos">
-            <li><span><strong>Cadastre o pagamento na Stripe.</strong> Nada é cobrado nos 7 dias grátis.</span></li>
             <li>Entre no painel com o e-mail e a senha que você acabou de criar.</li>
             <li>Monte a primeira pesquisa NPS da unidade.</li>
+            <li><span><strong>Até o 7º dia, faça o pagamento pelo painel.</strong> Sem pagamento, o painel é bloqueado depois disso.</span></li>
           </ol>
 
           <div class="onb__pagar">
-            <a class="btn btn--solido btn--grande btn--largo" href="pagamento-concluido.html" data-pagar>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>
-              Começar os 7 dias grátis
-            </a>
-            <p class="onb__pagar-nota">A primeira cobrança só acontece depois dos 7 dias grátis. Cancele antes e não paga nada.</p>
+            <a class="btn btn--solido btn--grande btn--largo" href="login.html" data-pagar>Entrar no painel</a>
+            <p class="onb__pagar-nota">Os 7 dias grátis começam hoje. O pagamento é feito depois, pelo painel.</p>
           </div>
-          <p class="onb__prototipo">Protótipo: nenhuma conta foi criada de verdade. O botão simula a volta da Stripe com o pagamento aprovado.</p>
+          <p class="onb__prototipo">Protótipo: nenhuma conta foi criada de verdade.</p>
         </div>
       </div>
 

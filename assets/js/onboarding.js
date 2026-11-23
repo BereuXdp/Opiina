@@ -196,23 +196,19 @@ function mostrarSucesso() {
   const preencher = (chave, texto) => { sucesso.querySelector(`[data-s="${chave}"]`).textContent = texto; };
 
   const texto = sucesso.querySelector('[data-sucesso-texto]');
-  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Agora é só cadastrar o pagamento: os primeiros 7 dias são grátis.`;
+  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Seus 7 dias grátis começaram hoje: o pagamento é feito depois, pelo painel.`;
   preencher('plano', `${plano.nome} · ${plano.preco} por mês`);
   preencher('endereco', endereco.textContent);
-  // Protótipo: o botão simula a volta da Stripe com o pagamento aprovado.
-  // No app, ele abre o Checkout da Stripe, e o success_url aponta para pagamento-concluido.
+  // 7 dias grátis (cliente, 2026-11-23): a conta entra direto no painel; o pagamento é feito depois, pelo painel
+  // (Checkout da Stripe → pagamento-concluido.html). Depois do 7º dia, sem pagamento, o painel fica bloqueado.
   const chavePlano = opcoesPlano.find((o) => o.checked).value;
-  const pagar = new URL('pagamento-concluido.html', location.href);
-  pagar.searchParams.set('plan', chavePlano);
   // Com cupom: a indicação vai para o painel do parceiro como "Cadastrou"; o pagamento a marca como paga.
   const cupom = parceiros.normalizarCupom(campoCupom.value);
   sucesso.querySelector('[data-linha-cupom]').hidden = !cupom;
   if (cupom) {
     preencher('cupom', `${cupom} · desconto no pagamento`);
-    const indicacao = parceiros.registrarIndicacao({ cupom, empresa: empresa || 'Empresa sem nome', plano: chavePlano });
-    pagar.searchParams.set('ind', indicacao.id);
+    parceiros.registrarIndicacao({ cupom, empresa: empresa || 'Empresa sem nome', plano: chavePlano });   // fica como "Cadastrou" até o pagamento
   }
-  sucesso.querySelector('[data-pagar]').href = pagar.pathname.split('/').pop() + pagar.search;
   preencher('email', valor('admin-email'));
   preencher('unidade', valor('unidade-nome') || 'Unidade 1');
 
