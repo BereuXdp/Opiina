@@ -124,7 +124,7 @@ function iniciarFeedbacks() {
     const meta = [esc(r.unidade), r.atendente ? `Atendente: ${esc(r.atendente)}` : '', esc(r.cliente),
       `<time datetime="${r.quando.toISOString()}" title="${quando(r.dias)}">${dataHora}</time>`, oc && podeTratar ? oc.id : ''].filter(Boolean);
     return `<li class="cartao fb-item${aberta(oc) && podeTratar ? ' fb-item--acao' : ''}">
-      <span class="nota nota--${categoria(r.nota)}" aria-label="Nota ${r.nota} de 0 a 10">${r.nota}</span>
+      <span class="nota nota--${categoria(r.nota)}" aria-label="Nota ${r.nota} de 0 a 5">${r.nota}</span>
       <div class="fb-item__corpo">
         ${r.comentario ? `<p class="fb-item__texto">“${esc(r.comentario)}”</p>` : '<p class="fb-item__sem">Sem comentário: só a nota.</p>'}
         <p class="fb-item__meta">${meta.join('<span aria-hidden="true"> · </span>')}</p>
@@ -244,7 +244,7 @@ function iniciarFeedbacks() {
     const nota = g('nota');
     nota.className = `nota nota--${categoria(atual.nota)}`;
     nota.textContent = atual.nota;
-    nota.setAttribute('aria-label', `Nota ${atual.nota} de 0 a 10`);
+    nota.setAttribute('aria-label', `Nota ${atual.nota} de 0 a 5`);
     g('comentario').textContent = `“${atual.comentario}”`;
     g('cliente').textContent = atual.cliente;
     g('unidade').textContent = atual.unidade;

@@ -50,7 +50,7 @@ if (!pesquisa || !unidade) {
 function iniciarPesquisa() {
   const p = pesquisa;
   const temNota = p.nps !== false;
-  const escala = p.escala === 5 ? 5 : 10;
+  const escala = 5;   // escala única de 0 a 5 (decisão do cliente), também nas pesquisas de exemplo
   const perguntas = p.perguntas.map((q, i) => ({ ...q, uid: i + 1, opcoes: (q.opcoes || []).filter((o) => o.trim()) }));
   const atendentes = D.atendentes[unidade] || [];
   document.title = `${p.nome} — ${D.empresa} ${unidade}`;

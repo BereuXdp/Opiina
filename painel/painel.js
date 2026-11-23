@@ -38,9 +38,10 @@ const numero = (n) => n.toLocaleString('pt-BR');
 const iniciais = (nome) => nome.split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
 const slug = (texto) => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, '-');
 
+// Escala única de 0 a 5 (decisão do cliente): 5 promotor, 4 passivo, 0–3 detrator
 function categoria(nota) {
-  if (nota <= 6) return 'detrator';
-  if (nota <= 8) return 'passivo';
+  if (nota <= 3) return 'detrator';
+  if (nota <= 4) return 'passivo';
   return 'promotor';
 }
 
@@ -392,7 +393,7 @@ function iniciarDashboard() {
     $('[data-kpi="nps-nota"]').innerHTML = variacao === 0
       ? 'Estável nas últimas 4 semanas'
       : `<strong class="${variacao > 0 ? 'sobe' : 'desce'}">${variacao > 0 ? '▲ +' : '▼ '}${variacao}</strong> nas últimas 4 semanas`;
-    $('[data-kpi="respostas-nota"]').textContent = `${pct.promotores}% deram nota 9 ou 10`;
+    $('[data-kpi="respostas-nota"]').textContent = `${pct.promotores}% deram nota 5`;
     // Cartões de ocorrências: só para perfis que veem Ocorrências (o Marketing não vê)
     if (verOcorrencias) {
       kpi('abertas', ocs.length);
@@ -484,9 +485,9 @@ function iniciarDashboard() {
 
   // ----- Distribuição: as 3 faixas são criadas uma vez e só mudam de largura -----
   const faixas = [
-    { chave: 'promotores', nome: 'Promotores', faixa: '9–10', cor: 'var(--promotor)' },
-    { chave: 'passivos', nome: 'Passivos', faixa: '7–8', cor: 'var(--passivo)' },
-    { chave: 'detratores', nome: 'Detratores', faixa: '0–6', cor: 'var(--detrator)' },
+    { chave: 'promotores', nome: 'Promotores', faixa: '5', cor: 'var(--promotor)' },
+    { chave: 'passivos', nome: 'Passivos', faixa: '4', cor: 'var(--passivo)' },
+    { chave: 'detratores', nome: 'Detratores', faixa: '0–3', cor: 'var(--detrator)' },
   ];
   const barraNps = $('[data-dist-barra]');
   barraNps.innerHTML = faixas.map((f) => `<span style="background:${f.cor}"></span>`).join('');
