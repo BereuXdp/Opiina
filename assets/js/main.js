@@ -229,6 +229,11 @@ if (vitrine) {
   const lista = document.createElement('div'); lista.className = 'vitrine__lista';
   const palco = document.createElement('div'); palco.className = 'vitrine__palco';
   const andamento = document.createElement('div'); andamento.className = 'vitrine__andamento'; andamento.setAttribute('aria-hidden', 'true');
+  // Controle do usuário (2026-11-23): quem não quer passar pelas 6 etapas pula direto para a próxima seção
+  const pular = document.createElement('a');
+  pular.className = 'vitrine__pular';
+  pular.href = '#como-funciona';
+  pular.textContent = 'Pular esta parte';
   andamento.innerHTML = itens.map(() => '<span></span>').join('');
   const tracos = [...andamento.children];
   const botoes = titulos.map((titulo, i) => {
@@ -288,7 +293,7 @@ if (vitrine) {
       titulos.forEach((titulo, i) => { botoes[i].append(...titulo.childNodes); titulo.append(botoes[i]); });
       telas.forEach((tela) => palco.append(tela));
       lista.append(...itens);
-      fixo.append(lista, palco, andamento);
+      fixo.append(lista, palco, pular, andamento);
       if (nota) fixo.append(nota);
       vitrine.append(fixo);
       vitrine.classList.add('vitrine--rolagem');

@@ -111,7 +111,7 @@
       <div class="demo__texto">
         <span class="tag revelar">Na prática</span>
         <h2 class="revelar" id="demo-titulo">Uma pergunta, <em>uma nota</em>, um comentário</h2>
-        <p class="sub revelar">Envie a pesquisa NPS pelo canal que o cliente já usa. Rápido de montar, fácil de responder — e a resposta volta pro painel. Veja o Opiina funcionando:</p>
+        <p class="sub revelar">Imprima o QR Code na mesa ou mande o link por mensagem. O cliente dá uma nota de 0 a 5, deixa um comentário — e a resposta volta pro painel. Veja o Opiina funcionando:</p>
       </div>
       <div class="demo__visual revelar">
         <div class="demo__video" data-video>
@@ -134,29 +134,29 @@
     <div class="sec__in">
       <span class="tag revelar">Benefícios</span>
       <h2 id="beneficios-titulo" data-palavras>Mais do que ouvir: entender, comparar e <em>cuidar</em></h2>
-      <p class="sub revelar">Nota, comentário e ocorrência no mesmo lugar — sem planilha, sem conversa perdida.</p>
+      <p class="sub revelar">Nota, comentário e ocorrência no mesmo lugar.</p>
       <!-- Etapas com imagem (pedido do cliente, 2026-11-17). Computador: lista e tela presas no meio da tela, e a rolagem
            passa por 1, 2, 3… (cada título vira botão que leva à etapa). Celular e sem JS: tudo aberto, um embaixo do outro.
            Imagens: telas do painel (protótipo) com dados de exemplo, geradas por tools/capturas-site.mjs. -->
       <div class="vitrine" data-vitrine>
         <div class="vitrine__item">
-          <h3 class="vitrine__titulo" id="vh-1"><i aria-hidden="true">1</i>Pesquisa rápida, em mais de um canal</h3>
+          <h3 class="vitrine__titulo" id="vh-1"><i aria-hidden="true">1</i>Pesquisa rápida, por link ou QR Code</h3>
           <div class="vitrine__painel" id="vp-1">
-            <p class="vitrine__texto">Rápido de montar, fácil de responder. A resposta volta direto pro painel.</p>
+            <p class="vitrine__texto">Cada unidade tem o próprio link e QR Code. O cliente responde pelo celular, sem baixar aplicativo, e a resposta volta direto pro painel.</p>
             <figure class="vitrine__tela"><img src="assets/img/painel/beneficio-pesquisa.webp" width="1476" height="1140" loading="lazy" alt="Editor de pesquisa do painel: nome, unidades e, ao lado, a prévia no celular com a pergunta de 0 a 5."></figure>
           </div>
         </div>
         <div class="vitrine__item">
-          <h3 class="vitrine__titulo" id="vh-2"><i aria-hidden="true">2</i>NPS e comentário no mesmo recorte</h3>
+          <h3 class="vitrine__titulo" id="vh-2"><i aria-hidden="true">2</i>Nota e comentário no mesmo lugar</h3>
           <div class="vitrine__painel" id="vp-2">
             <p class="vitrine__texto">A nota e o comentário chegam juntos. Você enxerga onde a casa está ganhando ou perdendo.</p>
             <figure class="vitrine__tela"><img src="assets/img/painel/beneficio-feedbacks.webp" width="1476" height="1007" loading="lazy" alt="Lista de feedbacks do painel: cada resposta com a nota, o comentário do cliente, a unidade e etiquetas como elogio ou reclamação."></figure>
           </div>
         </div>
         <div class="vitrine__item">
-          <h3 class="vitrine__titulo" id="vh-3"><i aria-hidden="true">3</i>Ocorrências no Kanban</h3>
+          <h3 class="vitrine__titulo" id="vh-3"><i aria-hidden="true">3</i>Ocorrências num quadro de tarefas</h3>
           <div class="vitrine__painel" id="vp-3">
-            <p class="vitrine__texto">Cada ocorrência vira um card. A equipe trata, você acompanha.</p>
+            <p class="vitrine__texto">Cada reclamação vira um cartão no quadro (o Kanban), com responsável e prazo. A equipe trata, você acompanha.</p>
             <figure class="vitrine__tela"><img src="assets/img/painel/beneficio-kanban.webp" width="1476" height="1020" loading="lazy" alt="Kanban do painel com colunas por etapa (nova, visualizada, em andamento), cada card com a reclamação, a unidade, o prazo e o responsável."></figure>
           </div>
         </div>
@@ -192,9 +192,9 @@
       <span class="tag revelar">Como funciona</span>
       <h2 class="revelar" id="como-titulo">Em três passos, <em>sem complicação</em></h2>
       <ol class="passos">
-        <li class="passo revelar"><b aria-hidden="true">01</b><h3>Pergunte</h3><p>Envie a pesquisa NPS pelo canal que o cliente já usa. Rápido de montar, fácil de responder.</p></li>
+        <li class="passo revelar"><b aria-hidden="true">01</b><h3>Pergunte</h3><p>Imprima o QR Code na mesa ou mande o link por mensagem. O cliente responde pelo celular, sem baixar aplicativo.</p></li>
         <li class="passo revelar"><b aria-hidden="true">02</b><h3>Veja o que importa</h3><p>A nota e o comentário chegam no mesmo lugar. Você enxerga onde a casa está ganhando ou perdendo.</p></li>
-        <li class="passo revelar"><b aria-hidden="true">03</b><h3>Resolva no Kanban</h3><p>Cada ocorrência vira um card. A equipe trata, você acompanha — sem planilha, sem conversa perdida.</p></li>
+        <li class="passo revelar"><b aria-hidden="true">03</b><h3>Resolva no quadro de tarefas</h3><p>Cada reclamação vira um cartão com responsável e prazo. A equipe trata e você acompanha até resolver.</p></li>
       </ol>
     </div>
   </section>
@@ -411,12 +411,14 @@
       <span class="tag revelar">Dúvidas</span>
       <h2 class="revelar" id="duvidas-titulo">Perguntas <em>frequentes</em></h2>
       <div class="faq revelar">
-        <details><summary>O que o Opiina faz?</summary><p>Captura o NPS, mostra o que o cliente falou e organiza o atendimento num Kanban simples.</p></details>
-        <details><summary>Como a pesquisa chega no cliente?</summary><p>Você monta a pesquisa em poucos passos e envia em mais de um canal. A resposta volta direto pro painel.</p></details>
+        <details><summary>O que o Opiina faz?</summary><p>Mostra o que o cliente achou da visita (a nota e o comentário) e organiza o que precisa ser resolvido num quadro de tarefas, com responsável e prazo.</p></details>
+        <details><summary>O que é NPS?</summary><p>É uma nota que mostra o quanto o cliente recomendaria a sua casa. No Opiina a pergunta vai de 0 a 5: quem dá 5 é promotor, 4 é neutro e de 0 a 3 é detrator. O NPS é a porcentagem de promotores menos a de detratores.</p></details>
+        <details><summary>Como a pesquisa chega no cliente?</summary><p>Cada unidade tem o próprio link e QR Code. Imprima o QR Code para a mesa ou o balcão, ou mande o link por mensagem. O cliente responde pelo celular, sem baixar aplicativo, e a resposta cai direto no painel.</p></details>
+        <details><summary>Preciso instalar alguma coisa?</summary><p>Não. O painel abre no navegador, no endereço da sua empresa (sua-marca.opiina.com), no computador ou no celular.</p></details>
         <details><summary>Como funciona o pagamento?</summary><p>Você escolhe o plano, cria a conta e paga pela Stripe, numa página segura de pagamento. Depois de pago, é só entrar no painel.</p></details>
         <details><summary>Posso cancelar?</summary><p>Sim. Você pode cancelar em até 7 dias depois de contratar o plano.</p></details>
         <details><summary>Serve pra uma casa só ou pra rede?</summary><p>Os dois. Start e Pro são para uma unidade. Redes cobre todas as unidades, com métricas por casa.</p></details>
-        <details><summary>Preciso treinar a equipe toda?</summary><p>Não. O fluxo é o de sempre: pergunta, vê a nota, trata a ocorrência.</p></details>
+        <details><summary>Preciso treinar a equipe toda?</summary><p>Não. O fluxo é o de sempre: pergunta, vê a nota, trata a reclamação. E o painel tem uma central de ajuda com tutoriais passo a passo.</p></details>
       </div>
       <p class="fino faq__ajuda revelar">Ficou com alguma dúvida? <a href="https://wa.me/5585997604444?text=Ol%C3%A1!%20Vim%20pelo%20site%20do%20Opiina%20e%20quero%20tirar%20uma%20d%C3%BAvida." target="_blank" rel="noopener">Fale com a gente no WhatsApp</a></p>
     </div>
@@ -466,7 +468,7 @@
       <a href="contadores.html">Para contadores</a>
       <a href="https://wa.me/5585997604444?text=Ol%C3%A1!%20Vim%20pelo%20site%20do%20Opiina%20e%20quero%20tirar%20uma%20d%C3%BAvida." target="_blank" rel="noopener">WhatsApp (85) 99760-4444</a>
       <a href="painel/suporte.html">Suporte</a>
-      <a href="login.html">Entrar</a>
+      <a href="login.html">Já tenho conta</a>
     </nav>
     <p class="rodape__credito"><a href="https://devmais.com" target="_blank" rel="noopener" aria-label="Dev+" style="display:inline-flex"><img src="assets/img/devmais-logo-dark.svg" alt="Dev+" height="20"></a> Desenvolvido por <a href="https://devmais.com">Dev+</a> · <a href="mailto:atendimento@devmais.com">atendimento@devmais.com</a></p>
   </footer>

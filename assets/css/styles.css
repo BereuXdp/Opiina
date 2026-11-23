@@ -596,6 +596,15 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
   .vitrine__andamento span { width: 22px; height: 4px; border-radius: 2px; background: rgba(28, 123, 255, .18); transition: background .3s, width .3s; }
   .vitrine__andamento .ativo { width: 36px; background: var(--acento); }
   .vitrine--rolagem .vitrine__nota { grid-column: 1 / -1; margin-top: 0; }
+  /* "Pular esta parte": coluna da lista, na linha dos tracinhos */
+  .vitrine__pular {
+    grid-column: 1; grid-row: 2; justify-self: start;
+    display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 20px;
+    color: var(--link); font-size: 14px; font-weight: 600;
+  }
+  .vitrine__pular::after { content: "↓"; transition: transform var(--rapido); }
+  .vitrine__pular:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .vitrine__pular:hover::after { transform: translateY(2px); }
 }
 
 /* Como funciona */
