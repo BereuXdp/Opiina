@@ -362,6 +362,24 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 .cliente__nome { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
 .cliente__unidade { color: var(--mudo); font-size: 14px; }
 
+/* Depoimentos (2026-11-23; seção escondida até chegarem frases reais) */
+.depoimentos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 14px; margin-top: 40px; }
+.depoimento {
+  display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+  padding: 28px;
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  background: #fff;
+}
+.depoimento__frase { margin: 0; font-size: 17px; line-height: 1.55; }
+.depoimento__frase p::before { content: "“"; }
+.depoimento__frase p::after { content: "”"; }
+.depoimento__autor { display: flex; align-items: center; gap: 12px; }
+.depoimento__autor img { width: 48px; height: 48px; border-radius: 50%; box-shadow: 0 0 0 1px var(--linha); }
+.depoimento__autor span { display: grid; }
+.depoimento__autor strong { font-size: 15px; font-weight: 600; }
+.depoimento__autor small { color: var(--mudo); font-size: 14px; }
+
 /* Benefícios */
 .grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .card {
