@@ -451,11 +451,11 @@ voltarTopo.addEventListener('click', (evento) => {
   video.controls = false;
   play.hidden = false;
   play.addEventListener('click', () => {
-    play.hidden = true;
-    video.controls = true;
     video.play().catch(() => {});
     video.focus({ preventScroll: true });
   });
+  // Começou a tocar (pelo botão ou por outro caminho): some a capa e entram os controles
+  video.addEventListener('play', () => { play.hidden = true; video.controls = true; });
   video.addEventListener('ended', () => { video.controls = false; play.hidden = false; video.currentTime = 0; video.load(); });
 })();
 

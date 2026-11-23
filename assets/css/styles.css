@@ -339,6 +339,7 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
   background: linear-gradient(180deg, rgba(10, 26, 51, .05), rgba(10, 26, 51, .45));
   color: #fff; font: inherit;
 }
+.demo__play[hidden] { display: none; }   /* [hidden] perde para o display:flex da classe */
 .demo__play-icone {
   display: grid; place-items: center;
   width: 84px; height: 84px; border-radius: 50%;
