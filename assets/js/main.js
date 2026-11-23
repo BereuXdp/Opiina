@@ -349,8 +349,8 @@ voltarTopo.addEventListener('click', (evento) => {
 });
 
 // ---------- Carrossel de depoimentos (2026-11-23) ----------
-// Trilho com rolagem lateral (funciona sem JS). Aqui: setas, bolinhas e passagem automática a cada 6 s,
-// que para com mouse/foco/toque em cima, tem botão de pausa e não roda com movimento reduzido.
+// Trilho com rolagem lateral (funciona sem JS). Aqui: setas, bolinhas e passagem automática a cada 5 s,
+// que para com foco de teclado ou toque, tem botão de pausa e não roda com movimento reduzido.
 (() => {
   const carrossel = document.querySelector('[data-carrossel]');
   if (!carrossel) return;
@@ -418,7 +418,7 @@ voltarTopo.addEventListener('click', (evento) => {
   function rodar() {
     clearInterval(timer);
     if (reduzirMovimento || parado || pausadoPeloBotao || !naTela || document.hidden) return;
-    timer = setInterval(() => ir(atual() + 1), 6000);
+    timer = setInterval(() => ir(atual() + 1), 5000);
   }
   function reiniciar() { rodar(); }
   pausa.addEventListener('click', () => {
@@ -429,10 +429,13 @@ voltarTopo.addEventListener('click', (evento) => {
   });
   const parar = () => { parado = true; rodar(); };
   const seguir = () => { parado = false; rodar(); };
-  trilho.addEventListener('pointerenter', parar);
-  trilho.addEventListener('pointerleave', seguir);
-  trilho.addEventListener('touchstart', parar, { passive: true });
-  carrossel.addEventListener('focusin', parar);
+  // Mouse em cima NÃO para (pedido do cliente: "deixa passando automático"). O toque para enquanto o dedo
+  // arrasta e volta sozinho 4 s depois de soltar.
+  let voltaDoToque = 0;
+  trilho.addEventListener('touchstart', () => { clearTimeout(voltaDoToque); parar(); }, { passive: true });
+  trilho.addEventListener('touchend', () => { voltaDoToque = setTimeout(seguir, 4000); }, { passive: true });
+  // Só o foco de teclado pausa (clicar numa seta com o mouse também dá foco ao botão, e isso não deve parar)
+  carrossel.addEventListener('focusin', (e) => { if (e.target.matches(':focus-visible')) parar(); });
   carrossel.addEventListener('focusout', (e) => { if (!carrossel.contains(e.relatedTarget)) seguir(); });
   document.addEventListener('visibilitychange', rodar);
   new IntersectionObserver(([e]) => { naTela = e.isIntersecting; rodar(); }, { threshold: 0.4 }).observe(carrossel);
