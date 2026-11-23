@@ -10,7 +10,7 @@ document.querySelector('[data-s="data"]').textContent =
 
 if (plano) {
   document.querySelector('[data-texto]').textContent =
-    `Seu plano ${plano.nome} está ativo. O painel do Opiina já está liberado para você.`;
+    `Seu plano ${plano.nome} está liberado. Cancele dentro de 7 dias e não paga nada.`;
   document.querySelector('[data-s="plano"]').textContent = `${plano.nome} · ${plano.preco} por mês`;
   document.querySelector('[data-linha-plano]').hidden = false;
 
@@ -21,13 +21,13 @@ if (plano) {
   preco.append(el('small', '', '/mês'));
   resumo.append(preco);
   resumo.append(el('p', 'plano-resumo__desc', plano.desc));
-  resumo.append(el('p', 'plano-resumo__pilula', 'Pagamento confirmado'));
+  resumo.append(el('p', 'plano-resumo__pilula', '7 dias grátis ativos'));
   const lista = el('ul', 'login__lista');
   plano.itens.forEach((item) => lista.append(el('li', '', item)));
   resumo.append(lista);
 } else {
   resumo.append(el('p', 'plano-resumo__nome', 'Tudo pronto'));
-  resumo.append(el('p', 'plano-resumo__desc', 'Seu pagamento foi confirmado.'));
+  resumo.append(el('p', 'plano-resumo__desc', 'Seus 7 dias grátis começaram.'));
 }
 
 // Indicação de parceiro (2026-11-19): com o pagamento aprovado, a comissão do contador é liberada.

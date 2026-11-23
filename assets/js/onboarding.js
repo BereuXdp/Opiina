@@ -196,7 +196,7 @@ function mostrarSucesso() {
   const preencher = (chave, texto) => { sucesso.querySelector(`[data-s="${chave}"]`).textContent = texto; };
 
   const texto = sucesso.querySelector('[data-sucesso-texto]');
-  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Agora falta o pagamento do plano.`;
+  texto.textContent = `${nome ? `${nome}, a` : 'A'} conta${empresa ? ` de ${empresa}` : ''} no Opiina foi criada. Agora é só cadastrar o pagamento: os primeiros 7 dias são grátis.`;
   preencher('plano', `${plano.nome} · ${plano.preco} por mês`);
   preencher('endereco', endereco.textContent);
   // Protótipo: o botão simula a volta da Stripe com o pagamento aprovado.
