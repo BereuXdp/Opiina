@@ -105,20 +105,24 @@
 
   <!-- Demonstração: o momento em que o cliente responde -->
   <section class="sec" id="demo" aria-labelledby="demo-titulo">
-    <div class="sec__in demo">
+    <!-- Vídeo do produto (pedido do cliente, 2026-11-23): gravação de tela do painel de demonstração, com narração
+         (ElevenLabs) e legendas na imagem. Gerado por tools/video-tela.mjs; versão web em assets/video/. Só carrega no play. -->
+    <div class="sec__in demo demo--video">
       <div class="demo__texto">
         <span class="tag revelar">Na prática</span>
         <h2 class="revelar" id="demo-titulo">Uma pergunta, <em>uma nota</em>, um comentário</h2>
-        <p class="sub revelar">Envie a pesquisa NPS pelo canal que o cliente já usa. Rápido de montar, fácil de responder — e a resposta volta pro painel.</p>
+        <p class="sub revelar">Envie a pesquisa NPS pelo canal que o cliente já usa. Rápido de montar, fácil de responder — e a resposta volta pro painel. Veja o Opiina funcionando:</p>
       </div>
       <div class="demo__visual revelar">
-        <figure class="demo__foto">
-          <img src="assets/img/hero-cliente-1024.jpg"
-               srcset="assets/img/hero-cliente-640.jpg 640w, assets/img/hero-cliente-1024.jpg 1024w, assets/img/hero-cliente-1448.jpg 1448w"
-               sizes="(min-width: 1024px) 620px, 100vw"
-               width="1448" height="1086" loading="lazy"
-               alt="Cliente sentada à mesa de um café, respondendo a uma pesquisa no celular depois da refeição.">
-        </figure>
+        <div class="demo__video" data-video>
+          <video src="assets/video/opiina-demo.mp4" poster="assets/video/opiina-demo-capa.webp" width="1280" height="720"
+                 preload="none" playsinline controls aria-label="Vídeo: o Opiina funcionando, com narração e legendas"></video>
+          <button class="demo__play" type="button" data-video-play hidden>
+            <span class="demo__play-icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
+            <span class="demo__play-texto">Ver o Opiina funcionando <small>1min20 · com som e legendas</small></span>
+          </button>
+        </div>
+        <p class="demo__nota">Telas do painel do Opiina com dados de exemplo.</p>
       </div>
     </div>
   </section>

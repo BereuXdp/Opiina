@@ -321,6 +321,45 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 .demo__foto { overflow: hidden; border-radius: 22px; background: var(--bg-suave); }
 .demo__foto img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 
+/* Na prática com vídeo (2026-11-23): uma coluna, texto em cima e o vídeo largo embaixo (gravação de tela precisa de largura) */
+.demo--video { grid-template-columns: 1fr; gap: 40px; }
+.demo--video .demo__texto { max-width: 760px; }
+.demo__video {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  background: #0A1A33;
+  box-shadow: 0 40px 90px -40px rgba(20, 60, 140, .55), 0 0 0 1px var(--linha);
+}
+.demo__video video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.demo__play {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+  padding: 0; border: 0; cursor: pointer;
+  background: linear-gradient(180deg, rgba(10, 26, 51, .05), rgba(10, 26, 51, .45));
+  color: #fff; font: inherit;
+}
+.demo__play-icone {
+  display: grid; place-items: center;
+  width: 84px; height: 84px; border-radius: 50%;
+  background: var(--grad);
+  box-shadow: 0 16px 40px -12px rgba(28, 123, 255, .8);
+  transition: transform .3s var(--suave);
+}
+.demo__play-icone svg { width: 34px; height: 34px; margin-left: 4px; fill: #fff; }
+.demo__play:hover .demo__play-icone { transform: scale(1.08); }
+.demo__play:focus-visible { outline: 3px solid var(--acento); outline-offset: -6px; border-radius: 22px; }
+.demo__play-texto { display: grid; gap: 4px; padding: 10px 18px; border-radius: 12px; background: rgba(10, 26, 51, .72); font-size: 18px; font-weight: 600; text-align: center; }
+.demo__play-texto small { font-size: 14px; font-weight: 500; opacity: .85; }
+.demo__nota { margin-top: 14px; color: var(--mudo); font-size: 14px; }
+@media (max-width: 560px) {
+  .demo__video { border-radius: 14px; }
+  .demo__play-icone { width: 64px; height: 64px; }
+  .demo__play-icone svg { width: 26px; height: 26px; }
+  .demo__play-texto { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .demo__play-icone { transition: none; } }
+
 
 /* Canal de denúncias */
 .denuncia { display: grid; grid-template-columns: 5fr 6fr; align-items: center; gap: 56px; }

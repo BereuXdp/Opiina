@@ -441,5 +441,23 @@ voltarTopo.addEventListener('click', (evento) => {
   new IntersectionObserver(([e]) => { naTela = e.isIntersecting; rodar(); }, { threshold: 0.4 }).observe(carrossel);
 })();
 
+// ---------- Vídeo da seção "Na prática" (2026-11-23) ----------
+// Sem JS: vídeo com os controles do navegador. Com JS: capa com um botão grande de play; ao tocar, os controles voltam.
+(() => {
+  const caixa = document.querySelector('[data-video]');
+  if (!caixa) return;
+  const video = caixa.querySelector('video');
+  const play = caixa.querySelector('[data-video-play]');
+  video.controls = false;
+  play.hidden = false;
+  play.addEventListener('click', () => {
+    play.hidden = true;
+    video.controls = true;
+    video.play().catch(() => {});
+    video.focus({ preventScroll: true });
+  });
+  video.addEventListener('ended', () => { video.controls = false; play.hidden = false; video.currentTime = 0; video.load(); });
+})();
+
 // ---------- Ano no rodapé ----------
 document.querySelector('[data-ano]').textContent = new Date().getFullYear();
