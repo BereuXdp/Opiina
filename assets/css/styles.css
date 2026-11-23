@@ -645,6 +645,20 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 
 /* Planos */
 .planos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: stretch; margin-top: 10px; }
+/* "Em todos os planos" (2026-11-23): as funções ficam aqui uma vez; os cards mostram só unidades e usuários */
+.planos__inclui { margin: -12px 0 24px; padding: 22px 26px; border: 1px solid var(--linha); border-radius: 14px; background: var(--bg-suave); }
+.planos__inclui-titulo { margin-bottom: 12px; color: var(--link); font-size: 13px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.planos__inclui ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 24px; }
+.planos__inclui li { position: relative; padding-left: 28px; color: var(--texto); font-size: 15px; font-weight: 500; }
+.planos__inclui li::before {
+  content: ""; position: absolute; left: 0; top: .2em;
+  width: 18px; height: 18px; border-radius: 50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E"), var(--grad);
+  background-size: 11px, 100%; background-position: center; background-repeat: no-repeat;
+}
+.plano li strong { color: var(--texto); font-weight: 700; }
+@media (max-width: 900px) { .planos__inclui ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .planos__inclui { padding: 20px; } .planos__inclui ul { grid-template-columns: 1fr; } }
 .plano {
   display: flex; flex-direction: column;
   padding: 28px;

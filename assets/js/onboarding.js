@@ -30,7 +30,7 @@ function montarResumo() {
   if (!plano) {
     resumo.append(el('p', 'plano-resumo__rotulo', 'Plano'));
     resumo.append(el('p', 'plano-resumo__nome', 'Escolha seu plano'));
-    resumo.append(el('p', 'plano-resumo__desc', 'Start e Pro para uma unidade. Redes para todas as suas unidades.'));
+    resumo.append(el('p', 'plano-resumo__desc', 'Todos os planos têm todas as funções. Muda o número de unidades e de usuários.'));
     resumo.append(trocar);
     return;
   }
