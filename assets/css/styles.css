@@ -363,8 +363,23 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 .cliente__unidade { color: var(--mudo); font-size: 14px; }
 
 /* Depoimentos (2026-11-23; seção escondida até chegarem frases reais) */
-.depoimentos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 14px; margin-top: 40px; }
+/* Carrossel: trilho com rolagem lateral e encaixe. 2 cards por vez no computador, 1 (com o próximo aparecendo) no celular */
+.carrossel { margin-top: 40px; }
+.depoimentos {
+  position: relative;
+  display: flex; gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+.depoimentos::-webkit-scrollbar { display: none; }
+.depoimentos:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; border-radius: 14px; }
+@media (prefers-reduced-motion: no-preference) { .depoimentos { scroll-behavior: smooth; } }
 .depoimento {
+  flex: 0 0 calc((100% - 14px) / 2);
+  scroll-snap-align: start;
   display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
   padding: 28px;
   border: 1px solid var(--linha);
@@ -379,6 +394,40 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 .depoimento__autor span { display: grid; }
 .depoimento__autor strong { font-size: 15px; font-weight: 600; }
 .depoimento__autor small { color: var(--mudo); font-size: 14px; }
+@media (max-width: 900px) { .depoimento { flex-basis: 78%; } }
+@media (max-width: 560px) { .depoimento { flex-basis: 86%; padding: 24px; } }
+
+.carrossel__controles { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 24px; }
+.carrossel__botao {
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  border: 1px solid var(--linha);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--texto);
+  cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.carrossel__botao:hover { border-color: var(--acento); color: var(--link); }
+.carrossel__botao:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
+.carrossel__botao svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.carrossel__pausa { margin-left: 8px; }
+.carrossel__pausa .icone-tocar { fill: currentColor; stroke: none; }
+.carrossel__pausa .icone-tocar, .carrossel__pausa[aria-pressed="true"] .icone-pausa { display: none; }
+.carrossel__pausa[aria-pressed="true"] .icone-tocar { display: block; }
+.carrossel__pontos { display: flex; }
+.carrossel__ponto {
+  display: grid; place-items: center;
+  width: 28px; height: 44px;
+  padding: 0; border: 0; background: none; cursor: pointer;
+}
+.carrossel__ponto::before {
+  content: ""; width: 8px; height: 8px; border-radius: 99px;
+  background: rgba(20, 60, 140, .25);
+  transition: width .25s, background .25s;
+}
+.carrossel__ponto[aria-current="true"]::before { width: 22px; background: var(--grad); }
+.carrossel__ponto:focus-visible { outline: 3px solid var(--acento); outline-offset: -6px; border-radius: 8px; }
 
 /* Benefícios */
 .grade { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }

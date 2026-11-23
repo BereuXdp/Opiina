@@ -348,5 +348,95 @@ voltarTopo.addEventListener('click', (evento) => {
   document.getElementById('hero-titulo').focus({ preventScroll: true });
 });
 
+// ---------- Carrossel de depoimentos (2026-11-23) ----------
+// Trilho com rolagem lateral (funciona sem JS). Aqui: setas, bolinhas e passagem automática a cada 6 s,
+// que para com mouse/foco/toque em cima, tem botão de pausa e não roda com movimento reduzido.
+(() => {
+  const carrossel = document.querySelector('[data-carrossel]');
+  if (!carrossel) return;
+  const trilho = carrossel.querySelector('[data-carrossel-trilho]');
+  const slides = [...trilho.children];
+  const controles = carrossel.querySelector('[data-carrossel-controles]');
+  const caixaPontos = carrossel.querySelector('[data-carrossel-pontos]');
+  const pausa = carrossel.querySelector('[data-carrossel-pausa]');
+  let paginas = [];
+  let pontos = [];
+  let timer = 0;
+  let parado = false;          // mouse, foco ou toque em cima
+  let pausadoPeloBotao = false;
+  let naTela = false;
+
+  // Posições onde o trilho pode parar (com 2 cards por vez, o último card não vira uma página própria)
+  function medir() {
+    const maximo = trilho.scrollWidth - trilho.clientWidth;
+    paginas = [];
+    slides.forEach((slide) => {
+      const pos = Math.min(slide.offsetLeft, maximo);
+      if (!paginas.some((p) => Math.abs(p - pos) < 4)) paginas.push(pos);
+    });
+    caixaPontos.replaceChildren();
+    pontos = paginas.map((_, i) => {
+      const ponto = document.createElement('button');
+      ponto.type = 'button';
+      ponto.className = 'carrossel__ponto';
+      ponto.setAttribute('aria-label', `Ir para o depoimento ${i + 1}`);
+      ponto.addEventListener('click', () => { ir(i); reiniciar(); });
+      caixaPontos.append(ponto);
+      return ponto;
+    });
+    marcar();
+  }
+  function atual() {
+    let melhor = 0;
+    paginas.forEach((p, i) => { if (Math.abs(p - trilho.scrollLeft) < Math.abs(paginas[melhor] - trilho.scrollLeft)) melhor = i; });
+    return melhor;
+  }
+  function marcar() {
+    const i = atual();
+    pontos.forEach((p, k) => p.setAttribute('aria-current', String(k === i)));
+  }
+  function ir(i) {
+    const n = paginas.length;
+    trilho.scrollTo({ left: paginas[((i % n) + n) % n], behavior: reduzirMovimento ? 'auto' : 'smooth' });
+  }
+
+  carrossel.querySelector('[data-carrossel-anterior]').addEventListener('click', () => { ir(atual() - 1); reiniciar(); });
+  carrossel.querySelector('[data-carrossel-proximo]').addEventListener('click', () => { ir(atual() + 1); reiniciar(); });
+  let quadro = 0;
+  trilho.addEventListener('scroll', () => {
+    cancelAnimationFrame(quadro);
+    quadro = requestAnimationFrame(marcar);
+  }, { passive: true });
+  window.addEventListener('resize', medir);
+  controles.hidden = false;
+  medir();
+
+  // Passagem automática
+  if (reduzirMovimento) return;
+  pausa.hidden = false;
+  pausa.setAttribute('aria-pressed', 'false');
+  function rodar() {
+    clearInterval(timer);
+    if (reduzirMovimento || parado || pausadoPeloBotao || !naTela || document.hidden) return;
+    timer = setInterval(() => ir(atual() + 1), 6000);
+  }
+  function reiniciar() { rodar(); }
+  pausa.addEventListener('click', () => {
+    pausadoPeloBotao = !pausadoPeloBotao;
+    pausa.setAttribute('aria-pressed', String(pausadoPeloBotao));
+    pausa.setAttribute('aria-label', pausadoPeloBotao ? 'Retomar a passagem automática' : 'Pausar a passagem automática');
+    rodar();
+  });
+  const parar = () => { parado = true; rodar(); };
+  const seguir = () => { parado = false; rodar(); };
+  trilho.addEventListener('pointerenter', parar);
+  trilho.addEventListener('pointerleave', seguir);
+  trilho.addEventListener('touchstart', parar, { passive: true });
+  carrossel.addEventListener('focusin', parar);
+  carrossel.addEventListener('focusout', (e) => { if (!carrossel.contains(e.relatedTarget)) seguir(); });
+  document.addEventListener('visibilitychange', rodar);
+  new IntersectionObserver(([e]) => { naTela = e.isIntersecting; rodar(); }, { threshold: 0.4 }).observe(carrossel);
+})();
+
 // ---------- Ano no rodapé ----------
 document.querySelector('[data-ano]').textContent = new Date().getFullYear();
