@@ -339,7 +339,20 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
   background: linear-gradient(180deg, rgba(10, 26, 51, .05), rgba(10, 26, 51, .45));
   color: #fff; font: inherit;
 }
-.demo__play[hidden] { display: none; }   /* [hidden] perde para o display:flex da classe */
+.demo__play[hidden], .demo__tela[hidden] { display: none; }   /* [hidden] perde para o display da classe */
+.demo__tela {
+  position: absolute; top: 12px; right: 12px; z-index: 2;
+  display: grid; place-items: center;
+  width: 44px; height: 44px; padding: 0;
+  border: 0; border-radius: 10px; cursor: pointer;
+  background: rgba(10, 26, 51, .72); color: #fff;
+}
+.demo__tela svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.demo__tela:hover { background: rgba(10, 26, 51, .9); }
+.demo__tela:focus-visible { outline: 3px solid var(--acento); outline-offset: 3px; }
+/* Em tela cheia, o vídeo ocupa a tela inteira e mantém a proporção */
+.demo__video:fullscreen, .demo__video:-webkit-full-screen { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 0; box-shadow: none; }
+.demo__video:fullscreen video, .demo__video:-webkit-full-screen video { width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; }
 .demo__play-icone {
   display: grid; place-items: center;
   width: 84px; height: 84px; border-radius: 50%;

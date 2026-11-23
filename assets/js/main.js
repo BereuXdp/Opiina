@@ -460,7 +460,17 @@ voltarTopo.addEventListener('click', (evento) => {
     video.focus({ preventScroll: true });
   });
   // Começou a tocar (pelo botão ou por outro caminho): some a capa e entram os controles
-  video.addEventListener('play', () => { play.hidden = true; video.controls = true; });
+  video.addEventListener('play', () => { play.hidden = true; video.controls = true; tela.hidden = false; });
+
+  // Tela cheia: pede a tela cheia do bloco (funciona nos navegadores comuns); no iPhone, usa a do próprio vídeo
+  const tela = caixa.querySelector('[data-video-tela]');
+  const telaCheiaNoIphone = () => { if (video.webkitEnterFullscreen) video.webkitEnterFullscreen(); };
+  tela.addEventListener('click', () => {
+    if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return; }
+    if (caixa.requestFullscreen) caixa.requestFullscreen().catch(telaCheiaNoIphone);
+    else if (caixa.webkitRequestFullscreen) caixa.webkitRequestFullscreen();
+    else telaCheiaNoIphone();
+  });
   video.addEventListener('ended', () => { video.controls = false; play.hidden = false; video.currentTime = 0; video.load(); });
 })();
 

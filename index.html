@@ -116,7 +116,11 @@
       <div class="demo__visual revelar">
         <div class="demo__video" data-video>
           <video src="assets/video/opiina-demo.mp4" poster="assets/video/opiina-demo-capa.webp" width="1280" height="720"
-                 preload="none" playsinline controls aria-label="Vídeo: o Opiina funcionando, com narração e legendas"></video>
+                 preload="none" playsinline controls controlslist="nofullscreen" aria-label="Vídeo: o Opiina funcionando, com narração e legendas"></video>
+          <!-- Tela cheia própria (2026-11-23): o botão nativo do vídeo nem sempre expande; este pede a tela cheia do bloco inteiro. -->
+          <button class="demo__tela" type="button" data-video-tela hidden aria-label="Expandir o vídeo para tela cheia">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+          </button>
           <button class="demo__play" type="button" data-video-play hidden>
             <span class="demo__play-icone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span>
             <span class="demo__play-texto">Ver o Opiina funcionando <small>48 segundos · com som e legendas</small></span>
