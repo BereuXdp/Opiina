@@ -279,6 +279,10 @@ h1 em, h2 em {
 .fino { margin-top: 18px; color: var(--mudo); font-size: 14px; }
 .fino a { color: var(--link); font-weight: 600; }
 .fino a:hover { text-decoration: underline; text-underline-offset: 3px; }
+/* Convite para conversar no WhatsApp, logo abaixo dos planos e das dúvidas (2026-11-23) */
+.planos__ajuda, .faq__ajuda { font-size: 16px; }
+.planos__ajuda { margin-top: 28px; text-align: center; }
+.faq__ajuda { margin-top: 24px; }
 
 /* Faixa de fatos (só informações verificadas) */
 .fatos {
