@@ -737,6 +737,7 @@ h3 { font-weight: 600; letter-spacing: -.02em; }
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq summary:hover { color: var(--link); }
 .faq details p { max-width: 640px; padding-bottom: 22px; color: #4B5B78; line-height: 1.6; }
+.faq details p a { color: var(--link); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 /* Para contadores (acesso à contadores.html, 2026-11-19) */
 .sec--contadores { padding-bottom: 0; }
