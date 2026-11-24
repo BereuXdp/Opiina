@@ -282,6 +282,18 @@ h1 em, h2 em {
 /* Convite para conversar no WhatsApp, logo abaixo dos planos e das dúvidas (2026-11-23) */
 .planos__ajuda, .faq__ajuda { font-size: 16px; }
 .planos__ajuda { margin-top: 28px; text-align: center; }
+/* Garantia (2026-11-23): logo abaixo dos cards, antes do convite para o WhatsApp */
+.planos__garantia {
+  max-width: 720px; margin: 28px auto 0; padding: 14px 20px;
+  line-height: 1.5;
+  border: 1px solid rgba(22, 128, 61, .25); border-radius: 14px;
+  background: #F0FBF4; color: var(--texto); font-size: 15px; text-align: center;
+}
+.planos__garantia::before {
+  content: ""; display: inline-block; width: 20px; height: 20px; margin-right: 8px; vertical-align: -4px; border-radius: 50%;
+  background: #16803D url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / 13px no-repeat;
+}
+.planos__garantia + .planos__ajuda { margin-top: 16px; }
 .faq__ajuda { margin-top: 24px; }
 
 /* Faixa de fatos (só informações verificadas) */
