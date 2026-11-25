@@ -786,7 +786,16 @@ function lerAvaliacoesEstado() {
   try { s = JSON.parse(localStorage.getItem(CHAVE_AV)); } catch { /* usa o inicial */ }
   if (!s?.atualizadoEm) {
     const inicio = Date.now() - 47 * 60e3;   // igual ao começo da aba Avaliações
-    s = { atualizadoEm: inicio, porPlataforma: { google: inicio, ifood: inicio }, conexoes: structuredClone(D.conexoes), extras: [] };
+    s = { atualizadoEm: inicio, porPlataforma: { google: inicio, ifood: inicio, tripadvisor: inicio }, conexoes: structuredClone(D.conexoes), extras: [], tripadvisorDemo: true };
+  }
+  // Estados de antes de 2026-11-25 tinham o Tripadvisor desconectado: liga uma vez as páginas de exemplo (igual a avaliacoes.js)
+  if (!s.tripadvisorDemo) {
+    s.tripadvisorDemo = true;
+    if (!Object.keys(s.conexoes?.tripadvisor || {}).length) {
+      s.conexoes = { ...s.conexoes, tripadvisor: structuredClone(D.conexoes.tripadvisor) };
+      if (s.contas) s.contas.tripadvisor = Object.entries(D.conexoes.tripadvisor).map(([u, link], i) => ({ id: `t-${i}`, nome: link, unidades: [u] }));
+      s.porPlataforma = { ...s.porPlataforma, tripadvisor: s.atualizadoEm };
+    }
   }
   // Estados antigos (sem contas): cada plataforma vira uma conta com as unidades que já estavam ligadas
   if (!s.contas) {

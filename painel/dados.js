@@ -312,7 +312,12 @@ window.OPIINA_DEMO = {
   conexoes: {
     google:      { 'Centro': 'Casa Exemplo – Centro', 'Shopping Norte': 'Casa Exemplo – Shopping Norte' },
     ifood:       { 'Centro': 'Casa Exemplo Centro', 'Orla': 'Casa Exemplo Orla' },   // lojas autorizadas no Portal do Parceiro
-    tripadvisor: {},
+    // Tripadvisor conectado também (cliente, 2026-11-25: "tá faltando a avaliação do Tripadvisor"; no app real ele está ligado).
+    // No Tripadvisor a conexão é a página da unidade (um link por unidade).
+    tripadvisor: {
+      'Orla': 'https://www.tripadvisor.com.br/Restaurant_Review-casa-exemplo-orla',
+      'Centro': 'https://www.tripadvisor.com.br/Restaurant_Review-casa-exemplo-centro',
+    },
   },
   // Avaliações já guardadas no cache. dias: negativo = há N dias; nota de 1 a 5; resposta = resposta da casa na plataforma.
   avaliacoes: [
@@ -336,7 +341,19 @@ window.OPIINA_DEMO = {
     { id: 'i-207', plataforma: 'ifood', unidade: 'Orla', nota: 1, dias: -9, hora: '20:15', autor: 'Cliente iFood', texto: 'Pedido veio trocado e o restaurante não atendeu o telefone.' },
     { id: 'i-208', plataforma: 'ifood', unidade: 'Centro', nota: 4, dias: -13, hora: '12:44', autor: 'Cliente iFood', texto: 'Bom, peço sempre.' },
     { id: 'i-209', plataforma: 'ifood', unidade: 'Orla', nota: 5, dias: -20, hora: '19:20', autor: 'Cliente iFood', texto: 'Entrega rápida.' },
+    { id: 't-301', plataforma: 'tripadvisor', unidade: 'Orla', nota: 5, dias: 0, hora: '09:40', autor: 'Viajante de SP', titulo: 'Pôr do sol imperdível', texto: 'Ótima vista e peixe fresco. Chegamos cedo e pegamos mesa na varanda. Recomendo.' },
+    { id: 't-302', plataforma: 'tripadvisor', unidade: 'Centro', nota: 4, dias: -2, hora: '22:10', autor: 'Ana_Rio', titulo: 'Boa comida caseira', texto: 'Feijoada muito boa e garçons atenciosos. Só o preço da sobremesa que achei alto.', resposta: 'Obrigado, Ana! Vamos rever os preços das sobremesas.' },
+    { id: 't-303', plataforma: 'tripadvisor', unidade: 'Orla', nota: 2, dias: -5, hora: '15:30', autor: 'Turista 2026', titulo: 'Demora no fim de semana', texto: 'Esperamos quase uma hora pelo prato num sábado. A comida estava boa, mas o serviço não deu conta do movimento.' },
+    { id: 't-304', plataforma: 'tripadvisor', unidade: 'Centro', nota: 5, dias: -10, hora: '13:05', autor: 'Marcelo F.', titulo: 'Almoço executivo excelente', texto: 'Rápido, bem servido e com preço justo. Volto sempre que trabalho na região.' },
+    { id: 't-305', plataforma: 'tripadvisor', unidade: 'Orla', nota: 4, dias: -17, hora: '20:45', autor: 'Família Souza', titulo: 'Bom para ir com crianças', texto: 'Espaço amplo e cardápio infantil. A música ao vivo estava um pouco alta.' },
   ],
+  // Resumo que o próprio Google faz das avaliações de cada unidade (no app: "Resumo feito com o Gemini · Google Maps",
+  // bloco "O que dizem no Google", visto no painel real em 2026-11-25). nota/total: nota geral da unidade no Google.
+  // texto vazio: o Google ainda não tem resumo da unidade. Fictício.
+  resumosGoogle: {
+    'Centro': { nota: 4.6, total: 1284, texto: 'Os frequentadores elogiam a comida caseira, com destaque para a feijoada e o prato do dia, e dizem que as porções são bem servidas. O atendimento é descrito como rápido e simpático, mesmo na hora do almoço. Alguns comentam que o salão fica cheio e barulhento nos horários de pico, mas que a espera costuma ser curta.' },
+    'Shopping Norte': { nota: 4.2, total: 37, texto: '' },
+  },
   // Avaliações que "chegam" quando o cache é atualizado na demonstração (simulam o que a plataforma devolveria)
   avaliacoesNovas: [
     { id: 'g-120', plataforma: 'google', unidade: 'Centro', nota: 5, autor: 'Patrícia O.', texto: 'Atendimento impecável, voltaremos com a família.' },
@@ -344,6 +361,7 @@ window.OPIINA_DEMO = {
     { id: 'g-121', plataforma: 'google', unidade: 'Shopping Norte', nota: 4, autor: 'Diego M.', texto: 'Gostei do almoço executivo.' },
     { id: 'i-221', plataforma: 'ifood', unidade: 'Centro', nota: 5, autor: 'Cliente iFood', texto: '' },
     { id: 'g-122', plataforma: 'google', unidade: 'Centro', nota: 2, autor: 'Renata B.', texto: 'Fila grande na hora do almoço e ninguém organizando.' },
+    { id: 't-320', plataforma: 'tripadvisor', unidade: 'Orla', nota: 5, autor: 'Carla_BH', titulo: 'Moqueca perfeita', texto: 'Melhor moqueca que comi na viagem. Atendimento simpático.' },
   ],
   // Exemplos que aparecem quando a pessoa conecta uma plataforma ainda não conectada (demonstração)
   avaliacoesAoConectar: {

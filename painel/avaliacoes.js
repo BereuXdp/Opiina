@@ -20,15 +20,30 @@ function avInstante(a) {
   return Math.min(d.getTime(), Date.now() - 60e3);   // "hoje" nunca no futuro
 }
 
+// Estados guardados antes de 2026-11-25 tinham o Tripadvisor desconectado: liga uma vez as páginas de exemplo
+// (depois disso, se a pessoa remover em Configurações, fica removido). Mesma regra em configuracoes.js.
+function avLigarTripadvisor(s) {
+  if (s.tripadvisorDemo) return s;
+  s.tripadvisorDemo = true;
+  if (!Object.keys(s.conexoes?.tripadvisor || {}).length) {
+    s.conexoes = { ...s.conexoes, tripadvisor: structuredClone(D.conexoes.tripadvisor) };
+    if (s.contas) s.contas.tripadvisor = Object.entries(D.conexoes.tripadvisor).map(([u, link], i) => ({ id: `t-${i}`, nome: link, unidades: [u] }));
+    s.porPlataforma = { ...s.porPlataforma, tripadvisor: s.atualizadoEm };
+  }
+  try { localStorage.setItem('opiina-demo-avaliacoes', JSON.stringify(s)); } catch { /* vale só nesta página */ }
+  return s;
+}
+
 // ----- Estado guardado (o "cache" da demonstração) -----
 const av = (() => {
   let salvo = null;
   try { salvo = JSON.parse(localStorage.getItem(AV_CHAVE)); } catch { /* sem armazenamento */ }
-  if (salvo?.atualizadoEm) return salvo;
+  if (salvo?.atualizadoEm) return avLigarTripadvisor(salvo);
   const inicio = Date.now() - 47 * 60e3;   // a demonstração começa com o cache atualizado há 47 min
   return {
     atualizadoEm: inicio,
-    porPlataforma: { google: inicio, ifood: inicio },
+    porPlataforma: { google: inicio, ifood: inicio, tripadvisor: inicio },
+    tripadvisorDemo: true,
     conexoes: structuredClone(D.conexoes),
     extras: [],          // avaliações que chegaram nas atualizações da demonstração
   };
@@ -76,6 +91,25 @@ function avNotaHtml(a) {
 }
 const avSelo = (plat) => `<span class="av-sigla" style="--cor:${AV_PLAT[plat].cor}" aria-hidden="true">${AV_PLAT[plat].sigla}</span>`;
 
+// Estrelas de uma média (preenche a fração da última estrela)
+function avEstrelasMedia(m) {
+  return `<span class="av-estrelas av-estrelas--media" role="img" aria-label="Nota média ${avNum(m)} de 5">${[1, 2, 3, 4, 5]
+    .map((i) => `<i style="--p:${Math.round(Math.max(0, Math.min(1, m - (i - 1))) * 100)}%" aria-hidden="true"></i>`).join('')}</span>`;
+}
+const avHora = (ms) => new Date(ms).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+// Título do grupo do dia na lista: Hoje · Ontem · "sábado, 22/11" (até 6 dias) · "15/11"
+function avDia(ms) {
+  const d = new Date(ms);
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const dia = new Date(d); dia.setHours(0, 0, 0, 0);
+  const dif = Math.round((hoje - dia) / 864e5);
+  if (dif === 0) return 'Hoje';
+  if (dif === 1) return 'Ontem';
+  const semana = d.toLocaleDateString('pt-BR', { weekday: 'long' });
+  return dif < 7 ? `${semana[0].toUpperCase()}${semana.slice(1)}, ${dataCurta(d)}` : dataCurta(d);
+}
+const avPlural = (n, um, varios) => `${n} ${n === 1 ? um : varios}`;
+
 if ($('[data-avaliacoes]')) iniciarAvaliacoes();
 
 function iniciarAvaliacoes() {
@@ -84,37 +118,38 @@ function iniciarAvaliacoes() {
   const params = new URLSearchParams(location.search);
   const estado = { ...padrao };
   Object.keys(padrao).forEach((k) => { if (params.get(k)) estado[k] = params.get(k); });
-  D.plataformas.filter((p) => !p.emAnalise).forEach((p) => form.plataforma.add(new Option(p.nome, p.id)));
+  // Plataforma em abas (rádios): Todas + só as conectadas, com a contagem
+  const abas = D.plataformas.filter((p) => !p.emAnalise && avPlatConectada(p.id));
+  if (estado.plataforma !== 'todas' && !abas.some((p) => p.id === estado.plataforma)) estado.plataforma = 'todas';
+  $('[data-av-chips]').insertAdjacentHTML('beforeend', [
+    `<label class="av-aba"><input type="radio" name="plataforma" value="todas">Todas <b data-av-qtd="todas"></b></label>`,
+    ...abas.map((p) => `<label class="av-aba"><input type="radio" name="plataforma" value="${p.id}">${p.nome} <b data-av-qtd="${p.id}"></b></label>`),
+  ].join(''));
   D.unidades.forEach((u) => form.unidade.add(new Option(u, u)));
-  Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
+  const preencherForm = () => Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
+  preencherForm();
   let mostrando = AV_POR_PAGINA;
   let atualizando = false;
 
-  // ----- Barra do cache -----
+  // ----- Status do cache (ao lado do título) -----
   function desenharCache() {
     const proxima = av.atualizadoEm + AV_INTERVALO;
     const liberaEm = av.atualizadoEm + AV_ESPERA;
     const espera = Date.now() < liberaEm;
     $('[data-av-cache]').innerHTML = `
-      <span class="av-cache__icone" aria-hidden="true">${icone(atualizando ? 'relogio' : 'ok')}</span>
-      <div class="av-cache__texto">
-        <p><strong>${atualizando ? 'Buscando avaliações novas…' : `Atualizado ${avQuando(av.atualizadoEm)}`}</strong>${atualizando ? '' : ` <span>(${avHa(av.atualizadoEm)})</span>`}</p>
-        <p class="av-cache__sub">As avaliações ficam guardadas e se atualizam sozinhas: Google e iFood a cada 6 horas, Tripadvisor uma vez por dia. Próxima atualização: ${avQuando(proxima)}.</p>
-      </div>
-      <div class="av-cache__acao">
-        <button class="btn btn--secundario" type="button" data-av-atualizar${atualizando || espera ? ' disabled' : ''}${espera && !atualizando ? ` aria-describedby="av-espera"` : ''}>${atualizando ? 'Atualizando…' : 'Atualizar agora'}</button>
-        ${espera && !atualizando ? `<span class="av-cache__espera" id="av-espera">Pode atualizar de novo às ${new Date(liberaEm).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>` : ''}
-      </div>
-      <p class="av-cache__demo">Protótipo: <button type="button" class="teste-simular" data-av-vencer>simular 6 horas sem atualizar</button></p>`;
+      <p class="av-sinc__texto"><span class="av-sinc__ponto${atualizando ? ' av-sinc__ponto--busca' : ''}" aria-hidden="true"></span>
+        ${atualizando ? 'Buscando avaliações novas…' : `Atualizado ${avHa(av.atualizadoEm)} <span class="av-sinc__sub">· próxima ${avQuando(proxima)}</span>`}</p>
+      <button class="btn btn--secundario av-sinc__btn" type="button" data-av-atualizar${atualizando || espera ? ' disabled' : ''}${espera && !atualizando ? ` aria-describedby="av-espera"` : ''}>${atualizando ? 'Atualizando…' : 'Atualizar agora'}</button>
+      ${espera && !atualizando ? `<span class="av-sinc__espera" id="av-espera">Pode atualizar de novo às ${avHora(liberaEm)}</span>` : ''}`;
     $('[data-av-atualizar]').addEventListener('click', () => atualizar(false));
-    $('[data-av-vencer]').addEventListener('click', () => {
-      const atras = AV_INTERVALO + 60e3;
-      av.atualizadoEm -= atras;
-      Object.keys(av.porPlataforma).forEach((id) => { av.porPlataforma[id] -= atras; });
-      avSalvar();
-      location.reload();
-    });
   }
+  $('[data-av-vencer]').addEventListener('click', () => {
+    const atras = AV_INTERVALO + 60e3;
+    av.atualizadoEm -= atras;
+    Object.keys(av.porPlataforma).forEach((id) => { av.porPlataforma[id] -= atras; });
+    avSalvar();
+    location.reload();
+  });
 
   // Busca nas plataformas conectadas (simulada): traz as avaliações que ainda não estavam no cache
   function atualizar(automatica) {
@@ -155,36 +190,13 @@ function iniciarAvaliacoes() {
   // A cada minuto, os textos "há X min" e o botão (que libera depois da espera) se atualizam
   setInterval(() => { if (!atualizando) desenharCache(); }, 60e3);
 
-  // ----- Cartões das plataformas -----
-  function desenharPlataformas() {
-    const todas = avTodas().filter((a) => a.ts >= Date.now() - 90 * 864e5);
-    $('[data-av-plataformas]').innerHTML = D.plataformas.map((p) => {
-      const ligada = avPlatConectada(p.id);
-      const lista = todas.filter((a) => a.plataforma === p.id);
-      const media = avMedia(lista);
-      const unidades = p.porUnidade ? Object.keys(av.conexoes[p.id] || {}) : [];
-      const onde = p.porUnidade ? (unidades.length === D.unidades.length ? 'Todas as unidades' : unidades.join(', ')) : 'Página da empresa';
-      // Aqui só se vê; conectar fica em Configurações › Integrações (cliente, 2026-11-05)
-      return `<article class="cartao av-plat${ligada ? '' : ' av-plat--off'}">
-        <div class="av-plat__topo">${avSelo(p.id)}<h3>${p.nome}</h3>
-          <span class="av-plat__estado${ligada ? ' av-plat__estado--on' : ''}">${ligada ? 'Conectada' : 'Não conectada'}</span></div>
-        ${ligada ? `
-          <p class="av-plat__nota">${media ? avNum(media) : '–'}<small> de 5 · ${lista.length} em 90 dias</small></p>
-          <p class="av-plat__onde">${esc(onde)}</p>
-          <p class="av-plat__quando">Atualizada ${avQuando(av.porPlataforma[p.id] || av.atualizadoEm)} · ${p.horas === 24 ? '1 vez por dia' : `a cada ${p.horas} horas`}</p>`
-        : '<p class="av-plat__onde">Ainda não conectada.</p>'}
-      </article>`;
-    }).join('');
-  }
-
-  // ----- Resumo + lista -----
-  const noPeriodo = () => avTodas().filter((a) => a.ts >= Date.now() - Number(estado.periodo) * 864e5)
-    .filter((a) => estado.unidade === 'todas' || a.unidade === estado.unidade || (!a.unidade && estado.unidade === 'todas'));
-
-  function filtrar() {
+  // ----- Recortes -----
+  const daUnidade = (a) => estado.unidade === 'todas' || a.unidade === estado.unidade;
+  const noPeriodo = () => avTodas().filter((a) => a.ts >= Date.now() - Number(estado.periodo) * 864e5).filter(daUnidade);
+  function filtrar({ ignorarPlataforma = false } = {}) {
     const q = estado.q.trim().toLowerCase();
     return noPeriodo().filter((a) => {
-      if (estado.plataforma !== 'todas' && a.plataforma !== estado.plataforma) return false;
+      if (!ignorarPlataforma && estado.plataforma !== 'todas' && a.plataforma !== estado.plataforma) return false;
       if (estado.nota === 'baixas' && !(a.nota && a.nota <= 2)) return false;
       if (estado.nota === 'altas' && !(a.nota >= 4)) return false;
       if (estado.nota === '3' && a.nota !== 3) return false;
@@ -195,56 +207,137 @@ function iniciarAvaliacoes() {
     }).sort((a, b) => b.ts - a.ts);
   }
 
+  // ----- Resumo: nota média · distribuição · o que pede atenção -----
   function desenharResumo() {
-    const lista = noPeriodo();
+    // Segue os filtros do topo: período, unidade e plataforma (nota, resposta e busca valem só para a lista)
+    const lista = noPeriodo().filter((a) => estado.plataforma === 'todas' || a.plataforma === estado.plataforma);
     const media = avMedia(lista);
+    const comNota = lista.filter((a) => a.nota);
+    const dist = [5, 4, 3, 2, 1].map((n) => ({ n, qtd: comNota.filter((a) => a.nota === n).length }));
+    const maior = Math.max(1, ...dist.map((d) => d.qtd));
     const baixas = lista.filter((a) => a.nota && a.nota <= 2).length;
-    const semResposta = lista.filter((a) => !a.resposta).length;
-    const per = `Últimos ${estado.periodo} dias`;
+    const sem = lista.filter((a) => !a.resposta).length;
+    const onde = `${estado.plataforma !== 'todas' ? ` no ${AV_PLAT[estado.plataforma].nome}` : ''}${estado.unidade !== 'todas' ? ` · ${esc(estado.unidade)}` : ''}`;
     $('[data-av-resumo]').innerHTML = `
-      <article class="kpi"><p class="kpi__rotulo">Nota média</p><p class="kpi__valor">${media ? avNum(media) : '–'}<small>de 5</small></p><p class="kpi__nota">${per}, todas as plataformas com nota</p></article>
-      <article class="kpi"><p class="kpi__rotulo">Avaliações</p><p class="kpi__valor">${lista.length}</p><p class="kpi__nota">${per}</p></article>
-      <article class="kpi${baixas ? ' kpi--alerta' : ''}"><p class="kpi__rotulo"><a class="kpi__link" href="#" data-av-atalho="baixas">Notas baixas (1 e 2)</a></p><p class="kpi__valor">${baixas}</p><p class="kpi__nota">${baixas ? 'Clique para ver' : 'Nenhuma no período'}</p></article>
-      <article class="kpi"><p class="kpi__rotulo"><a class="kpi__link" href="#" data-av-atalho="sem">Sem resposta da casa</a></p><p class="kpi__valor">${semResposta}</p><p class="kpi__nota">Respostas ficam na própria plataforma</p></article>`;
-    $$('[data-av-atalho]').forEach((l) => l.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (l.dataset.avAtalho === 'baixas') estado.nota = 'baixas'; else estado.resposta = 'sem';
-      Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
-      mostrando = AV_POR_PAGINA;
-      sincronizarEndereco();
-      desenharLista();
-      $('[data-av-lista]').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
-    }));
+      <div class="av-geral__media">
+        <p class="av-rotulo">Nota média</p>
+        <p class="av-geral__valor">${media ? avNum(media) : '–'}<small>de 5</small></p>
+        ${media ? avEstrelasMedia(media) : ''}
+        <p class="av-geral__nota">${avPlural(lista.length, 'avaliação', 'avaliações')} nos últimos ${estado.periodo} dias${onde}</p>
+      </div>
+      <div class="av-geral__dist">
+        <p class="av-rotulo" id="av-dist-titulo">Notas</p>
+        <ul class="av-dist" aria-labelledby="av-dist-titulo">${dist.map((d) => `
+          <li><span class="visualmente-oculto">${d.n} ${d.n === 1 ? 'estrela' : 'estrelas'}: ${avPlural(d.qtd, 'avaliação', 'avaliações')}</span>
+            <span class="av-dist__n" aria-hidden="true">${d.n}<i></i></span>
+            <span class="av-dist__barra" aria-hidden="true"><i class="${d.n <= 2 ? 'baixa' : ''}" style="--w:${Math.round((d.qtd / maior) * 100)}%"></i></span>
+            <span class="av-dist__qtd" aria-hidden="true">${d.qtd}</span></li>`).join('')}
+        </ul>
+      </div>
+      <div class="av-geral__atencao">
+        <p class="av-rotulo">Pede atenção</p>
+        <a class="av-atencao${baixas ? ' av-atencao--alerta' : ''}" href="#" data-av-atalho="baixas"><strong>${baixas}</strong><span>${baixas === 1 ? 'nota baixa' : 'notas baixas'} (1 e 2)</span>${icone('seta')}</a>
+        <a class="av-atencao" href="#" data-av-atalho="sem"><strong>${sem}</strong><span>sem resposta da casa</span>${icone('seta')}</a>
+      </div>`;
+  }
+  $('[data-av-resumo]').addEventListener('click', (e) => {
+    const l = e.target.closest('[data-av-atalho]');
+    if (!l) return;
+    e.preventDefault();
+    if (l.dataset.avAtalho === 'baixas') estado.nota = 'baixas'; else estado.resposta = 'sem';
+    preencherForm();
+    mostrando = AV_POR_PAGINA;
+    sincronizarEndereco();
+    desenharLista();
+    $('#av-lista-titulo').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  });
+
+  // ----- Nota de cada plataforma (linha embaixo do resumo) -----
+  function desenharPlataformas() {
+    const todas = avTodas().filter((a) => a.ts >= Date.now() - 90 * 864e5);
+    $('[data-av-plataformas]').innerHTML = D.plataformas.map((p) => {
+      const ligada = avPlatConectada(p.id);
+      const lista = todas.filter((a) => a.plataforma === p.id);
+      const media = avMedia(lista);
+      const unidades = Object.keys(av.conexoes[p.id] || {});
+      const onde = unidades.length === D.unidades.length ? 'Todas as unidades' : unidades.join(', ');
+      const freq = p.horas === 24 ? '1 vez por dia' : `a cada ${p.horas} horas`;
+      // Aqui só se vê; conectar fica em Configurações › Integrações (cliente, 2026-11-05)
+      return `<li class="av-plat${ligada ? '' : ' av-plat--off'}"${ligada ? ` title="${esc(onde)} · atualiza ${freq}"` : ''}>
+        ${avSelo(p.id)}
+        <div class="av-plat__texto">
+          <p class="av-plat__nome">${p.nome}${ligada ? ` <strong>${media ? avNum(media) : '–'}</strong>${media ? avEstrelasMedia(media) : ''}` : ''}</p>
+          <p class="av-plat__sub">${ligada ? `${avPlural(lista.length, 'avaliação', 'avaliações')} em 90 dias<span class="visualmente-oculto"> · ${esc(onde)} · atualiza ${freq}</span>` : 'Não conectada'}</p>
+        </div>
+      </li>`;
+    }).join('');
   }
 
-  function htmlItem(a) {
+  // ----- O que dizem no Google: resumo do próprio Google por unidade conectada -----
+  function desenharResumosGoogle() {
+    const unidades = Object.keys(av.conexoes.google || {}).filter((u) => D.resumosGoogle?.[u]);
+    $('[data-av-resumos-secao]').hidden = !unidades.length;
+    $('[data-av-resumos]').innerHTML = unidades.map((u, i) => {
+      const r = D.resumosGoogle[u];
+      return `<article class="cartao av-resumo">
+        <div class="av-resumo__topo"><h3>${esc(u)}</h3>
+          <p class="av-resumo__nota"><strong>${avNum(r.nota)}</strong>${avEstrelasMedia(r.nota)}<span>${numero(r.total)} no Google</span></p></div>
+        ${r.texto ? `
+          <p class="av-resumo__texto" id="av-resumo-${i}">${esc(r.texto)}</p>
+          <button class="av-resumo__mais" type="button" aria-expanded="false" aria-controls="av-resumo-${i}" data-av-ler>Ler tudo</button>
+          <p class="av-resumo__fonte">Resumo feito com o Gemini · Google Maps · <a href="#" data-av-google>Ver no Google</a></p>`
+        : '<p class="av-resumo__vazio">O Google ainda não tem um resumo das avaliações desta unidade.</p>'}
+      </article>`;
+    }).join('');
+    $$('[data-av-ler]').forEach((b) => b.addEventListener('click', () => {
+      const aberto = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(aberto));
+      b.closest('.av-resumo').classList.toggle('av-resumo--aberto', aberto);
+      b.textContent = aberto ? 'Mostrar menos' : 'Ler tudo';
+    }));
+    $$('[data-av-google]').forEach((l) => l.addEventListener('click', (e) => { e.preventDefault(); avisar('No app, abre as avaliações da unidade no Google.'); }));
+  }
+
+  // ----- Lista: cada avaliação com o texto à vista -----
+  function htmlCard(a) {
     const p = AV_PLAT[a.plataforma];
     const nova = av.extras.some((x) => x.id === a.id) && a.ts > Date.now() - 864e5;
-    return `<li class="cartao av-item">
-      <div class="av-item__topo">
+    const baixa = a.nota && a.nota <= 2;
+    return `<li class="av-card${baixa ? ' av-card--baixa' : ''}">
+      <div class="av-card__topo">
         ${avSelo(a.plataforma)}
-        <span class="av-item__meta"><strong>${p.nome}</strong>${a.unidade ? ` · ${esc(a.unidade)}` : ''} · <time datetime="${new Date(a.ts).toISOString()}">${avQuando(a.ts)}</time></span>
-        ${nova ? '<span class="av-novo">Nova</span>' : ''}
+        <p class="av-card__quem"><strong>${esc(a.autor)}</strong><span>${p.nome}${a.unidade ? ` · ${esc(a.unidade)}` : ''}</span></p>
+        <p class="av-card__quando">${nova ? '<span class="av-novo">Nova</span>' : ''}<time datetime="${new Date(a.ts).toISOString()}">${avQuando(a.ts)}</time></p>
       </div>
-      <div class="av-item__nota">${avNotaHtml(a)}<span class="av-item__autor">${esc(a.autor)}</span></div>
+      <div class="av-card__nota">${avNotaHtml(a)}${baixa && !a.resposta ? '<span class="av-tag-alerta">Sem resposta da casa</span>' : ''}</div>
       ${a.titulo ? `<p class="av-item__titulo">${esc(a.titulo)}</p>` : ''}
-      ${a.texto ? `<p class="av-item__texto">“${esc(a.texto)}”</p>` : '<p class="fb-item__sem">Só a nota, sem comentário</p>'}
+      ${a.texto ? `<p class="av-card__texto">${esc(a.texto)}</p>` : '<p class="av-card__sem">Só a nota, sem comentário</p>'}
       ${a.resposta ? `<div class="av-resposta"><span>Resposta da casa</span><p>${esc(a.resposta)}</p></div>` : ''}
-      <button class="btn btn--fantasma av-item__ver" type="button" data-av-ver="${p.nome}">${icone('link')}Ver no ${p.nome}</button>
+      <button class="av-card__ver" type="button" data-av-ver="${p.nome}">Ver no ${p.nome}${icone('seta')}</button>
     </li>`;
   }
 
   function desenharLista() {
+    const semPlat = filtrar({ ignorarPlataforma: true });
+    $$('[data-av-qtd]').forEach((b) => {
+      const id = b.dataset.avQtd;
+      b.textContent = id === 'todas' ? semPlat.length : semPlat.filter((a) => a.plataforma === id).length;
+    });
     const lista = filtrar();
     const n = lista.length;
-    $('[data-av-contagem]').textContent = `${n} ${n === 1 ? 'avaliação' : 'avaliações'}`;
-    $('[data-av-lista]').innerHTML = lista.slice(0, mostrando).map(htmlItem).join('');
+    $('[data-av-contagem]').textContent = avPlural(n, 'avaliação', 'avaliações');
+    $('[data-av-lista]').innerHTML = lista.slice(0, mostrando).map(htmlCard).join('');
     $('[data-av-vazio]').hidden = n > 0;
     $('[data-av-mais]').hidden = n <= mostrando;
-    $$('[data-av-ver]').forEach((b) => b.addEventListener('click', () => avisar(`No app, abre esta avaliação no ${b.dataset.avVer}.`)));
+    const filtrando = Object.keys(padrao).some((k) => estado[k] !== padrao[k]);
+    $('[data-av-limpar]').hidden = !filtrando;
   }
+  $('[data-av-lista]').addEventListener('click', (e) => {
+    const ver = e.target.closest('[data-av-ver]');
+    if (ver) avisar(`No app, abre esta avaliação no ${ver.dataset.avVer}.`);
+  });
 
-  function desenharTudo() { desenharCache(); desenharPlataformas(); desenharResumo(); desenharLista(); }
+  function desenharTudo() { desenharCache(); desenharResumo(); desenharPlataformas(); desenharResumosGoogle(); desenharLista(); }
 
   function sincronizarEndereco() {
     const p = new URLSearchParams();
@@ -261,11 +354,12 @@ function iniciarAvaliacoes() {
   form.addEventListener('submit', (e) => e.preventDefault());
   $('[data-av-limpar]').addEventListener('click', () => {
     Object.assign(estado, padrao);
-    Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
+    preencherForm();
     mostrando = AV_POR_PAGINA;
     sincronizarEndereco();
     desenharResumo();
     desenharLista();
+    form.q.focus();
   });
   $('[data-av-mais]').addEventListener('click', () => { mostrando += AV_POR_PAGINA; desenharLista(); });
 

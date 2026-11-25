@@ -81,36 +81,32 @@
 
     <main class="principal" id="conteudo" data-fora-do-menu>
       <div class="principal__conteudo" data-avaliacoes>
-        <p class="aviso-prototipo"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg>Protótipo com dados de exemplo. Nenhuma plataforma é consultada de verdade.</p>
+        <p class="aviso-prototipo"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg><span>Protótipo com dados de exemplo. Nenhuma plataforma é consultada de verdade. <button type="button" class="teste-simular" data-av-vencer>Simular 6 horas sem atualizar</button></span></p>
 
+        <!-- Visual refeito em 2026-11-25, versão limpa (pedido do cliente: "algo mais clean e que mostre as informações
+             mais claras"): uma coluna, um cartão de resumo, a nota de cada plataforma e a lista com o texto à vista. -->
         <div class="cabeca">
           <div>
             <h1 class="cabeca__titulo">Avaliações</h1>
             <p class="cabeca__desc">O que os clientes dizem sobre as unidades no Google, iFood e Tripadvisor, num lugar só.</p>
           </div>
+          <!-- Cache: as avaliações ficam guardadas e são atualizadas sozinhas de tempos em tempos -->
+          <div class="av-sinc" role="group" aria-label="Atualização das avaliações" data-av-cache></div>
         </div>
 
-        <!-- Cache: as avaliações ficam guardadas e são atualizadas sozinhas de tempos em tempos -->
-        <section class="av-cache" aria-label="Atualização das avaliações" data-av-cache></section>
-
-        <section aria-labelledby="av-plat-titulo">
-          <h2 class="visualmente-oculto" id="av-plat-titulo">Plataformas</h2>
-          <div class="av-plataformas" data-av-plataformas></div>
-        </section>
-
-        <section class="kpis" aria-label="Resumo das avaliações" data-av-resumo></section>
-
-        <section class="cartao" aria-label="Filtros">
-          <form class="filtros" data-av-filtros>
-            <div class="campo campo--busca">
-              <label for="a-busca">Buscar</label>
-              <input id="a-busca" name="q" type="search" placeholder="Texto da avaliação ou autor" autocomplete="off">
+        <!-- Filtros no topo (cliente, 2026-11-25): período, unidade e plataforma valem para o resumo e para a lista -->
+        <form class="cartao av-barra" aria-label="Filtros" data-av-filtros>
+          <div class="av-barra__linha">
+            <fieldset class="av-abas" data-av-chips>
+              <legend class="visualmente-oculto">Plataforma</legend>
+            </fieldset>
+            <div class="campo campo--busca av-barra__busca">
+              <label for="a-busca" class="visualmente-oculto">Buscar</label>
+              <input id="a-busca" name="q" type="search" placeholder="Buscar no texto ou pelo nome" autocomplete="off">
               <svg class="icone" aria-hidden="true"><use href="icones.svg#busca"/></svg>
             </div>
-            <div class="campo">
-              <label for="a-plataforma">Plataforma</label>
-              <select id="a-plataforma" name="plataforma"><option value="todas">Todas</option></select>
-            </div>
+          </div>
+          <div class="av-barra__linha av-barra__linha--campos">
             <div class="campo">
               <label for="a-unidade">Unidade</label>
               <select id="a-unidade" name="unidade"><option value="todas">Todas</option></select>
@@ -140,15 +136,29 @@
                 <option value="com">Respondidas</option>
               </select>
             </div>
-          </form>
-          <div class="filtros__rodape">
-            <p class="filtros__contagem" role="status" aria-live="polite" data-av-contagem></p>
-            <button class="btn btn--fantasma" type="button" data-av-limpar>Limpar filtros</button>
+            <button class="btn btn--fantasma av-barra__limpar" type="button" data-av-limpar>Limpar filtros</button>
           </div>
+        </form>
+
+        <section class="cartao av-geral" aria-labelledby="av-geral-titulo">
+          <h2 class="visualmente-oculto" id="av-geral-titulo">Resumo</h2>
+          <div class="av-geral__corpo" data-av-resumo></div>
+          <ul class="av-geral__plats" aria-label="Nota por plataforma" data-av-plataformas></ul>
         </section>
 
-        <section aria-label="Lista de avaliações">
-          <ul class="av-lista" data-av-lista></ul>
+        <section aria-labelledby="av-resumos-titulo" data-av-resumos-secao hidden>
+          <h2 class="av-titulo" id="av-resumos-titulo">O que dizem no Google</h2>
+          <div class="av-resumos" data-av-resumos></div>
+        </section>
+
+        <section aria-labelledby="av-lista-titulo">
+          <div class="av-lista__cabeca">
+            <h2 class="av-titulo" id="av-lista-titulo">Todas as avaliações</h2>
+            <p class="filtros__contagem" role="status" aria-live="polite" data-av-contagem></p>
+          </div>
+
+
+          <ul class="av-cards" aria-label="Lista de avaliações" data-av-lista></ul>
           <p class="vazio cartao" data-av-vazio hidden><strong>Nenhuma avaliação com esses filtros</strong>Aumente o período ou clique em "Limpar filtros".</p>
           <button class="btn btn--secundario av-mais" type="button" data-av-mais hidden>Mostrar mais</button>
         </section>
