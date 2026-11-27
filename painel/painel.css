@@ -1993,50 +1993,85 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 /* ---------- Denúncias: Visão geral e mais funções (2026-11-27) ---------- */
 .den-aba { display: grid; gap: 20px; }
 .den-aba[hidden] { display: none; }
-.den-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 700px) { .den-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 1360px) { .den-kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
-.den-kpi-tempo { font-size: 26px; }
-.den-nota { color: var(--mudo); font-size: 13px; }
+/* Organizado em 2026-11-27 ("tá muito bagunçado"), na estrutura da referência do cliente:
+   números + gráfico do mês · dois destaques + rosca de categorias · precisa de atenção. Lista: cartões por situação. */
+.den-sigilo { margin-top: 8px; padding: 0; border: 0; background: none; font-size: 13px; }
+.den-sigilo .icone { width: 16px; height: 16px; }
+.den-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.den-periodo { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--mudo); }
+.den-periodo[hidden] { display: none; }
+.den-periodo select { min-height: 44px; }
 
-/* Barras horizontais em azul (as de Temas usam o gradiente da IA) */
-.den-barras-h .temas__barra { background: var(--grad); }
-.den-barras-h li { grid-template-columns: minmax(120px, 170px) minmax(0, 1fr) auto; }
-.den-pct { color: var(--mudo); font-weight: 500; }
+/* Linha 1: 4 números (2×2) + gráfico */
+.den-topo, .den-meio { display: grid; gap: 20px; }
+@media (min-width: 1100px) {
+  .den-topo { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
+  .den-meio { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.6fr); }
+}
+@media (min-width: 640px) and (max-width: 1099px) { .den-meio { grid-template-columns: 1fr 1fr; } .den-cat { grid-column: 1 / -1; } }
+.den-kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.den-kpi { display: flex; flex-direction: column; justify-content: space-between; min-height: 140px; }
+.den-kpi .kpi__valor { font-size: 34px; }
+.den-kpi--destaque { border-color: transparent; background: var(--grad); }
+.den-kpi--destaque .kpi__rotulo, .den-kpi--destaque .kpi__valor, .den-kpi--destaque .kpi__nota { color: #fff; }
+.den-kpi--alerta .kpi__valor { color: var(--perigo); }
+.den-kpi-tempo { font-size: 26px; }
+
+.den-mes { display: flex; flex-direction: column; }
+.den-colunas { flex: 1; display: flex; align-items: stretch; gap: 12px; min-height: 220px; margin-top: 8px;
+  background: repeating-linear-gradient(to top, var(--linha) 0 1px, transparent 1px 25%); background-size: 100% calc(100% - 26px); background-repeat: no-repeat; }
+.den-coluna { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+.den-coluna__area { flex: 1; display: flex; align-items: flex-end; justify-content: center; width: 100%; padding-top: 22px; }
+.den-coluna__pilha { position: relative; width: min(44px, 100%); min-height: 4px; border-radius: 8px 8px 3px 3px; background: var(--grad); transition: height .5s var(--suave); }
+.den-coluna__total { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 600; }
+.den-coluna__mes { color: var(--mudo); font-size: 12px; text-transform: capitalize; }
+
+/* Linha 2: destaques em frase */
+.den-destaque { position: relative; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; min-height: 190px; padding: 20px; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--superficie); color: var(--texto); text-decoration: none; transition: border-color .2s, transform .2s; }
+.den-destaque:hover { border-color: var(--acento); transform: translateY(-2px); }
+.den-destaque__icone { position: absolute; top: 18px; left: 18px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--bg-suave); color: var(--link); }
+.den-destaque__icone .icone { width: 18px; height: 18px; }
+.den-destaque__seta { position: absolute; top: 18px; right: 18px; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--linha); color: var(--link); }
+.den-destaque__seta .icone { width: 16px; height: 16px; transform: rotate(-45deg); }
+.den-destaque__num { font-size: 20px; }
+.den-destaque__num strong { font-size: 44px; font-weight: 600; letter-spacing: -.03em; }
+.den-destaque__frase { color: var(--mudo); font-size: 14px; }
+@media (max-width: 639px) { .den-destaque { min-height: 150px; } .den-destaque__num strong { font-size: 36px; } }
+
+/* Rosca de categorias */
+.den-rosca-bloco { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 28px; margin-top: 12px; }
+.den-rosca { flex: none; width: 140px; height: 140px; border-radius: 50%;
+  -webkit-mask: radial-gradient(circle, transparent 44px, #000 45px); mask: radial-gradient(circle, transparent 44px, #000 45px); }
+.den-rosca-legenda { flex: 1 1 200px; display: grid; gap: 10px; font-size: 14px; }
+.den-rosca-legenda li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.den-rosca-legenda__cor { width: 12px; height: 12px; border-radius: 50%; }
+.den-rosca-legenda__n { color: var(--mudo); font-variant-numeric: tabular-nums; }
 .den-sem { color: var(--mudo); font-size: 14px; }
 
-/* Precisa de atenção: selo de prioridade na primeira coluna */
-.den-atencao .atencao__item { color: inherit; text-decoration: none; }
-.den-atencao .den-prio { margin-top: 1px; }
+/* Precisa de atenção: linhas simples (prioridade · resumo · prazo) */
+.den-atencao { display: grid; }
+.den-atencao li + li { border-top: 1px solid var(--linha); }
+.den-atencao__item { display: grid; grid-template-columns: 76px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 12px 8px; border-radius: 10px; color: inherit; text-decoration: none; }
+.den-atencao__item:hover { background: var(--bg-suave); }
+.den-atencao__texto { display: grid; gap: 2px; font-size: 14px; font-weight: 500; }
+.den-atencao__texto span { color: var(--mudo); font-size: 13px; font-weight: 400; }
+@media (max-width: 639px) { .den-atencao__item { grid-template-columns: 1fr; gap: 6px; } }
 
-/* Por mês: colunas empilhadas (anônimas embaixo, identificadas em cima) */
-.den-colunas { display: flex; align-items: flex-end; gap: 10px; height: 200px; padding-top: 22px; }
-.den-coluna { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%; min-width: 0; }
-.den-coluna__total { font-size: 13px; font-weight: 600; }
-.den-coluna__pilha { display: flex; flex-direction: column; width: min(48px, 100%); min-height: 4px; border-radius: 8px 8px 4px 4px; overflow: hidden; background: var(--bg-suave); transition: height .5s var(--suave); }
-.den-coluna__anonima { background: var(--primario); }
-.den-coluna__ident { background: #8FB4FF; }
-.den-coluna__mes { color: var(--mudo); font-size: 12px; text-transform: capitalize; }
-.den-legenda { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; color: var(--mudo); font-size: 13px; }
-.den-legenda li { display: inline-flex; align-items: center; gap: 6px; }
-.den-legenda__cor { width: 12px; height: 12px; border-radius: 3px; }
-.den-legenda__cor--anonima { background: var(--primario); }
-.den-legenda__cor--ident { background: #8FB4FF; }
+/* Lista: cartões por situação (filtram a lista) */
+.den-situacoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.den-situacao { display: grid; gap: 6px; padding: 0 0 14px; overflow: hidden; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--superficie); color: var(--texto); font: inherit; text-align: left; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.den-situacao__nome { padding: 8px 14px; background: var(--bg-suave); font-size: 13px; font-weight: 600; color: var(--mudo); }
+.den-situacao__n { padding: 0 14px; font-size: 28px; font-weight: 600; }
+.den-situacao--recebida .den-situacao__nome { box-shadow: inset 0 3px 0 #2563EB; }
+.den-situacao--em-analise .den-situacao__nome { box-shadow: inset 0 3px 0 #94A3B8; }
+.den-situacao--em-investigacao .den-situacao__nome { box-shadow: inset 0 3px 0 #F59E0B; }
+.den-situacao--aguardando-informacoes .den-situacao__nome { box-shadow: inset 0 3px 0 #7038F8; }
+.den-situacao--em-aberto .den-situacao__nome { box-shadow: inset 0 3px 0 var(--texto); }
+.den-situacao:hover { border-color: var(--acento); }
+.den-situacao[aria-pressed="true"] { border-color: var(--acento); box-shadow: 0 0 0 2px var(--acento); }
+.den-situacao[aria-pressed="true"] .den-situacao__nome { color: var(--texto); }
 
-/* Por unidade */
-.den-unidades th[scope="row"] a { color: var(--link); font-weight: 600; }
-.den-unidades th[scope="row"] a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.den-unidades td, .den-unidades th { white-space: nowrap; }
-.den-graves { color: var(--perigo); font-weight: 600; }
-
-.den-anonimato { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: var(--bg-suave); font-size: 14px; }
-.den-anonimato:empty { display: none; }
-.den-anonimato .icone { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--link); }
-
-@media (min-width: 1100px) {
-  /* Por unidade ocupa a coluna larga; Desfecho fica ao lado */
-  .den-aba .grade-dash > section:nth-child(5) { grid-column: 1; }
-}
+@media (prefers-reduced-motion: reduce) { .den-destaque, .den-coluna__pilha { transition: none; } .den-destaque:hover { transform: none; } }
 
 /* Lista: ações dos filtros */
 .den-filtros-acoes { display: flex; flex-wrap: wrap; gap: 8px; }

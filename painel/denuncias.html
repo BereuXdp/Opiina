@@ -89,91 +89,78 @@
           <div>
             <h1 class="cabeca__titulo">Denúncias</h1>
             <p class="cabeca__desc">Relatos do canal de ética, enviados pela equipe. Ficam separados das pesquisas de clientes.</p>
+            <p class="den-sigilo"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg><span><strong>Confidencial.</strong> Só quem tem acesso a Denúncias vê esta tela. Não compartilhe os relatos fora da equipe responsável.</span></p>
           </div>
           <div class="cabeca__acoes">
-            <div class="campo" data-den-so="visao">
-              <label for="d-periodo">Período</label>
-              <select id="d-periodo" data-den-periodo>
-                <option value="90">Últimos 3 meses</option>
-                <option value="180" selected>Últimos 6 meses</option>
-                <option value="365">Últimos 12 meses</option>
-              </select>
-            </div>
-            <!-- Visão geral (painel de indicadores) e Lista (2026-11-27: "faça um dashboard dele também") -->
-            <nav class="alternar" aria-label="Forma de ver">
-              <a href="denuncias.html" data-den-aba-link="visao"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Visão geral</a>
-              <a href="denuncias.html?aba=lista" data-den-aba-link="lista"><svg class="icone" aria-hidden="true"><use href="icones.svg#lista"/></svg>Lista</a>
-            </nav>
             <button class="btn btn--secundario" type="button" data-divulgar aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="icones.svg#link"/></svg>Divulgar o canal</button>
           </div>
         </div>
 
-        <p class="den-sigilo"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg><span><strong>Confidencial.</strong> Só os perfis com acesso a Denúncias veem esta tela. Não compartilhe os relatos fora da equipe responsável.</span></p>
+        <!-- Visão geral e Lista (2026-11-27); organizado no mesmo dia: "tá muito bagunçado" -->
+        <div class="den-barra">
+          <nav class="alternar" aria-label="Forma de ver">
+            <a href="denuncias.html" data-den-aba-link="visao"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Visão geral</a>
+            <a href="denuncias.html?aba=lista" data-den-aba-link="lista"><svg class="icone" aria-hidden="true"><use href="icones.svg#lista"/></svg>Lista</a>
+          </nav>
+          <div class="den-periodo" data-den-so="visao">
+            <label for="d-periodo">Período</label>
+            <select id="d-periodo" data-den-periodo>
+              <option value="90">Últimos 3 meses</option>
+              <option value="180" selected>Últimos 6 meses</option>
+              <option value="365">Últimos 12 meses</option>
+            </select>
+          </div>
+        </div>
 
-        <!-- ===== Visão geral ===== -->
+        <!-- ===== Visão geral ===== (estrutura da referência do cliente, 2026-11-27: números + gráfico do mês; destaques + categorias; precisa de atenção) -->
         <div class="den-aba" data-den-aba="visao">
-          <section class="kpis den-kpis" aria-label="Resumo das denúncias" data-den-kpis></section>
-
-          <div class="grade-dash">
-            <section class="cartao" aria-labelledby="dv-atencao">
+          <div class="den-topo">
+            <section class="den-kpis" aria-label="Resumo das denúncias" data-den-kpis></section>
+            <section class="cartao den-mes" aria-labelledby="dv-mes">
               <div class="cartao__topo">
                 <div>
-                  <h2 class="cartao__titulo" id="dv-atencao">Precisa de atenção</h2>
-                  <p class="cartao__sub">Em aberto: atrasadas primeiro, depois as mais graves</p>
+                  <h2 class="cartao__titulo" id="dv-mes">Recebidas por mês</h2>
+                  <p class="cartao__sub" data-den-periodo-texto></p>
                 </div>
-                <a class="cartao__link" href="denuncias.html?aba=lista">Ver todas<svg class="icone" aria-hidden="true"><use href="icones.svg#seta"/></svg></a>
               </div>
-              <ul class="atencao den-atencao" data-den-atencao></ul>
-              <p class="vazio" data-den-atencao-vazio hidden><strong>Nada em aberto</strong>Todas as denúncias foram encerradas.</p>
-            </section>
-
-            <section class="cartao" aria-labelledby="dv-situacao">
-              <h2 class="cartao__titulo" id="dv-situacao">Situação dos casos</h2>
-              <p class="cartao__sub" data-den-periodo-texto></p>
-              <ul class="temas den-barras-h" data-den-situacao></ul>
-            </section>
-
-            <section class="cartao" aria-labelledby="dv-mes">
-              <h2 class="cartao__titulo" id="dv-mes">Denúncias por mês</h2>
-              <p class="cartao__sub">Recebidas pelo canal, anônimas e identificadas</p>
               <div class="den-colunas" data-den-meses></div>
-              <ul class="den-legenda" aria-hidden="true">
-                <li><span class="den-legenda__cor den-legenda__cor--anonima"></span>Anônimas</li>
-                <li><span class="den-legenda__cor den-legenda__cor--ident"></span>Identificadas</li>
-              </ul>
-            </section>
-
-            <section class="cartao" aria-labelledby="dv-categoria">
-              <h2 class="cartao__titulo" id="dv-categoria">Por categoria</h2>
-              <p class="cartao__sub">As que mais aparecem no período</p>
-              <ul class="temas den-barras-h" data-den-categorias></ul>
-            </section>
-
-            <section class="cartao" aria-labelledby="dv-unidade">
-              <h2 class="cartao__titulo" id="dv-unidade">Por unidade</h2>
-              <p class="cartao__sub">Onde os relatos acontecem e quanto tempo leva para resolver</p>
-              <div class="tabela-rolagem">
-                <table class="tabela den-unidades">
-                  <thead>
-                    <tr><th scope="col">Unidade</th><th scope="col">Recebidas</th><th scope="col">Em aberto</th><th scope="col">Graves</th><th scope="col">Tempo para concluir</th></tr>
-                  </thead>
-                  <tbody data-den-unidades></tbody>
-                </table>
-              </div>
-            </section>
-
-            <section class="cartao" aria-labelledby="dv-desfecho">
-              <h2 class="cartao__titulo" id="dv-desfecho">Desfecho dos casos encerrados</h2>
-              <p class="cartao__sub" data-den-encerrados></p>
-              <ul class="temas den-barras-h" data-den-desfechos></ul>
-              <p class="den-anonimato" data-den-anonimato></p>
             </section>
           </div>
-          <p class="den-nota">Prazos por prioridade (proposta): crítica 5 dias, alta 15, média 30, baixa 45, contados do recebimento.</p>
+
+          <div class="den-meio">
+            <a class="den-destaque" data-den-destaque="novas" href="denuncias.html?situacao=Recebida"></a>
+            <a class="den-destaque" data-den-destaque="aguardando" href="denuncias.html?situacao=Aguardando%20informa%C3%A7%C3%B5es"></a>
+            <section class="cartao den-cat" aria-labelledby="dv-categoria">
+              <div class="cartao__topo">
+                <div>
+                  <h2 class="cartao__titulo" id="dv-categoria">Por categoria</h2>
+                  <p class="cartao__sub">As que mais aparecem no período</p>
+                </div>
+              </div>
+              <div class="den-rosca-bloco">
+                <div class="den-rosca" data-den-rosca aria-hidden="true"></div>
+                <ul class="den-rosca-legenda" data-den-categorias></ul>
+              </div>
+            </section>
+          </div>
+
+          <section class="cartao" aria-labelledby="dv-atencao">
+            <div class="cartao__topo">
+              <div>
+                <h2 class="cartao__titulo" id="dv-atencao">Precisa de atenção</h2>
+                <p class="cartao__sub">Atrasadas primeiro, depois as mais graves</p>
+              </div>
+              <a class="cartao__link" href="denuncias.html?aba=lista">Ver todas<svg class="icone" aria-hidden="true"><use href="icones.svg#seta"/></svg></a>
+            </div>
+            <ul class="den-atencao" data-den-atencao></ul>
+            <p class="vazio" data-den-atencao-vazio hidden><strong>Nada em aberto</strong>Todas as denúncias foram encerradas.</p>
+          </section>
         </div>
 
         <!-- ===== Lista ===== -->
         <div class="den-aba" data-den-aba="lista" hidden>
+        <!-- Cartões por situação (como na referência): clicar filtra a lista -->
+        <nav class="den-situacoes" aria-label="Filtrar por situação" data-den-situacoes></nav>
         <section class="cartao" aria-label="Filtros">
           <form class="filtros" data-den-filtros>
             <div class="campo campo--busca">

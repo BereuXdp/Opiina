@@ -73,7 +73,6 @@ function iniciarDenuncias() {
   // =====================================================================
   const seletorPeriodo = $('[data-den-periodo]');
   if (['90', '180', '365'].includes(params.get('periodo'))) seletorPeriodo.value = params.get('periodo');
-  const NOME_PERIODO = { 90: 'Últimos 3 meses', 180: 'Últimos 6 meses', 365: 'Últimos 12 meses' };
 
   function desenharVisao() {
     const dias = Number(seletorPeriodo.value);
@@ -82,94 +81,77 @@ function iniciarDenuncias() {
     const novas = abertas.filter((d) => d.situacao === 'Recebida').length;
     const graves = abertas.filter((d) => d.prioridade === 'Alta' || d.prioridade === 'Crítica').length;
     const atrasadas = abertas.filter((d) => prazoDen(d).atrasada).length;
-    const tAnalise = media(noPeriodo.filter((d) => d.primeiraAnalise != null).map((d) => d.primeiraAnalise - d.criada));
     const concluidas = noPeriodo.filter((d) => d.situacao === 'Concluída' && d.concluida != null);
     const tConcluir = media(concluidas.map((d) => d.concluida - d.criada));
     const anonimas = noPeriodo.filter((d) => !d.identificacao).length;
     const pctAnon = noPeriodo.length ? Math.round((anonimas / noPeriodo.length) * 100) : 0;
 
-    $('[data-den-kpis]').innerHTML = `
-      <article class="kpi"><p class="kpi__rotulo">Em aberto</p><p class="kpi__valor">${abertas.length}</p><p class="kpi__nota">${novas} ${novas === 1 ? 'nova' : 'novas'}, ainda sem análise</p></article>
-      <article class="kpi${graves ? ' kpi--alerta' : ''}"><p class="kpi__rotulo">Graves em aberto</p><p class="kpi__valor">${graves}</p><p class="kpi__nota">Prioridade alta ou crítica</p></article>
-      <article class="kpi${atrasadas ? ' kpi--alerta' : ''}"><p class="kpi__rotulo">Atrasadas</p><p class="kpi__valor">${atrasadas}</p><p class="kpi__nota">${atrasadas ? 'Passaram do prazo. Trate primeiro.' : 'Todas dentro do prazo'}</p></article>
-      <article class="kpi"><p class="kpi__rotulo">Recebidas</p><p class="kpi__valor">${noPeriodo.length}</p><p class="kpi__nota">${NOME_PERIODO[dias]} · ${pctAnon}% anônimas</p></article>
-      <article class="kpi"><p class="kpi__rotulo">Até a primeira análise</p><p class="kpi__valor den-kpi-tempo">${textoDias(tAnalise)}</p><p class="kpi__nota">Tempo médio no período</p></article>
-      <article class="kpi"><p class="kpi__rotulo">Para concluir</p><p class="kpi__valor den-kpi-tempo">${textoDias(tConcluir)}</p><p class="kpi__nota">Tempo médio dos casos concluídos</p></article>`;
+    // Estrutura da referência do cliente (2026-11-27): 4 números (o primeiro em destaque) + gráfico do mês
+    const kpi = (rotulo, valor, nota, mod = '') => `<article class="kpi den-kpi${mod}"><p class="kpi__rotulo">${rotulo}</p><p class="kpi__valor">${valor}</p><p class="kpi__nota">${nota}</p></article>`;
+    $('[data-den-kpis]').innerHTML = [
+      kpi('Em aberto', abertas.length, 'Casos ainda não encerrados', ' den-kpi--destaque'),
+      kpi('Graves em aberto', graves, 'Prioridade alta ou crítica', graves ? ' den-kpi--alerta' : ''),
+      kpi('Atrasadas', atrasadas, atrasadas ? 'Passaram do prazo' : 'Todas dentro do prazo', atrasadas ? ' den-kpi--alerta' : ''),
+      kpi('Tempo para concluir', `<span class="den-kpi-tempo">${textoDias(tConcluir)}</span>`, 'Média dos casos concluídos'),
+    ].join('');
+
+    // Dois destaques em frase, cada um leva à lista filtrada
+    const aguardando = abertas.filter((d) => d.situacao === 'Aguardando informações').length;
+    const destaque = (chave, n, unidade, frase) => {
+      const el = $(`[data-den-destaque="${chave}"]`);
+      el.innerHTML = `<span class="den-destaque__icone" aria-hidden="true">${icone(chave === 'novas' ? 'alerta' : 'pessoa')}</span>
+        <span class="den-destaque__num"><strong>${n}</strong> ${unidade}</span>
+        <span class="den-destaque__frase">${frase}</span>
+        <span class="den-destaque__seta" aria-hidden="true">${icone('seta')}</span>`;
+    };
+    destaque('novas', novas, novas === 1 ? 'nova' : 'novas', novas ? `${novas === 1 ? 'Denúncia ainda espera' : 'Denúncias ainda esperam'} a primeira análise.` : 'Nenhuma denúncia esperando a primeira análise.');
+    destaque('aguardando', aguardando, aguardando === 1 ? 'aguardando' : 'aguardando', aguardando ? `${aguardando === 1 ? 'Caso espera' : 'Casos esperam'} resposta de quem denunciou.` : 'Nenhum caso esperando resposta de quem denunciou.');
 
     // Precisa de atenção: atrasadas, depois as mais graves, depois o prazo mais curto
     const atencao = [...abertas].sort((a, b) => prazoDen(b).atrasada - prazoDen(a).atrasada
       || PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade] || prazoDen(a).restante - prazoDen(b).restante).slice(0, 5);
     $('[data-den-atencao]').innerHTML = atencao.map((d) => `<li>
-      <a class="atencao__item" href="denuncias.html?aba=lista&amp;abrir=${encodeURIComponent(d.id)}">
+      <a class="den-atencao__item" href="denuncias.html?aba=lista&amp;abrir=${encodeURIComponent(d.id)}">
         ${htmlPrioridade(d.prioridade)}
-        <span class="atencao__texto">${esc(d.resumo)}</span>
-        <span class="atencao__meta">${htmlPrazo(d)}<span>${esc(d.unidade || 'Unidade não informada')}</span><span>${d.situacao}</span><span>${esc(d.categoria)}</span></span>
+        <span class="den-atencao__texto">${esc(d.resumo)}<span>${esc(d.id)} · ${esc(d.unidade || 'Unidade não informada')} · ${esc(d.categoria)}</span></span>
+        ${htmlPrazo(d)}
       </a></li>`).join('');
     $('[data-den-atencao-vazio]').hidden = atencao.length > 0;
 
-    const barras = (pares, total) => {
-      const maior = Math.max(1, ...pares.map(([, n]) => n));
-      return pares.map(([nome, n]) => `<li><span class="temas__nome">${esc(nome)}</span>
-        <span class="temas__trilho" aria-hidden="true"><span class="temas__barra" style="width:${(n / maior) * 100}%"></span></span>
-        <span class="temas__total">${n}${total ? `<span class="den-pct"> · ${Math.round((n / total) * 100)}%</span>` : ''}</span></li>`).join('');
-    };
+    $('[data-den-periodo-texto]').textContent = `${noPeriodo.length} no período · ${pctAnon}% anônimas`;
 
-    $('[data-den-periodo-texto]').textContent = `${NOME_PERIODO[dias]}: ${noPeriodo.length} ${noPeriodo.length === 1 ? 'denúncia recebida' : 'denúncias recebidas'}`;
-    $('[data-den-situacao]').innerHTML = barras(D.denunciaSituacoes.map((s) => [s, noPeriodo.filter((d) => d.situacao === s).length]));
-
-    // Por mês: um bloco por mês do período, anônimas e identificadas empilhadas
+    // Por mês: uma coluna por mês, uma cor só, com linhas de grade
     const meses = Math.round(dias / 30);
     const hoje = new Date();
     const cols = Array.from({ length: meses }, (_, i) => {
       const ref = new Date(hoje.getFullYear(), hoje.getMonth() - (meses - 1 - i), 1);
-      const doMes = noPeriodo.filter((d) => { const dt = diaRelativo(d.criada); return dt.getFullYear() === ref.getFullYear() && dt.getMonth() === ref.getMonth(); });
-      return { ref, total: doMes.length, anon: doMes.filter((d) => !d.identificacao).length };
+      const total = noPeriodo.filter((d) => { const dt = diaRelativo(d.criada); return dt.getFullYear() === ref.getFullYear() && dt.getMonth() === ref.getMonth(); }).length;
+      return { ref, total };
     });
     const maiorMes = Math.max(1, ...cols.map((c) => c.total));
     $('[data-den-meses]').innerHTML = cols.map((c) => {
       const nome = c.ref.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
       const nomeLongo = c.ref.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-      const ident = c.total - c.anon;
-      return `<div class="den-coluna" role="img" aria-label="${nomeLongo}: ${c.total} ${c.total === 1 ? 'denúncia' : 'denúncias'}, ${c.anon} ${c.anon === 1 ? 'anônima' : 'anônimas'} e ${ident} ${ident === 1 ? 'identificada' : 'identificadas'}">
-        <span class="den-coluna__total">${c.total}</span>
-        <span class="den-coluna__pilha" style="height:${(c.total / maiorMes) * 100}%">
-          <span class="den-coluna__ident" style="flex:${ident}"></span><span class="den-coluna__anonima" style="flex:${c.anon}"></span>
-        </span>
+      return `<div class="den-coluna" role="img" aria-label="${nomeLongo}: ${c.total} ${c.total === 1 ? 'denúncia' : 'denúncias'}">
+        <span class="den-coluna__area"><span class="den-coluna__pilha" style="height:${(c.total / maiorMes) * 100}%"><span class="den-coluna__total">${c.total}</span></span></span>
         <span class="den-coluna__mes">${nome}</span>
       </div>`;
     }).join('');
 
-    // Por categoria: as 6 que mais aparecem
-    const porCat = D.denunciaCategorias.map((c) => [c, noPeriodo.filter((d) => d.categoria === c).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]).slice(0, 6);
-    $('[data-den-categorias]').innerHTML = porCat.length ? barras(porCat, noPeriodo.length) : '<li class="den-sem">Nenhuma denúncia no período.</li>';
-
-    // Por unidade
-    const unidades = [...D.unidades, ...(den.lista.some((d) => !d.unidade) ? [null] : [])];
-    $('[data-den-unidades]').innerHTML = unidades.map((u) => {
-      const daUnidade = (lista) => lista.filter((d) => d.unidade === u);
-      const rec = daUnidade(noPeriodo);
-      const abertasU = daUnidade(abertas).length;
-      const gravesU = rec.filter((d) => d.prioridade === 'Alta' || d.prioridade === 'Crítica').length;
-      const tU = media(rec.filter((d) => d.situacao === 'Concluída' && d.concluida != null).map((d) => d.concluida - d.criada));
-      const link = u ? `denuncias.html?unidade=${encodeURIComponent(u)}&amp;situacao=todas` : 'denuncias.html?aba=lista&amp;situacao=todas';
-      return `<tr>
-        <th scope="row"><a href="${link}">${esc(u || 'Não informada')}</a></th>
-        <td>${rec.length}</td>
-        <td>${abertasU ? `<strong>${abertasU}</strong>` : '0'}</td>
-        <td>${gravesU ? `<span class="den-graves">${gravesU}</span>` : '0'}</td>
-        <td>${textoDias(tU)}</td>
-      </tr>`;
-    }).join('');
-
-    // Desfecho dos encerrados no período
-    const encerradas = noPeriodo.filter((d) => SITUACOES_ENCERRADAS.includes(d.situacao) && d.desfecho);
-    $('[data-den-encerrados]').textContent = `${encerradas.length} ${encerradas.length === 1 ? 'caso encerrado' : 'casos encerrados'} no período`;
-    $('[data-den-desfechos]').innerHTML = encerradas.length
-      ? barras(D.denunciaDesfechos.map((x) => [x, encerradas.filter((d) => d.desfecho === x).length]), encerradas.length)
-      : '<li class="den-sem">Nenhum caso encerrado no período.</li>';
-    $('[data-den-anonimato]').innerHTML = noPeriodo.length
-      ? `${icone('cadeado')}<span><strong>${pctAnon}%</strong> das denúncias do período foram anônimas. A equipe confia no canal quando pode relatar sem se expor.</span>`
-      : '';
+    // Por categoria: rosca com as 4 que mais aparecem + "Outras"
+    const CORES = ['#2563EB', '#7038F8', '#0EA5A4', '#F59E0B', '#94A3B8'];
+    const ordenadas = D.denunciaCategorias.map((c) => [c, noPeriodo.filter((d) => d.categoria === c).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]);
+    const fatias = ordenadas.slice(0, 4);
+    const resto = ordenadas.slice(4).reduce((s, [, n]) => s + n, 0);
+    if (resto) fatias.push(['Outras', resto]);
+    const total = noPeriodo.length || 1;
+    let acum = 0;
+    $('[data-den-rosca]').style.background = fatias.length
+      ? `conic-gradient(${fatias.map(([, n], i) => { const de = acum; acum += (n / total) * 100; return `${CORES[i]} ${de}% ${acum}%`; }).join(', ')})`
+      : 'var(--bg-suave)';
+    $('[data-den-categorias]').innerHTML = fatias.length
+      ? fatias.map(([nome, n], i) => `<li><span class="den-rosca-legenda__cor" style="background:${CORES[i]}"></span><span class="den-rosca-legenda__nome">${esc(nome)}</span><span class="den-rosca-legenda__n">${n} · ${Math.round((n / total) * 100)}%</span></li>`).join('')
+      : '<li class="den-sem">Nenhuma denúncia no período.</li>';
 
     if (aba === 'visao') {
       const p = new URLSearchParams();
@@ -213,7 +195,17 @@ function iniciarDenuncias() {
     </tr>`;
   }
 
+  function desenharSituacoes() {
+    const cartoes = [['abertas', 'Em aberto'], ...SITUACOES_ABERTAS.map((s) => [s, s])];
+    $('[data-den-situacoes]').innerHTML = cartoes.map(([valor, nome]) => {
+      const n = valor === 'abertas' ? den.lista.filter(aberta).length : den.lista.filter((d) => d.situacao === valor).length;
+      return `<button type="button" class="den-situacao den-situacao--${slug(nome)}" data-den-sit="${esc(valor)}" aria-pressed="${estado.situacao === valor}">
+        <span class="den-situacao__nome">${nome}</span><span class="den-situacao__n">${n}</span></button>`;
+    }).join('');
+  }
+
   function desenharLista() {
+    desenharSituacoes();
     const itens = filtrar();
     $('[data-den-lista]').innerHTML = itens.map(htmlLinha).join('');
     $('[data-den-vazio]').hidden = itens.length > 0;
@@ -236,6 +228,12 @@ function iniciarDenuncias() {
     desenharLista();
   });
   form.addEventListener('submit', (e) => e.preventDefault());
+  $('[data-den-situacoes]').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-den-sit]');
+    if (!b) return;
+    estado.situacao = form.situacao.value = b.dataset.denSit;
+    desenharLista();
+  });
   $('[data-den-limpar]').addEventListener('click', () => {
     Object.assign(estado, padrao);
     Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
