@@ -156,9 +156,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .nav { display: grid; gap: 18px; }
 /* Seletor de área (2026-11-27): Avaliação | Denúncia, cada uma com o seu menu */
-.area { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--linha); border-radius: 12px; background: var(--bg-suave); }
-.area__opcao { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 8px; border-radius: 9px; color: var(--mudo); font-size: 14px; font-weight: 600; text-decoration: none; transition: background .2s, color .2s; }
-.area__opcao .icone { width: 16px; height: 16px; flex: none; }
+.area { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1px solid var(--linha); border-radius: 12px; background: var(--bg-suave); }
+.area__opcao { display: flex; align-items: center; justify-content: center; gap: 5px; min-width: 0; min-height: 40px; padding: 0 6px; border-radius: 9px; color: var(--mudo); font-size: 13px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; text-decoration: none; transition: background .2s, color .2s; }
+.area__opcao .icone { width: 15px; height: 15px; flex: none; }
 .area__opcao:hover { color: var(--texto); background: var(--superficie); }
 .area__opcao[aria-current="true"] { background: var(--grad); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, .25); }
 @media (prefers-reduced-motion: reduce) { .area__opcao { transition: none; } }
