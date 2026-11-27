@@ -1998,9 +1998,11 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 .den-sigilo { margin-top: 8px; padding: 0; border: 0; background: none; font-size: 13px; }
 .den-sigilo .icone { width: 16px; height: 16px; }
 .den-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-.den-periodo { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--mudo); }
-.den-periodo[hidden] { display: none; }
-.den-periodo select { min-height: 44px; }
+/* Período: mesmo campo de seleção do painel (.campo), com o rótulo ao lado */
+.campo.den-periodo { display: flex; align-items: center; gap: 10px; }
+.campo.den-periodo[hidden] { display: none; }
+.campo.den-periodo label { margin: 0; color: var(--mudo); font-size: 14px; font-weight: 500; }
+.campo.den-periodo select { width: auto; min-width: 190px; }
 
 /* Linha 1: 4 números (2×2) + gráfico */
 .den-topo, .den-meio { display: grid; gap: 20px; }
