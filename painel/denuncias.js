@@ -60,6 +60,7 @@ function iniciarDenuncias() {
   const aba = params.get('aba') === 'lista' || params.get('abrir') || Object.keys(padrao).some((k) => params.get(k)) ? 'lista' : 'visao';
   $$('[data-den-aba]').forEach((el) => { el.hidden = el.dataset.denAba !== aba; });
   $$('[data-den-so]').forEach((el) => { el.hidden = el.dataset.denSo !== aba; });
+  if (aba === 'lista') { $('.cabeca__titulo').textContent = 'Lista de denúncias'; document.title = 'Lista de denúncias — Opiina'; }
   $$('[data-den-aba-link]').forEach((a) => { if (a.dataset.denAbaLink === aba) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
 
   D.denunciaSituacoes.forEach((s) => form.situacao.add(new Option(s, s)));

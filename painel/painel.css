@@ -155,6 +155,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .marca__empresa { display: block; margin-top: -16px; padding: 0 8px 0 47px; color: var(--mudo); font-size: 13px; font-weight: 500; }
 
 .nav { display: grid; gap: 18px; }
+/* Seletor de área (2026-11-27): Avaliação | Denúncia, cada uma com o seu menu */
+.area { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid var(--linha); border-radius: 12px; background: var(--bg-suave); }
+.area__opcao { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 8px; border-radius: 9px; color: var(--mudo); font-size: 14px; font-weight: 600; text-decoration: none; transition: background .2s, color .2s; }
+.area__opcao .icone { width: 16px; height: 16px; flex: none; }
+.area__opcao:hover { color: var(--texto); background: var(--superficie); }
+.area__opcao[aria-current="true"] { background: var(--grad); color: #fff; box-shadow: 0 4px 12px rgba(37, 99, 235, .25); }
+@media (prefers-reduced-motion: reduce) { .area__opcao { transition: none; } }
 .nav__grupo { display: grid; gap: 2px; }
 .nav__titulo { padding: 0 12px 6px; color: var(--mudo); font-size: 13px; font-weight: 600; }
 .nav__item {
@@ -1997,7 +2004,8 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
    números + gráfico do mês · dois destaques + rosca de categorias · precisa de atenção. Lista: cartões por situação. */
 .den-sigilo { margin-top: 8px; padding: 0; border: 0; background: none; font-size: 13px; }
 .den-sigilo .icone { width: 16px; height: 16px; }
-.den-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.den-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 20px; }
+.den-barra:not(:has(> :not([hidden]))) { display: none; }
 /* Período: mesmo campo de seleção do painel (.campo), com o rótulo ao lado */
 .campo.den-periodo { display: flex; align-items: center; gap: 10px; }
 .campo.den-periodo[hidden] { display: none; }
@@ -2060,7 +2068,7 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 @media (max-width: 639px) { .den-atencao__item { grid-template-columns: 1fr; gap: 6px; } }
 
 /* Lista: cartões por situação (filtram a lista) */
-.den-situacoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.den-situacoes { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
 .den-situacao { display: grid; gap: 6px; padding: 0 0 14px; overflow: hidden; border: 1px solid var(--linha); border-radius: var(--raio); background: var(--superficie); color: var(--texto); font: inherit; text-align: left; cursor: pointer; transition: border-color .2s, box-shadow .2s; }
 .den-situacao__nome { padding: 8px 14px; background: var(--bg-suave); font-size: 13px; font-weight: 600; color: var(--mudo); }
 .den-situacao__n { padding: 0 14px; font-size: 28px; font-weight: 600; }

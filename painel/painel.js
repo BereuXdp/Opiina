@@ -227,6 +227,43 @@ $$('[data-nav]').forEach((item) => {
   if (item.dataset.nav === 'configuracoes' && !pode('configuracoes')) item.href = `configuracoes.html?aba=${pode('atendentes') ? 'atendentes' : 'conta'}`;
   else if (!pode(item.dataset.nav)) item.remove();
 });
+// Duas áreas no menu (cliente, 2026-11-27): seletor "Avaliação | Denúncia" no topo; cada uma com o seu menu
+// e a sua visão geral. Configurações, Ajuda e Suporte aparecem nas duas. Só quem vê Denúncias tem o seletor.
+(() => {
+  const nav = $('.nav');
+  const itemDen = $('[data-nav="denuncias"]');
+  if (!nav) return;
+  if (!itemDen) return;
+  const CHAVE_AREA = 'opiina-demo-area';
+  const COMUNS = ['configuracoes', 'ajuda', 'suporte'];
+  const TELAS_COMUNS = ['configuracoes', 'integracoes', 'ajuda'];
+  let area = 'avaliacao';
+  if (telaAtual === 'denuncias') area = 'denuncia';
+  else if (TELAS_COMUNS.includes(telaAtual)) { try { area = sessionStorage.getItem(CHAVE_AREA) || 'avaliacao'; } catch { /* padrão */ } }
+  try { sessionStorage.setItem(CHAVE_AREA, area); } catch { /* ignora */ }
+
+  nav.insertAdjacentHTML('beforebegin', `
+    <div class="area" role="group" aria-label="Área do painel">
+      <a class="area__opcao" href="index.html" data-area="avaliacao"${area === 'avaliacao' ? ' aria-current="true"' : ''}>${icone('estrela')}Avaliação</a>
+      <a class="area__opcao" href="denuncias.html" data-area="denuncia"${area === 'denuncia' ? ' aria-current="true"' : ''}>${icone('denuncias')}Denúncia</a>
+    </div>`);
+  $$('.area__opcao').forEach((a) => a.addEventListener('click', () => { try { sessionStorage.setItem(CHAVE_AREA, a.dataset.area); } catch { /* ignora */ } }));
+
+  if (area === 'avaliacao') { itemDen.remove(); return; }
+
+  // Área Denúncia: some o menu de avaliação; entram Visão geral, Lista e o canal da equipe
+  $$('[data-nav]', nav).forEach((item) => { if (!COMUNS.includes(item.dataset.nav)) item.remove(); });
+  const p = new URLSearchParams(location.search);
+  const naLista = telaAtual === 'denuncias' && [...p.keys()].some((k) => k !== 'periodo' && k !== 'demo');
+  const atual = (sim) => (telaAtual === 'denuncias' && sim ? ' aria-current="page"' : '');
+  nav.insertAdjacentHTML('afterbegin', `
+    <div class="nav__grupo">
+      <p class="nav__titulo">Denúncias</p>
+      <a class="nav__item" href="denuncias.html" data-nav-den="visao"${atual(!naLista)}>${icone('dashboard')}Visão geral</a>
+      <a class="nav__item" href="denuncias.html?aba=lista" data-nav-den="lista"${atual(naLista)}>${icone('lista')}Lista de denúncias</a>
+      <a class="nav__item" href="canal.html" target="_blank" rel="noopener">${icone('link')}Canal da equipe<span class="visualmente-oculto"> (abre em nova aba)</span></a>
+    </div>`);
+})();
 $$('.nav__grupo').forEach((grupo) => { if (!$('.nav__item', grupo)) grupo.remove(); });
 // Prêmios ainda em desenvolvimento (decisão do cliente): selo no item do menu
 $('[data-nav="premios"]')?.insertAdjacentHTML('beforeend', '<span class="visualmente-oculto">, </span><span class="selo-dev nav__dev">Em desenvolvimento</span>');
