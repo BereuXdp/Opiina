@@ -1,9 +1,22 @@
 // Opiina — painel (protótipo): Denúncias. Usa utilidades de painel.js ($, esc, quando, avisar…).
-// Lista primeiro (no app atual o link e o QR Code ficam no topo); "Divulgar o canal" abre numa gaveta.
+// 2026-11-27 (cliente: "faça um dashboard dele também, com mais funções; é o carro-chefe do Opiina"):
+// Visão geral (indicadores) e Lista; prazo por prioridade; exportar relatório sem nomes nem relatos;
+// desfecho obrigatório ao encerrar; conversa com quem denunciou pelo protocolo (também anônima).
 
-const CHAVE_DEN = 'opiina-demo-denuncias';
+// v2: a lista de exemplo cresceu (24 casos com datas, desfecho e mensagens); a chave nova evita a lista antiga da aba
+const CHAVE_DEN = 'opiina-demo-denuncias-v2';
 const SITUACOES_ABERTAS = ['Recebida', 'Em análise', 'Em investigação', 'Aguardando informações'];
+const SITUACOES_ENCERRADAS = ['Concluída', 'Arquivada'];
 const PESO_PRIORIDADE = { 'Crítica': 0, 'Alta': 1, 'Média': 2, 'Baixa': 3 };
+
+function historicoInicial(d) {
+  const h = [{ dias: d.criada, texto: `Recebida pelo canal (${d.identificacao ? 'identificada' : 'anônima'})` }];
+  if (d.situacao !== 'Recebida') h.push({ dias: d.primeiraAnalise ?? Math.min(0, d.criada + 1), texto: 'Análise iniciada' });
+  (d.mensagens || []).forEach((m) => h.push({ dias: m.dias, texto: m.de === 'equipe' ? 'Mensagem enviada a quem denunciou' : 'Quem denunciou respondeu pelo protocolo' }));
+  if (SITUACOES_ENCERRADAS.includes(d.situacao)) h.push({ dias: d.concluida ?? 0, texto: `${d.situacao}${d.desfecho ? `: ${d.desfecho}` : ''}` });
+  else if (!['Recebida', 'Em análise'].includes(d.situacao)) h.push({ dias: Math.min(0, (d.primeiraAnalise ?? d.criada) + 1), texto: `Situação alterada para "${d.situacao}"` });
+  return h.sort((a, b) => a.dias - b.dias);
+}
 
 const den = {
   lista: (() => {
@@ -11,13 +24,7 @@ const den = {
       const salvo = JSON.parse(sessionStorage.getItem(CHAVE_DEN));
       if (Array.isArray(salvo) && salvo.length) return salvo;
     } catch { /* sem armazenamento: usa os dados iniciais */ }
-    return D.denuncias.map((d) => ({
-      ...d,
-      historico: [
-        { dias: d.criada, texto: `Recebida pelo canal (${d.identificacao ? 'identificada' : 'anônima'})` },
-        ...(d.situacao !== 'Recebida' ? [{ dias: Math.min(0, d.criada + 1), texto: `Situação alterada para "${d.situacao}"` }] : []),
-      ],
-    }));
+    return D.denuncias.map((d) => ({ mensagens: [], ...d, historico: historicoInicial(d) }));
   })(),
   salvar() { try { sessionStorage.setItem(CHAVE_DEN, JSON.stringify(this.lista)); } catch { /* ignora */ } },
 };
@@ -28,6 +35,18 @@ const htmlIdent = (d) => d.identificacao
   ? `<span class="den-ident">${icone('pessoa')}Identificada</span>`
   : `<span class="den-ident den-ident--anonima">${icone('cadeado')}Anônima</span>`;
 
+// Prazo para concluir, contado do recebimento (dias por prioridade em dados.js; proposta do protótipo)
+function prazoDen(d) {
+  if (!aberta(d)) return { texto: d.concluida != null ? `Encerrada ${quando(d.concluida)}` : 'Encerrada', classe: '', atrasada: false, restante: Infinity };
+  const restante = d.criada + (D.denunciaPrazos[d.prioridade] || 30);
+  if (restante < 0) return { texto: `Atrasada há ${-restante} ${-restante === 1 ? 'dia' : 'dias'}`, classe: 'prazo--vencido', atrasada: true, restante };
+  if (restante === 0) return { texto: 'Vence hoje', classe: 'prazo--hoje', atrasada: false, restante };
+  return { texto: `Vence em ${restante} ${restante === 1 ? 'dia' : 'dias'}`, classe: restante <= 2 ? 'prazo--hoje' : '', atrasada: false, restante };
+}
+const htmlPrazo = (d) => { const p = prazoDen(d); return `<span class="prazo ${p.classe}">${aberta(d) ? icone('relogio') : ''}${p.texto}</span>`; };
+const media = (nums) => (nums.length ? nums.reduce((a, b) => a + b, 0) / nums.length : null);
+const textoDias = (n) => (n == null ? '—' : n < 0.5 ? 'No mesmo dia' : `${n.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} ${n === 1 ? 'dia' : 'dias'}`);
+
 if ($('[data-denuncias]')) iniciarDenuncias();
 
 function iniciarDenuncias() {
@@ -37,26 +56,132 @@ function iniciarDenuncias() {
   const estado = { ...padrao };
   Object.keys(padrao).forEach((k) => { if (params.get(k)) estado[k] = params.get(k); });
 
+  // ----- Abas: Visão geral (padrão) e Lista. Filtro ou "abrir" no endereço levam direto à Lista -----
+  const aba = params.get('aba') === 'lista' || params.get('abrir') || Object.keys(padrao).some((k) => params.get(k)) ? 'lista' : 'visao';
+  $$('[data-den-aba]').forEach((el) => { el.hidden = el.dataset.denAba !== aba; });
+  $$('[data-den-so]').forEach((el) => { el.hidden = el.dataset.denSo !== aba; });
+  $$('[data-den-aba-link]').forEach((a) => { if (a.dataset.denAbaLink === aba) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+
   D.denunciaSituacoes.forEach((s) => form.situacao.add(new Option(s, s)));
   [...D.denunciaPrioridades].reverse().forEach((p) => form.prioridade.add(new Option(p, p)));
   D.denunciaCategorias.forEach((c) => form.categoria.add(new Option(c, c)));
   D.unidades.forEach((u) => form.unidade.add(new Option(u, u)));
   Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
 
-  // ----- Resumo: o que pede ação primeiro -----
-  function desenharResumo() {
+  // =====================================================================
+  // Visão geral
+  // =====================================================================
+  const seletorPeriodo = $('[data-den-periodo]');
+  if (['90', '180', '365'].includes(params.get('periodo'))) seletorPeriodo.value = params.get('periodo');
+  const NOME_PERIODO = { 90: 'Últimos 3 meses', 180: 'Últimos 6 meses', 365: 'Últimos 12 meses' };
+
+  function desenharVisao() {
+    const dias = Number(seletorPeriodo.value);
+    const noPeriodo = den.lista.filter((d) => d.criada >= -dias);
     const abertas = den.lista.filter(aberta);
     const novas = abertas.filter((d) => d.situacao === 'Recebida').length;
     const graves = abertas.filter((d) => d.prioridade === 'Alta' || d.prioridade === 'Crítica').length;
-    const concluidas = den.lista.filter((d) => d.situacao === 'Concluída' && d.criada >= -90).length;
-    $('[data-den-resumo]').innerHTML = `
-      <article class="kpi"><p class="kpi__rotulo">Novas</p><p class="kpi__valor">${novas}</p><p class="kpi__nota">Ainda sem análise</p></article>
-      <article class="kpi"><p class="kpi__rotulo">Em andamento</p><p class="kpi__valor">${abertas.length - novas}</p><p class="kpi__nota">Em análise, investigação ou aguardando informações</p></article>
-      <article class="kpi${graves ? ' kpi--alerta' : ''}"><p class="kpi__rotulo">Prioridade alta ou crítica</p><p class="kpi__valor">${graves}</p><p class="kpi__nota">${graves ? 'Em aberto. Trate primeiro.' : 'Nenhuma em aberto'}</p></article>
-      <article class="kpi"><p class="kpi__rotulo">Concluídas</p><p class="kpi__valor">${concluidas}</p><p class="kpi__nota">Nos últimos 90 dias</p></article>`;
-  }
+    const atrasadas = abertas.filter((d) => prazoDen(d).atrasada).length;
+    const tAnalise = media(noPeriodo.filter((d) => d.primeiraAnalise != null).map((d) => d.primeiraAnalise - d.criada));
+    const concluidas = noPeriodo.filter((d) => d.situacao === 'Concluída' && d.concluida != null);
+    const tConcluir = media(concluidas.map((d) => d.concluida - d.criada));
+    const anonimas = noPeriodo.filter((d) => !d.identificacao).length;
+    const pctAnon = noPeriodo.length ? Math.round((anonimas / noPeriodo.length) * 100) : 0;
 
-  // ----- Lista -----
+    $('[data-den-kpis]').innerHTML = `
+      <article class="kpi"><p class="kpi__rotulo">Em aberto</p><p class="kpi__valor">${abertas.length}</p><p class="kpi__nota">${novas} ${novas === 1 ? 'nova' : 'novas'}, ainda sem análise</p></article>
+      <article class="kpi${graves ? ' kpi--alerta' : ''}"><p class="kpi__rotulo">Graves em aberto</p><p class="kpi__valor">${graves}</p><p class="kpi__nota">Prioridade alta ou crítica</p></article>
+      <article class="kpi${atrasadas ? ' kpi--alerta' : ''}"><p class="kpi__rotulo">Atrasadas</p><p class="kpi__valor">${atrasadas}</p><p class="kpi__nota">${atrasadas ? 'Passaram do prazo. Trate primeiro.' : 'Todas dentro do prazo'}</p></article>
+      <article class="kpi"><p class="kpi__rotulo">Recebidas</p><p class="kpi__valor">${noPeriodo.length}</p><p class="kpi__nota">${NOME_PERIODO[dias]} · ${pctAnon}% anônimas</p></article>
+      <article class="kpi"><p class="kpi__rotulo">Até a primeira análise</p><p class="kpi__valor den-kpi-tempo">${textoDias(tAnalise)}</p><p class="kpi__nota">Tempo médio no período</p></article>
+      <article class="kpi"><p class="kpi__rotulo">Para concluir</p><p class="kpi__valor den-kpi-tempo">${textoDias(tConcluir)}</p><p class="kpi__nota">Tempo médio dos casos concluídos</p></article>`;
+
+    // Precisa de atenção: atrasadas, depois as mais graves, depois o prazo mais curto
+    const atencao = [...abertas].sort((a, b) => prazoDen(b).atrasada - prazoDen(a).atrasada
+      || PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade] || prazoDen(a).restante - prazoDen(b).restante).slice(0, 5);
+    $('[data-den-atencao]').innerHTML = atencao.map((d) => `<li>
+      <a class="atencao__item" href="denuncias.html?aba=lista&amp;abrir=${encodeURIComponent(d.id)}">
+        ${htmlPrioridade(d.prioridade)}
+        <span class="atencao__texto">${esc(d.resumo)}</span>
+        <span class="atencao__meta">${htmlPrazo(d)}<span>${esc(d.unidade || 'Unidade não informada')}</span><span>${d.situacao}</span><span>${esc(d.categoria)}</span></span>
+      </a></li>`).join('');
+    $('[data-den-atencao-vazio]').hidden = atencao.length > 0;
+
+    const barras = (pares, total) => {
+      const maior = Math.max(1, ...pares.map(([, n]) => n));
+      return pares.map(([nome, n]) => `<li><span class="temas__nome">${esc(nome)}</span>
+        <span class="temas__trilho" aria-hidden="true"><span class="temas__barra" style="width:${(n / maior) * 100}%"></span></span>
+        <span class="temas__total">${n}${total ? `<span class="den-pct"> · ${Math.round((n / total) * 100)}%</span>` : ''}</span></li>`).join('');
+    };
+
+    $('[data-den-periodo-texto]').textContent = `${NOME_PERIODO[dias]}: ${noPeriodo.length} ${noPeriodo.length === 1 ? 'denúncia recebida' : 'denúncias recebidas'}`;
+    $('[data-den-situacao]').innerHTML = barras(D.denunciaSituacoes.map((s) => [s, noPeriodo.filter((d) => d.situacao === s).length]));
+
+    // Por mês: um bloco por mês do período, anônimas e identificadas empilhadas
+    const meses = Math.round(dias / 30);
+    const hoje = new Date();
+    const cols = Array.from({ length: meses }, (_, i) => {
+      const ref = new Date(hoje.getFullYear(), hoje.getMonth() - (meses - 1 - i), 1);
+      const doMes = noPeriodo.filter((d) => { const dt = diaRelativo(d.criada); return dt.getFullYear() === ref.getFullYear() && dt.getMonth() === ref.getMonth(); });
+      return { ref, total: doMes.length, anon: doMes.filter((d) => !d.identificacao).length };
+    });
+    const maiorMes = Math.max(1, ...cols.map((c) => c.total));
+    $('[data-den-meses]').innerHTML = cols.map((c) => {
+      const nome = c.ref.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+      const nomeLongo = c.ref.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      const ident = c.total - c.anon;
+      return `<div class="den-coluna" role="img" aria-label="${nomeLongo}: ${c.total} ${c.total === 1 ? 'denúncia' : 'denúncias'}, ${c.anon} ${c.anon === 1 ? 'anônima' : 'anônimas'} e ${ident} ${ident === 1 ? 'identificada' : 'identificadas'}">
+        <span class="den-coluna__total">${c.total}</span>
+        <span class="den-coluna__pilha" style="height:${(c.total / maiorMes) * 100}%">
+          <span class="den-coluna__ident" style="flex:${ident}"></span><span class="den-coluna__anonima" style="flex:${c.anon}"></span>
+        </span>
+        <span class="den-coluna__mes">${nome}</span>
+      </div>`;
+    }).join('');
+
+    // Por categoria: as 6 que mais aparecem
+    const porCat = D.denunciaCategorias.map((c) => [c, noPeriodo.filter((d) => d.categoria === c).length]).filter(([, n]) => n).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    $('[data-den-categorias]').innerHTML = porCat.length ? barras(porCat, noPeriodo.length) : '<li class="den-sem">Nenhuma denúncia no período.</li>';
+
+    // Por unidade
+    const unidades = [...D.unidades, ...(den.lista.some((d) => !d.unidade) ? [null] : [])];
+    $('[data-den-unidades]').innerHTML = unidades.map((u) => {
+      const daUnidade = (lista) => lista.filter((d) => d.unidade === u);
+      const rec = daUnidade(noPeriodo);
+      const abertasU = daUnidade(abertas).length;
+      const gravesU = rec.filter((d) => d.prioridade === 'Alta' || d.prioridade === 'Crítica').length;
+      const tU = media(rec.filter((d) => d.situacao === 'Concluída' && d.concluida != null).map((d) => d.concluida - d.criada));
+      const link = u ? `denuncias.html?unidade=${encodeURIComponent(u)}&amp;situacao=todas` : 'denuncias.html?aba=lista&amp;situacao=todas';
+      return `<tr>
+        <th scope="row"><a href="${link}">${esc(u || 'Não informada')}</a></th>
+        <td>${rec.length}</td>
+        <td>${abertasU ? `<strong>${abertasU}</strong>` : '0'}</td>
+        <td>${gravesU ? `<span class="den-graves">${gravesU}</span>` : '0'}</td>
+        <td>${textoDias(tU)}</td>
+      </tr>`;
+    }).join('');
+
+    // Desfecho dos encerrados no período
+    const encerradas = noPeriodo.filter((d) => SITUACOES_ENCERRADAS.includes(d.situacao) && d.desfecho);
+    $('[data-den-encerrados]').textContent = `${encerradas.length} ${encerradas.length === 1 ? 'caso encerrado' : 'casos encerrados'} no período`;
+    $('[data-den-desfechos]').innerHTML = encerradas.length
+      ? barras(D.denunciaDesfechos.map((x) => [x, encerradas.filter((d) => d.desfecho === x).length]), encerradas.length)
+      : '<li class="den-sem">Nenhum caso encerrado no período.</li>';
+    $('[data-den-anonimato]').innerHTML = noPeriodo.length
+      ? `${icone('cadeado')}<span><strong>${pctAnon}%</strong> das denúncias do período foram anônimas. A equipe confia no canal quando pode relatar sem se expor.</span>`
+      : '';
+
+    if (aba === 'visao') {
+      const p = new URLSearchParams();
+      if (seletorPeriodo.value !== '180') p.set('periodo', seletorPeriodo.value);
+      history.replaceState(null, '', p.toString() ? `?${p}` : location.pathname);
+    }
+  }
+  seletorPeriodo.addEventListener('change', desenharVisao);
+
+  // =====================================================================
+  // Lista
+  // =====================================================================
   function filtrar() {
     const q = estado.q.trim().toLowerCase();
     return den.lista.filter((d) => {
@@ -69,76 +194,134 @@ function iniciarDenuncias() {
       if (estado.ident === 'identificada' && !d.identificacao) return false;
       if (q && !`${d.id} ${d.resumo} ${d.relato} ${d.categoria}`.toLowerCase().includes(q)) return false;
       return true;
-    // Em aberto primeiro; depois a mais grave; depois a mais recente
-    }).sort((a, b) => aberta(b) - aberta(a) || PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade] || b.criada - a.criada);
+    // Em aberto primeiro; atrasadas; a mais grave; a mais recente
+    }).sort((a, b) => aberta(b) - aberta(a) || prazoDen(b).atrasada - prazoDen(a).atrasada
+      || PESO_PRIORIDADE[a.prioridade] - PESO_PRIORIDADE[b.prioridade] || b.criada - a.criada);
   }
 
   function htmlLinha(d) {
+    const msgs = (d.mensagens || []).length;
     return `<tr>
       <td data-col="nota">${htmlPrioridade(d.prioridade)}</td>
       <td data-col="comentario"><button class="oc-abrir" type="button" data-den-abrir="${d.id}" aria-haspopup="dialog">
         <span class="oc-abrir__texto">${esc(d.resumo)}</span>
-        <span class="oc-abrir__meta">${d.id} · ${esc(d.categoria)} · ${quando(d.criada)}</span></button></td>
+        <span class="oc-abrir__meta">${d.id} · ${esc(d.categoria)} · ${quando(d.criada)}${msgs ? ` · ${msgs} ${msgs === 1 ? 'mensagem' : 'mensagens'}` : ''}</span></button></td>
       <td data-col="unidade">${esc(d.unidade || 'Não informada')}</td>
       <td data-col="etapa">${htmlSituacao(d.situacao)}</td>
+      <td data-col="prazo">${htmlPrazo(d)}</td>
       <td data-col="responsavel">${htmlIdent(d)}</td>
     </tr>`;
   }
 
-  function desenhar() {
+  function desenharLista() {
     const itens = filtrar();
     $('[data-den-lista]').innerHTML = itens.map(htmlLinha).join('');
     $('[data-den-vazio]').hidden = itens.length > 0;
     $('.den-tabela').hidden = itens.length === 0;
     $('[data-den-contagem]').innerHTML = `<strong>${itens.length}</strong> ${itens.length === 1 ? 'denúncia' : 'denúncias'}`;
-    // Filtros no endereço (dá para voltar ao mesmo recorte)
-    const p = new URLSearchParams();
-    Object.keys(padrao).forEach((k) => { if (estado[k] !== padrao[k]) p.set(k, estado[k]); });
-    history.replaceState(null, '', p.toString() ? `?${p}` : location.pathname);
-    desenharResumo();
+    $('[data-den-exportar]').disabled = itens.length === 0;
+    if (aba === 'lista') {
+      // Filtros no endereço (dá para voltar ao mesmo recorte)
+      const p = new URLSearchParams({ aba: 'lista' });
+      Object.keys(padrao).forEach((k) => { if (estado[k] !== padrao[k]) p.set(k, estado[k]); });
+      history.replaceState(null, '', `?${p}`);
+    }
   }
+
+  const desenharTudo = () => { desenharVisao(); desenharLista(); };
 
   form.addEventListener('input', (e) => {
     if (!e.target.name) return;
     estado[e.target.name] = e.target.value;
-    desenhar();
+    desenharLista();
   });
   form.addEventListener('submit', (e) => e.preventDefault());
   $('[data-den-limpar]').addEventListener('click', () => {
     Object.assign(estado, padrao);
     Object.keys(padrao).forEach((k) => { if (form[k]) form[k].value = estado[k]; });
-    desenhar();
+    desenharLista();
     form.q.focus();
   });
 
-  // ----- Gaveta de detalhe -----
+  // ----- Exportar relatório (CSV para Excel/Planilhas): sem nomes, contatos nem relatos -----
+  $('[data-den-exportar]').addEventListener('click', () => {
+    const itens = filtrar();
+    const dataLonga = (dias) => diaRelativo(dias).toLocaleDateString('pt-BR');
+    const celula = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const linhas = [
+      ['Protocolo', 'Recebida em', 'Categoria', 'Unidade', 'Prioridade', 'Situação', 'Prazo', 'Identificação', 'Desfecho', 'Encerrada em'],
+      ...itens.map((d) => [d.id, dataLonga(d.criada), d.categoria, d.unidade || 'Não informada', d.prioridade, d.situacao,
+        aberta(d) ? prazoDen(d).texto : '', d.identificacao ? 'Identificada' : 'Anônima', d.desfecho || '', d.concluida != null ? dataLonga(d.concluida) : '']),
+    ];
+    const csv = `﻿${linhas.map((l) => l.map(celula).join(';')).join('\r\n')}`;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `denuncias-relatorio-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    avisar(`Relatório com ${itens.length} ${itens.length === 1 ? 'denúncia' : 'denúncias'} baixado (sem nomes nem relatos)`);
+  });
+
+  // =====================================================================
+  // Gaveta de detalhe
+  // =====================================================================
   const gaveta = $('[data-den-gaveta]');
   const gForm = $('[data-dg-form]', gaveta);
+  const msgForm = $('[data-dg-msg-form]', gaveta);
   const campo = (nome) => $(`[data-dg="${nome}"]`, gaveta);
   D.denunciaSituacoes.forEach((s) => gForm.situacao.add(new Option(s, s)));
   [...D.denunciaPrioridades].reverse().forEach((p) => gForm.prioridade.add(new Option(p, p)));
+  D.denunciaDesfechos.forEach((x) => gForm.desfecho.add(new Option(x, x)));
+  const blocoEncerrar = $('[data-dg-encerrar]', gaveta);
+  const erroDesfecho = $('#dg-desfecho-erro');
+  const mostrarEncerrar = () => { blocoEncerrar.hidden = !SITUACOES_ENCERRADAS.includes(gForm.situacao.value); };
+  gForm.situacao.addEventListener('change', mostrarEncerrar);
+  gForm.desfecho.addEventListener('change', () => { erroDesfecho.hidden = true; gForm.desfecho.removeAttribute('aria-invalid'); });
   let atual = null;
+
+  function preencher(d) {
+    campo('id').textContent = d.id;
+    campo('prioridade').innerHTML = htmlPrioridade(d.prioridade);
+    campo('situacao').innerHTML = htmlSituacao(d.situacao);
+    campo('resumo').textContent = d.resumo;
+    campo('relato').textContent = d.relato;
+    campo('categoria').textContent = d.categoria;
+    campo('unidade').textContent = d.unidade || 'Não informada';
+    campo('recebida').textContent = `${dataCurta(diaRelativo(d.criada))} (${quando(d.criada)})`;
+    campo('prazo').innerHTML = htmlPrazo(d);
+    campo('identificacao').innerHTML = d.identificacao
+      ? `${esc(d.identificacao.nome)}<span class="den-contato">${esc(d.identificacao.contato)}</span>`
+      : 'Anônima';
+    campo('aviso-anonima').hidden = Boolean(d.identificacao);
+    campo('desfecho-bloco').hidden = !d.desfecho;
+    campo('desfecho').textContent = d.desfecho || '';
+    campo('medidas').textContent = d.medidas || '';
+    campo('medidas').hidden = !d.medidas;
+    gForm.situacao.value = d.situacao;
+    gForm.prioridade.value = d.prioridade;
+    gForm.desfecho.value = d.desfecho || '';
+    gForm.medidas.value = d.medidas || '';
+    gForm.anotacao.value = '';
+    erroDesfecho.hidden = true;
+    gForm.desfecho.removeAttribute('aria-invalid');
+    mostrarEncerrar();
+    const msgs = d.mensagens || [];
+    campo('mensagens').innerHTML = msgs.length
+      ? msgs.map((m) => `<li class="den-msg den-msg--${m.de === 'equipe' ? 'equipe' : 'denunciante'}">
+          <span class="den-msg__quem">${m.de === 'equipe' ? 'Equipe responsável' : 'Quem denunciou'}</span>
+          <p>${esc(m.texto)}</p>
+          <span class="den-msg__quando">${quando(m.dias)}</span></li>`).join('')
+      : '<li class="den-msg-vazio">Nenhuma mensagem ainda.</li>';
+    msgForm.hidden = !aberta(d);
+    campo('historico').innerHTML = [...d.historico].reverse()
+      .map((h) => `<li>${esc(h.texto)}<span class="historico__quando">${quando(h.dias)}</span></li>`).join('');
+  }
 
   function abrir(id) {
     atual = den.lista.find((d) => d.id === id);
     if (!atual) return;
-    campo('id').textContent = atual.id;
-    campo('prioridade').innerHTML = htmlPrioridade(atual.prioridade);
-    campo('situacao').innerHTML = htmlSituacao(atual.situacao);
-    campo('resumo').textContent = atual.resumo;
-    campo('relato').textContent = atual.relato;
-    campo('categoria').textContent = atual.categoria;
-    campo('unidade').textContent = atual.unidade || 'Não informada';
-    campo('recebida').textContent = `${dataCurta(diaRelativo(atual.criada))} (${quando(atual.criada)})`;
-    campo('identificacao').innerHTML = atual.identificacao
-      ? `${esc(atual.identificacao.nome)}<span class="den-contato">${esc(atual.identificacao.contato)}</span>`
-      : 'Anônima';
-    campo('aviso-anonima').hidden = Boolean(atual.identificacao);
-    gForm.situacao.value = atual.situacao;
-    gForm.prioridade.value = atual.prioridade;
-    gForm.anotacao.value = '';
-    campo('historico').innerHTML = [...atual.historico].reverse()
-      .map((h) => `<li>${esc(h.texto)}<span class="historico__quando">${quando(h.dias)}</span></li>`).join('');
+    preencher(atual);
+    msgForm.mensagem.value = '';
     gaveta.showModal();
     campo('resumo').focus();
   }
@@ -156,18 +339,56 @@ function iniciarDenuncias() {
 
   gForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    const { situacao, prioridade, desfecho } = gForm;
+    const encerrando = SITUACOES_ENCERRADAS.includes(situacao.value);
+    if (encerrando && !desfecho.value) {
+      erroDesfecho.hidden = false;
+      desfecho.setAttribute('aria-invalid', 'true');
+      desfecho.focus();
+      return;
+    }
     const mudancas = [];
-    const { situacao, prioridade } = gForm;
     const anotacao = gForm.anotacao.value.trim();
-    if (situacao.value !== atual.situacao) { mudancas.push(`Situação alterada para "${situacao.value}"`); atual.situacao = situacao.value; }
+    const medidas = gForm.medidas.value.trim();
+    if (situacao.value !== atual.situacao) {
+      if (atual.situacao === 'Recebida' && atual.primeiraAnalise == null) atual.primeiraAnalise = 0;
+      if (encerrando) atual.concluida = 0;
+      if (!encerrando && SITUACOES_ENCERRADAS.includes(atual.situacao)) { delete atual.concluida; delete atual.desfecho; mudancas.push('Reaberta'); }
+      mudancas.push(`Situação alterada para "${situacao.value}"`);
+      atual.situacao = situacao.value;
+    }
+    if (encerrando && desfecho.value !== atual.desfecho) { mudancas.push(`Desfecho: ${desfecho.value}`); atual.desfecho = desfecho.value; }
+    if (encerrando && medidas !== (atual.medidas || '')) { if (medidas) mudancas.push('Medidas tomadas registradas'); atual.medidas = medidas; }
     if (prioridade.value !== atual.prioridade) { mudancas.push(`Prioridade alterada para ${prioridade.value}`); atual.prioridade = prioridade.value; }
     if (anotacao) mudancas.push(`Anotação: ${anotacao}`);
     if (!mudancas.length) { gaveta.close(); return; }
     mudancas.forEach((texto) => atual.historico.push({ dias: 0, texto }));
     den.salvar();
-    desenhar();
+    desenharTudo();
     gaveta.close();
     avisar(`${atual.id} atualizada`);
+  });
+
+  // Mensagem para quem denunciou (lida e respondida pelo canal, com o protocolo)
+  msgForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const texto = msgForm.mensagem.value.trim();
+    const erro = $('#dg-mensagem-erro');
+    erro.hidden = Boolean(texto);
+    if (!texto) { msgForm.mensagem.setAttribute('aria-invalid', 'true'); msgForm.mensagem.focus(); return; }
+    msgForm.mensagem.removeAttribute('aria-invalid');
+    atual.mensagens = [...(atual.mensagens || []), { de: 'equipe', dias: 0, texto }];
+    atual.historico.push({ dias: 0, texto: 'Mensagem enviada a quem denunciou' });
+    if (msgForm.aguardar.checked && aberta(atual) && atual.situacao !== 'Aguardando informações') {
+      if (atual.situacao === 'Recebida' && atual.primeiraAnalise == null) atual.primeiraAnalise = 0;
+      atual.situacao = 'Aguardando informações';
+      atual.historico.push({ dias: 0, texto: 'Situação alterada para "Aguardando informações"' });
+    }
+    den.salvar();
+    desenharTudo();
+    preencher(atual);
+    msgForm.mensagem.value = '';
+    avisar('Mensagem enviada. Quem denunciou vê ao consultar o protocolo.');
   });
 
   // ----- Divulgar o canal -----
@@ -187,6 +408,6 @@ function iniciarDenuncias() {
   $('[data-dv-qr]', divulgar).innerHTML = qrSvg(linkCanal, { rotulo: 'QR Code do canal de denúncias' });
   $('[data-dv-baixar]', divulgar).addEventListener('click', () => { baixarQr(linkCanal, 'qrcode-canal-de-denuncias.png'); avisar('QR Code baixado'); });
 
-  desenhar();
+  desenharTudo();
   if (params.get('abrir')) abrir(params.get('abrir'));
 }

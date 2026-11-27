@@ -34,17 +34,22 @@ function protocolo() {
   return `DEN${data}-${Math.floor(Math.random() * 4096).toString(16).toUpperCase().padStart(3, '0')}`;
 }
 
-// Mesma lista do painel (denuncias.js): se a aba ainda não tem, parte dos exemplos
-function listaDoPainel() {
-  try { const s = JSON.parse(sessionStorage.getItem('opiina-demo-denuncias')); if (Array.isArray(s)) return s; } catch { /* usa os exemplos */ }
-  return D.denuncias.map((x) => ({
-    ...x,
-    historico: [
-      { dias: x.criada, texto: `Recebida pelo canal (${x.identificacao ? 'identificada' : 'anônima'})` },
-      ...(x.situacao !== 'Recebida' ? [{ dias: Math.min(0, x.criada + 1), texto: `Situação alterada para "${x.situacao}"` }] : []),
-    ],
-  }));
+// Mesma lista e mesma chave do painel (denuncias.js, v2): se a aba ainda não tem, parte dos exemplos
+const CHAVE_DEN = 'opiina-demo-denuncias-v2';
+const ENCERRADAS = ['Concluída', 'Arquivada'];
+function historicoInicial(d) {   // igual ao de denuncias.js (esta página não carrega painel.js)
+  const h = [{ dias: d.criada, texto: `Recebida pelo canal (${d.identificacao ? 'identificada' : 'anônima'})` }];
+  if (d.situacao !== 'Recebida') h.push({ dias: d.primeiraAnalise ?? Math.min(0, d.criada + 1), texto: 'Análise iniciada' });
+  (d.mensagens || []).forEach((m) => h.push({ dias: m.dias, texto: m.de === 'equipe' ? 'Mensagem enviada a quem denunciou' : 'Quem denunciou respondeu pelo protocolo' }));
+  if (ENCERRADAS.includes(d.situacao)) h.push({ dias: d.concluida ?? 0, texto: `${d.situacao}${d.desfecho ? `: ${d.desfecho}` : ''}` });
+  else if (!['Recebida', 'Em análise'].includes(d.situacao)) h.push({ dias: Math.min(0, (d.primeiraAnalise ?? d.criada) + 1), texto: `Situação alterada para "${d.situacao}"` });
+  return h.sort((a, b) => a.dias - b.dias);
 }
+function listaDoPainel() {
+  try { const s = JSON.parse(sessionStorage.getItem(CHAVE_DEN)); if (Array.isArray(s) && s.length) return s; } catch { /* usa os exemplos */ }
+  return D.denuncias.map((x) => ({ mensagens: [], ...x, historico: historicoInicial(x) }));
+}
+const salvarLista = (lista) => { try { sessionStorage.setItem(CHAVE_DEN, JSON.stringify(lista)); return true; } catch { return false; } };
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -72,9 +77,10 @@ form.addEventListener('submit', (e) => {
     situacao: 'Recebida', prioridade: 'Média',   // a prioridade é revista pelo time responsável
     resumo: form.resumo.value.trim(),
     relato: `${form.relato.value.trim()}${quando ? `\n\nQuando aconteceu: ${quando}.` : ''}`,
+    mensagens: [],
     historico: [{ dias: 0, texto: `Recebida pelo canal (${identificada ? 'identificada' : 'anônima'})` }],
   });
-  try { sessionStorage.setItem('opiina-demo-denuncias', JSON.stringify(lista)); } catch { /* sem armazenamento: só mostra o protocolo */ }
+  salvarLista(lista);   // sem armazenamento: só mostra o protocolo
 
   // Confirmação com o protocolo
   $('[data-canal]').innerHTML = `
@@ -88,7 +94,7 @@ form.addEventListener('submit', (e) => {
         <strong data-protocolo>${numero}</strong>
         <button class="btn btn--secundario" type="button" data-copiar>${icone('link')}Copiar protocolo</button>
       </div>
-      <p class="cli__desc">Guarde este número: ele identifica sua denúncia se você precisar falar sobre ela.</p>
+      <p class="cli__desc">Guarde este número: com ele você acompanha a denúncia e responde ao time responsável nesta mesma página, em "Acompanhe pelo protocolo".</p>
       <p class="cli__desc">Obrigado por avisar. Pode fechar esta página.</p>
     </div>`;
   // Só no protótipo: atalho para ver a denúncia chegando no painel (mesma aba)
@@ -100,4 +106,84 @@ form.addEventListener('submit', (e) => {
     try { await navigator.clipboard.writeText(numero); b.lastChild.textContent = 'Protocolo copiado'; }
     catch { getSelection().selectAllChildren($('[data-protocolo]')); b.lastChild.textContent = 'Selecionado: copie com Ctrl+C'; }
   });
+});
+
+// ── Acompanhar pelo protocolo (2026-11-27) ──
+// Quem denunciou (até anônimo) vê a situação e as mensagens do time e responde. Não mostra notas internas,
+// prioridade, desfecho nem medidas: só o que o time escreveu para a pessoa.
+const normalizar = (t) => String(t).toUpperCase().replace(/[^A-Z0-9]/g, '');
+const textoDia = (dias) => (dias === 0 ? 'hoje' : dias === -1 ? 'ontem' : `há ${-dias} dias`);
+
+function situacaoPublica(d) {
+  const ultima = (d.mensagens || []).at(-1);
+  if (d.situacao === 'Recebida') return ['Recebida', 'Sua denúncia chegou e ainda vai ser analisada pelo time responsável.'];
+  if (d.situacao === 'Aguardando informações' && ultima?.de === 'equipe') return ['Aguardando sua resposta', 'O time responsável fez uma pergunta. Responda aqui embaixo; você não precisa se identificar.'];
+  if (ENCERRADAS.includes(d.situacao)) return ['Encerrada', 'A apuração terminou. Por sigilo, as medidas tomadas não são detalhadas aqui.'];
+  return ['Em apuração', 'O time responsável está apurando o que você relatou.'];
+}
+
+function mostrarAcompanhamento(id) {
+  const lista = listaDoPainel();
+  const d = lista.find((x) => x.id === id);
+  const [rotulo, explica] = situacaoPublica(d);
+  const encerrada = ENCERRADAS.includes(d.situacao);
+  const msgs = d.mensagens || [];
+  $('[data-canal]').innerHTML = `
+    <div class="cli__marca"><img src="../assets/icons/logo-opiina-64.png" alt="">Casa Exemplo</div>
+    <div class="canal__topo">
+      <p class="canal__acomp-voltar"><a href="canal.html">← Voltar ao canal</a></p>
+      <h1 class="cli__titulo" tabindex="-1" data-acomp-titulo>Sua denúncia</h1>
+      <p class="cli__desc">Protocolo <strong>${esc(d.id)}</strong> · enviada ${textoDia(d.criada)}</p>
+    </div>
+    <div class="canal__situacao canal__situacao--${encerrada ? 'fim' : rotulo === 'Aguardando sua resposta' ? 'resposta' : 'andamento'}" role="status">
+      <strong>${rotulo}</strong><span>${explica}</span>
+    </div>
+    <section class="canal__conversa" aria-labelledby="canal-conversa-t">
+      <h2 id="canal-conversa-t" class="canal__conversa-t">Mensagens</h2>
+      ${msgs.length ? `<ul class="den-mensagens canal__mensagens">${msgs.map((m) => `
+        <li class="den-msg den-msg--${m.de === 'equipe' ? 'equipe' : 'denunciante'}">
+          <span class="den-msg__quem">${m.de === 'equipe' ? 'Time responsável' : 'Você'} · ${textoDia(m.dias)}</span>
+          <p>${esc(m.texto)}</p>
+        </li>`).join('')}</ul>` : '<p class="cli__desc">Ainda não há mensagens. Se o time precisar de mais detalhes, a pergunta aparece aqui.</p>'}
+      ${encerrada ? '<p class="cli__desc">Esta denúncia foi encerrada. Se aconteceu algo novo, faça uma nova denúncia pelo canal.</p>' : `
+      <form class="den-msg-form" data-acomp-form novalidate>
+        <div class="campo">
+          <label for="a-resposta">${msgs.length ? 'Responder ao time responsável' : 'Acrescentar uma informação'}</label>
+          <textarea id="a-resposta" name="resposta" rows="4" aria-describedby="a-resposta-dica a-resposta-erro"></textarea>
+          <p class="campo__dica" id="a-resposta-dica">Se quiser continuar anônimo, não escreva seu nome nem detalhes que identifiquem você.</p>
+          <p class="campo__erro" id="a-resposta-erro" hidden>Escreva a mensagem antes de enviar.</p>
+        </div>
+        <button class="cli__enviar" type="submit">Enviar mensagem</button>
+      </form>`}
+    </section>`;
+  $('.pub__prototipo').innerHTML = 'Protótipo: a resposta vai para <a href="denuncias.html?aba=lista">Painel › Denúncias</a> (só neste navegador).';
+  scrollTo(0, 0);
+  $('[data-acomp-titulo]').focus();
+
+  const f = $('[data-acomp-form]');
+  if (!f) return;
+  f.resposta.addEventListener('input', () => marcar(f.resposta, false));
+  f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const texto = f.resposta.value.trim();
+    if (marcar(f.resposta, !texto)) { f.resposta.focus(); return; }
+    d.mensagens = [...msgs, { de: 'denunciante', dias: 0, texto }];
+    d.historico = [...(d.historico || []), { dias: 0, texto: 'Quem denunciou respondeu pelo protocolo' }];
+    salvarLista(lista);
+    mostrarAcompanhamento(id);
+    const aviso = document.createElement('p');
+    aviso.className = 'canal__enviado'; aviso.setAttribute('role', 'status');
+    aviso.textContent = 'Mensagem enviada ao time responsável.';
+    $('.canal__conversa').prepend(aviso);
+  });
+}
+
+const consulta = $('[data-canal-consulta]');
+consulta.protocolo.addEventListener('input', () => marcar(consulta.protocolo, false));
+consulta.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const busca = normalizar(consulta.protocolo.value);
+  const achada = busca && listaDoPainel().find((x) => normalizar(x.id) === busca);
+  if (marcar(consulta.protocolo, !achada)) { consulta.protocolo.focus(); return; }
+  mostrarAcompanhamento(achada.id);
 });

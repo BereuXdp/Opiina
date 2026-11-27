@@ -20,7 +20,7 @@
   a denúncia enviada entra na lista de Denúncias do painel só nesta aba (sessionStorage).
 -->
 <body class="pub">
-  <p class="pub__prototipo">Protótipo: a denúncia não sai deste navegador.</p>
+  <p class="pub__prototipo">Protótipo: a denúncia não sai deste navegador. Para testar o acompanhamento, use o protocolo <strong>DEN-1015</strong>.</p>
   <main class="pub__pagina">
     <div class="pub__cartao pub__cartao--largo">
       <div class="canal" data-canal>
@@ -38,6 +38,19 @@
         </ul>
 
         <p class="canal__urgente" role="note"><svg class="icone" aria-hidden="true"><use href="icones.svg#alerta"/></svg><span>Se alguém está em perigo agora, ligue <strong>190</strong> (Polícia) ou <strong>192</strong> (SAMU). Este canal não é atendido em tempo real.</span></p>
+
+        <!-- Acompanhar pelo protocolo (2026-11-27): ver a situação e responder às perguntas do time, mesmo sem nome -->
+        <details class="canal__acompanhar" data-canal-acompanhar>
+          <summary><span>Já fez uma denúncia? <strong>Acompanhe pelo protocolo</strong></span></summary>
+          <form class="canal__acompanhar-form" data-canal-consulta novalidate>
+            <div class="campo">
+              <label for="d-protocolo">Número do protocolo</label>
+              <input id="d-protocolo" name="protocolo" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Ex.: DEN20261127-4F2" aria-describedby="d-protocolo-erro">
+              <p class="campo__erro" id="d-protocolo-erro" hidden>Protocolo não encontrado. Confira o número e tente de novo.</p>
+            </div>
+            <button class="btn btn--secundario" type="submit">Acompanhar</button>
+          </form>
+        </details>
 
         <form class="canal__form" data-canal-form novalidate>
           <div class="campo">

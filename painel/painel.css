@@ -1335,6 +1335,32 @@ body.pub { min-height: 100svh; background: linear-gradient(180deg, #EAF2FF, #F6F
 .canal__protocolo strong { font-size: 24px; letter-spacing: .04em; font-variant-numeric: tabular-nums; user-select: all; }
 .canal__fim .cli__desc strong { color: var(--texto); }
 
+/* Canal: acompanhar pelo protocolo (2026-11-27) */
+.canal__acompanhar { border: 1px solid var(--linha); border-radius: 12px; background: var(--superficie); }
+.canal__acompanhar > summary { display: flex; align-items: center; gap: 6px; min-height: 48px; padding: 10px 14px; cursor: pointer; font-size: 14px; color: var(--mudo); list-style: none; }
+.canal__acompanhar > summary::-webkit-details-marker { display: none; }
+.canal__acompanhar > summary strong { color: var(--link); }
+.canal__acompanhar > summary::after { content: "+"; margin-left: auto; font-size: 20px; line-height: 1; color: var(--link); transition: transform .2s; }
+.canal__acompanhar[open] > summary::after { transform: rotate(45deg); }
+.canal__acompanhar-form { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; padding: 0 14px 14px; }
+.canal__acompanhar-form .campo { flex: 1 1 220px; }
+.canal__acompanhar-form .campo input { font-size: 16px; text-transform: uppercase; }
+.canal__acompanhar-form .campo input::placeholder { text-transform: none; }
+.canal__acompanhar-form .btn { margin-top: 26px; min-height: 44px; }
+.canal__acomp-voltar { margin-bottom: 6px; font-size: 14px; }
+.canal__acomp-voltar a { color: var(--link); }
+.canal__situacao { display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; border-left: 4px solid var(--acento); background: var(--bg-suave); font-size: 14px; color: var(--mudo); }
+.canal__situacao strong { font-size: 16px; color: var(--texto); }
+.canal__situacao--resposta { border-left-color: #B45309; background: #FFF7E8; }
+.canal__situacao--fim { border-left-color: var(--sucesso); }
+.canal__conversa { display: grid; gap: 12px; }
+.canal__conversa-t { font-size: 16px; font-weight: 600; }
+.canal__mensagens .den-msg--equipe { justify-self: start; background: var(--bg-suave); }
+.canal__mensagens .den-msg--denunciante { justify-self: end; border: 0; background: var(--selecionado); }
+.canal__conversa .den-msg-form textarea { font-size: 16px; }
+.canal__enviado { padding: 10px 12px; border-radius: 10px; background: var(--sucesso-fundo, #E8F7EE); color: var(--texto); font-size: 14px; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .canal__acompanhar > summary::after { transition: none; } }
+
 /* Suporte público: abrir chamado (suporte.html) e consultar a ordem de serviço (suporte-consulta.html) */
 .sup__topo-links { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .sup__voltar, .sup__ja-tem a { color: var(--link); font-size: 14px; font-weight: 600; }
@@ -1963,3 +1989,79 @@ a.fb-oc:hover { border-color: var(--acento); background: var(--selecionado); }
 .inativa__cartao .confirmar__acoes { margin-top: 20px; }
 .inativa__demo { margin-top: 16px; padding-top: 12px; border-top: 1px dashed var(--linha-forte); color: var(--mudo); font-size: 13px; }
 .inativa__demo .teste-simular { display: inline; margin: 0; }
+
+/* ---------- Denúncias: Visão geral e mais funções (2026-11-27) ---------- */
+.den-aba { display: grid; gap: 20px; }
+.den-aba[hidden] { display: none; }
+.den-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 700px) { .den-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1360px) { .den-kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.den-kpi-tempo { font-size: 26px; }
+.den-nota { color: var(--mudo); font-size: 13px; }
+
+/* Barras horizontais em azul (as de Temas usam o gradiente da IA) */
+.den-barras-h .temas__barra { background: var(--grad); }
+.den-barras-h li { grid-template-columns: minmax(120px, 170px) minmax(0, 1fr) auto; }
+.den-pct { color: var(--mudo); font-weight: 500; }
+.den-sem { color: var(--mudo); font-size: 14px; }
+
+/* Precisa de atenção: selo de prioridade na primeira coluna */
+.den-atencao .atencao__item { color: inherit; text-decoration: none; }
+.den-atencao .den-prio { margin-top: 1px; }
+
+/* Por mês: colunas empilhadas (anônimas embaixo, identificadas em cima) */
+.den-colunas { display: flex; align-items: flex-end; gap: 10px; height: 200px; padding-top: 22px; }
+.den-coluna { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%; min-width: 0; }
+.den-coluna__total { font-size: 13px; font-weight: 600; }
+.den-coluna__pilha { display: flex; flex-direction: column; width: min(48px, 100%); min-height: 4px; border-radius: 8px 8px 4px 4px; overflow: hidden; background: var(--bg-suave); transition: height .5s var(--suave); }
+.den-coluna__anonima { background: var(--primario); }
+.den-coluna__ident { background: #8FB4FF; }
+.den-coluna__mes { color: var(--mudo); font-size: 12px; text-transform: capitalize; }
+.den-legenda { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; color: var(--mudo); font-size: 13px; }
+.den-legenda li { display: inline-flex; align-items: center; gap: 6px; }
+.den-legenda__cor { width: 12px; height: 12px; border-radius: 3px; }
+.den-legenda__cor--anonima { background: var(--primario); }
+.den-legenda__cor--ident { background: #8FB4FF; }
+
+/* Por unidade */
+.den-unidades th[scope="row"] a { color: var(--link); font-weight: 600; }
+.den-unidades th[scope="row"] a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.den-unidades td, .den-unidades th { white-space: nowrap; }
+.den-graves { color: var(--perigo); font-weight: 600; }
+
+.den-anonimato { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px 14px; border-radius: 12px; background: var(--bg-suave); font-size: 14px; }
+.den-anonimato:empty { display: none; }
+.den-anonimato .icone { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--link); }
+
+@media (min-width: 1100px) {
+  /* Por unidade ocupa a coluna larga; Desfecho fica ao lado */
+  .den-aba .grade-dash > section:nth-child(5) { grid-column: 1; }
+}
+
+/* Lista: ações dos filtros */
+.den-filtros-acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.den-filtros-acoes .icone { width: 18px; height: 18px; }
+.den-tabela td[data-col="prazo"] { white-space: nowrap; }
+@media (max-width: 759px) {
+  .den-tabela td[data-col="prazo"] { grid-column: 1 / -1; }
+}
+
+/* Detalhe: desfecho, encerrar e conversa */
+.den-desfecho { display: grid; gap: 4px; margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: var(--bg-suave); font-size: 14px; }
+.den-desfecho[hidden] { display: none; }
+.den-encerrar { display: grid; gap: 14px; padding: 14px; border: 1px dashed var(--linha-forte); border-radius: 12px; }
+.den-encerrar[hidden] { display: none; }
+.den-conversa { display: grid; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--linha); }
+.den-mensagens { display: grid; gap: 10px; }
+.den-msg { display: grid; gap: 4px; max-width: 92%; padding: 10px 12px; border-radius: 12px; font-size: 14px; }
+.den-msg--equipe { justify-self: end; background: var(--selecionado); }
+.den-msg--denunciante { justify-self: start; border: 1px solid var(--linha-forte); background: var(--superficie); }
+.den-msg__quem { font-size: 12px; font-weight: 600; color: var(--mudo); }
+.den-msg__quando { justify-self: end; font-size: 12px; color: var(--mudo); }
+.den-msg-vazio { color: var(--mudo); font-size: 14px; }
+.den-msg-form { display: grid; gap: 8px; }
+.den-msg-form[hidden] { display: none; }
+.den-msg-form textarea { min-height: 80px; }
+.den-msg-form .btn { justify-self: start; }
+.den-msg-aguardar { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.den-msg-aguardar input { width: 18px; height: 18px; accent-color: var(--primario); }

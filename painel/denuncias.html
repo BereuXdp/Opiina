@@ -90,13 +90,90 @@
             <h1 class="cabeca__titulo">Denúncias</h1>
             <p class="cabeca__desc">Relatos do canal de ética, enviados pela equipe. Ficam separados das pesquisas de clientes.</p>
           </div>
-          <button class="btn btn--secundario" type="button" data-divulgar aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="icones.svg#link"/></svg>Divulgar o canal</button>
+          <div class="cabeca__acoes">
+            <div class="campo" data-den-so="visao">
+              <label for="d-periodo">Período</label>
+              <select id="d-periodo" data-den-periodo>
+                <option value="90">Últimos 3 meses</option>
+                <option value="180" selected>Últimos 6 meses</option>
+                <option value="365">Últimos 12 meses</option>
+              </select>
+            </div>
+            <!-- Visão geral (painel de indicadores) e Lista (2026-11-27: "faça um dashboard dele também") -->
+            <nav class="alternar" aria-label="Forma de ver">
+              <a href="denuncias.html" data-den-aba-link="visao"><svg class="icone" aria-hidden="true"><use href="icones.svg#dashboard"/></svg>Visão geral</a>
+              <a href="denuncias.html?aba=lista" data-den-aba-link="lista"><svg class="icone" aria-hidden="true"><use href="icones.svg#lista"/></svg>Lista</a>
+            </nav>
+            <button class="btn btn--secundario" type="button" data-divulgar aria-haspopup="dialog"><svg class="icone" aria-hidden="true"><use href="icones.svg#link"/></svg>Divulgar o canal</button>
+          </div>
         </div>
 
         <p class="den-sigilo"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg><span><strong>Confidencial.</strong> Só os perfis com acesso a Denúncias veem esta tela. Não compartilhe os relatos fora da equipe responsável.</span></p>
 
-        <section class="kpis" aria-label="Resumo das denúncias" data-den-resumo></section>
+        <!-- ===== Visão geral ===== -->
+        <div class="den-aba" data-den-aba="visao">
+          <section class="kpis den-kpis" aria-label="Resumo das denúncias" data-den-kpis></section>
 
+          <div class="grade-dash">
+            <section class="cartao" aria-labelledby="dv-atencao">
+              <div class="cartao__topo">
+                <div>
+                  <h2 class="cartao__titulo" id="dv-atencao">Precisa de atenção</h2>
+                  <p class="cartao__sub">Em aberto: atrasadas primeiro, depois as mais graves</p>
+                </div>
+                <a class="cartao__link" href="denuncias.html?aba=lista">Ver todas<svg class="icone" aria-hidden="true"><use href="icones.svg#seta"/></svg></a>
+              </div>
+              <ul class="atencao den-atencao" data-den-atencao></ul>
+              <p class="vazio" data-den-atencao-vazio hidden><strong>Nada em aberto</strong>Todas as denúncias foram encerradas.</p>
+            </section>
+
+            <section class="cartao" aria-labelledby="dv-situacao">
+              <h2 class="cartao__titulo" id="dv-situacao">Situação dos casos</h2>
+              <p class="cartao__sub" data-den-periodo-texto></p>
+              <ul class="temas den-barras-h" data-den-situacao></ul>
+            </section>
+
+            <section class="cartao" aria-labelledby="dv-mes">
+              <h2 class="cartao__titulo" id="dv-mes">Denúncias por mês</h2>
+              <p class="cartao__sub">Recebidas pelo canal, anônimas e identificadas</p>
+              <div class="den-colunas" data-den-meses></div>
+              <ul class="den-legenda" aria-hidden="true">
+                <li><span class="den-legenda__cor den-legenda__cor--anonima"></span>Anônimas</li>
+                <li><span class="den-legenda__cor den-legenda__cor--ident"></span>Identificadas</li>
+              </ul>
+            </section>
+
+            <section class="cartao" aria-labelledby="dv-categoria">
+              <h2 class="cartao__titulo" id="dv-categoria">Por categoria</h2>
+              <p class="cartao__sub">As que mais aparecem no período</p>
+              <ul class="temas den-barras-h" data-den-categorias></ul>
+            </section>
+
+            <section class="cartao" aria-labelledby="dv-unidade">
+              <h2 class="cartao__titulo" id="dv-unidade">Por unidade</h2>
+              <p class="cartao__sub">Onde os relatos acontecem e quanto tempo leva para resolver</p>
+              <div class="tabela-rolagem">
+                <table class="tabela den-unidades">
+                  <thead>
+                    <tr><th scope="col">Unidade</th><th scope="col">Recebidas</th><th scope="col">Em aberto</th><th scope="col">Graves</th><th scope="col">Tempo para concluir</th></tr>
+                  </thead>
+                  <tbody data-den-unidades></tbody>
+                </table>
+              </div>
+            </section>
+
+            <section class="cartao" aria-labelledby="dv-desfecho">
+              <h2 class="cartao__titulo" id="dv-desfecho">Desfecho dos casos encerrados</h2>
+              <p class="cartao__sub" data-den-encerrados></p>
+              <ul class="temas den-barras-h" data-den-desfechos></ul>
+              <p class="den-anonimato" data-den-anonimato></p>
+            </section>
+          </div>
+          <p class="den-nota">Prazos por prioridade (proposta): crítica 5 dias, alta 15, média 30, baixa 45, contados do recebimento.</p>
+        </div>
+
+        <!-- ===== Lista ===== -->
+        <div class="den-aba" data-den-aba="lista" hidden>
         <section class="cartao" aria-label="Filtros">
           <form class="filtros" data-den-filtros>
             <div class="campo campo--busca">
@@ -134,7 +211,10 @@
           </form>
           <div class="filtros__rodape">
             <p class="filtros__contagem" role="status" aria-live="polite" data-den-contagem></p>
-            <button class="btn btn--fantasma" type="button" data-den-limpar>Limpar filtros</button>
+            <div class="den-filtros-acoes">
+              <button class="btn btn--fantasma" type="button" data-den-limpar>Limpar filtros</button>
+              <button class="btn btn--secundario" type="button" data-den-exportar title="Planilha com as denúncias filtradas, sem nomes, contatos nem relatos"><svg class="icone" aria-hidden="true"><use href="icones.svg#baixo"/></svg>Exportar relatório</button>
+            </div>
           </div>
         </section>
 
@@ -148,6 +228,7 @@
                   <th scope="col">Denúncia</th>
                   <th scope="col">Unidade</th>
                   <th scope="col">Situação</th>
+                  <th scope="col">Prazo</th>
                   <th scope="col">Identificação</th>
                 </tr>
               </thead>
@@ -156,6 +237,7 @@
           </div>
           <p class="vazio" data-den-vazio hidden><strong>Nenhuma denúncia com esses filtros</strong>Escolha "Todas" em Situação ou clique em "Limpar filtros".</p>
         </section>
+        </div>
       </div>
     </main>
   </div>
@@ -184,8 +266,13 @@
         <div><dt>Categoria</dt><dd data-dg="categoria"></dd></div>
         <div><dt>Unidade</dt><dd data-dg="unidade"></dd></div>
         <div><dt>Recebida</dt><dd data-dg="recebida"></dd></div>
+        <div><dt>Prazo</dt><dd data-dg="prazo"></dd></div>
         <div><dt>Identificação</dt><dd data-dg="identificacao"></dd></div>
       </dl>
+      <div class="den-desfecho" data-dg="desfecho-bloco" hidden>
+        <p><strong>Desfecho:</strong> <span data-dg="desfecho"></span></p>
+        <p data-dg="medidas"></p>
+      </div>
       <p class="den-anonima" data-dg="aviso-anonima"><svg class="icone" aria-hidden="true"><use href="icones.svg#cadeado"/></svg>Anônima: o canal não guarda quem enviou. Não tente descobrir quem foi.</p>
 
       <form class="gaveta__form" data-dg-form>
@@ -199,6 +286,18 @@
             <select id="dg-prioridade" name="prioridade"></select>
           </div>
         </div>
+        <!-- Ao encerrar (Concluída ou Arquivada), o desfecho é obrigatório (2026-11-27) -->
+        <div class="den-encerrar" data-dg-encerrar hidden>
+          <div class="campo">
+            <label for="dg-desfecho">Desfecho</label>
+            <select id="dg-desfecho" name="desfecho" aria-describedby="dg-desfecho-erro"><option value="">Escolha o desfecho</option></select>
+            <p class="campo__erro" id="dg-desfecho-erro" hidden>Escolha o desfecho para encerrar a denúncia.</p>
+          </div>
+          <div class="campo">
+            <label for="dg-medidas">Medidas tomadas <span style="font-weight:500;color:var(--mudo)">(opcional)</span></label>
+            <textarea id="dg-medidas" name="medidas" placeholder="Ex.: Supervisor advertido; treinamento com a equipe do turno da noite."></textarea>
+          </div>
+        </div>
         <div class="campo">
           <label for="dg-anotacao">Anotação interna <span style="font-weight:500;color:var(--mudo)">(opcional)</span></label>
           <textarea id="dg-anotacao" name="anotacao" aria-describedby="dg-anotacao-dica" placeholder="Ex.: Conversei com o RH; vamos ouvir a equipe do turno da noite."></textarea>
@@ -209,6 +308,20 @@
           <button class="btn btn--primario" type="submit">Salvar</button>
         </div>
       </form>
+
+      <!-- Conversa com quem denunciou, pelo protocolo (2026-11-27): funciona também com denúncia anônima -->
+      <section class="den-conversa" aria-labelledby="dg-conversa">
+        <h3 class="historico__titulo" id="dg-conversa">Conversa com quem denunciou</h3>
+        <p class="campo__dica">Quem denunciou lê e responde pelo canal, digitando o protocolo. Funciona mesmo sem nome. As anotações internas não aparecem para essa pessoa.</p>
+        <ul class="den-mensagens" data-dg="mensagens"></ul>
+        <form class="den-msg-form" data-dg-msg-form>
+          <label class="visualmente-oculto" for="dg-mensagem">Mensagem para quem denunciou</label>
+          <textarea id="dg-mensagem" name="mensagem" placeholder="Ex.: Você consegue dizer em quais dias isso aconteceu? Não precisa se identificar." aria-describedby="dg-mensagem-erro"></textarea>
+          <p class="campo__erro" id="dg-mensagem-erro" hidden>Escreva a mensagem.</p>
+          <label class="den-msg-aguardar"><input type="checkbox" name="aguardar" checked> Mudar a situação para "Aguardando informações"</label>
+          <button class="btn btn--secundario" type="submit">Enviar mensagem</button>
+        </form>
+      </section>
 
       <section class="historico" aria-labelledby="dg-historico">
         <h3 class="historico__titulo" id="dg-historico">Histórico</h3>
